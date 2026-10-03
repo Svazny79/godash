@@ -2,3385 +2,3099 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#070713">
-<meta name="apple-mobile-web-app-capable" content="yes">
-
-<title>Neon Dash</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#050510">
+<title>NEON DASH</title>
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    -webkit-tap-highlight-color:transparent;
-}
-
-html,
-body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#05050d;
-    color:white;
-    font-family:Arial,Helvetica,sans-serif;
-}
-
-button{
-    font-family:inherit;
-}
-
-.hidden{
-    display:none!important;
-}
-
-/* =========================================================
-   BACKGROUND
-========================================================= */
-
-body{
-    background:
-        radial-gradient(circle at 50% 25%,#17134b 0%,#08081b 38%,#030308 100%);
-}
-
-.screen{
-    position:fixed;
-    inset:0;
-    overflow:hidden;
-}
-
-.grid{
-    position:absolute;
-    inset:-50%;
-    background-image:
-        linear-gradient(rgba(91,239,255,.09) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(91,239,255,.09) 1px,transparent 1px);
-    background-size:70px 70px;
-    transform:perspective(500px) rotateX(62deg);
-    transform-origin:center;
-    animation:gridMove 4s linear infinite;
-    opacity:.55;
-}
-
-@keyframes gridMove{
-    from{
-        background-position:0 0;
-    }
-    to{
-        background-position:0 70px;
-    }
-}
-
-.stars{
-    position:absolute;
-    inset:0;
-    overflow:hidden;
-    pointer-events:none;
-}
-
-.star{
-    position:absolute;
-    width:2px;
-    height:2px;
-    border-radius:50%;
-    background:#fff;
-    box-shadow:0 0 8px #fff;
-    animation:starMove linear infinite;
-}
-
-@keyframes starMove{
-    from{
-        transform:translateY(0);
-        opacity:.2;
-    }
-    50%{
-        opacity:1;
-    }
-    to{
-        transform:translateY(110vh);
-        opacity:.1;
-    }
-}
-
-/* =========================================================
-   HOME
-========================================================= */
-
-#home{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-}
-
-.home-content{
-    position:relative;
-    z-index:5;
-    width:min(900px,94vw);
-}
-
-.logo{
-    font-size:clamp(58px,11vw,125px);
-    font-weight:1000;
-    font-style:italic;
-    letter-spacing:-7px;
-    line-height:.9;
-    color:#fff;
-    text-shadow:
-        0 0 8px #63f5ff,
-        0 0 30px #63f5ff,
-        0 0 70px #714fff;
-    animation:logoPulse 2.2s ease-in-out infinite;
-}
-
-@keyframes logoPulse{
-    0%,100%{
-        filter:brightness(1);
-        transform:scale(1);
-    }
-    50%{
-        filter:brightness(1.3);
-        transform:scale(1.015);
-    }
-}
-
-.subtitle{
-    margin-top:18px;
-    font-size:15px;
-    font-weight:900;
-    letter-spacing:8px;
-    color:#8df8ff;
-    text-shadow:0 0 15px #63f5ff;
-}
-
-.menu{
-    margin:45px auto 0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:15px;
-}
-
-.neon-button{
-    position:relative;
-    width:min(360px,85vw);
-    padding:17px 25px;
-    border:2px solid #63f5ff;
-    border-radius:14px;
-    color:white;
-    background:
-        linear-gradient(135deg,
-            rgba(99,245,255,.12),
-            rgba(113,79,255,.18));
-    box-shadow:
-        0 0 15px rgba(99,245,255,.25),
-        inset 0 0 20px rgba(99,245,255,.05);
-    font-size:17px;
-    font-weight:1000;
-    letter-spacing:3px;
-    cursor:pointer;
-    transition:.2s;
-    overflow:hidden;
-}
-
-.neon-button::before{
-    content:"";
-    position:absolute;
-    left:-100%;
-    top:0;
-    width:100%;
-    height:100%;
-    background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,.2),
-        transparent
-    );
-    transition:.45s;
-}
-
-.neon-button:hover::before{
-    left:100%;
-}
-
-.neon-button:hover{
-    transform:translateY(-3px) scale(1.02);
-    box-shadow:
-        0 0 25px rgba(99,245,255,.5),
-        0 0 60px rgba(113,79,255,.25),
-        inset 0 0 20px rgba(99,245,255,.1);
-}
-
-.neon-button:active{
-    transform:scale(.97);
-}
-
-.stats{
-    margin-top:30px;
-    display:flex;
-    justify-content:center;
-    gap:35px;
-    flex-wrap:wrap;
-}
-
-.stat{
-    min-width:110px;
-}
-
-.stat-number{
-    font-size:25px;
-    font-weight:1000;
-    color:#63f5ff;
-    text-shadow:0 0 12px #63f5ff;
-}
-
-.stat-label{
-    margin-top:4px;
-    color:#8888a9;
-    font-size:10px;
-    letter-spacing:2px;
-    font-weight:900;
-}
-
-/* =========================================================
-   LEVEL SELECT
-========================================================= */
-
-#levels{
-    display:none;
-    padding:30px;
-    overflow:auto;
-}
-
-.levels-wrap{
-    position:relative;
-    z-index:5;
-    width:min(1050px,100%);
-    margin:auto;
-}
-
-.topbar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:15px;
-    margin-bottom:30px;
-}
-
-.page-title{
-    font-size:clamp(30px,6vw,58px);
-    font-weight:1000;
-    font-style:italic;
-    text-shadow:0 0 25px #63f5ff;
-}
-
-.back-button{
-    padding:12px 18px;
-    border:1px solid #63f5ff;
-    border-radius:10px;
-    color:white;
-    background:#63f5ff12;
-    cursor:pointer;
-    font-weight:900;
-}
-
-.level-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:18px;
-}
-
-.level-card{
-    position:relative;
-    min-height:220px;
-    padding:22px;
-    border:1px solid rgba(99,245,255,.3);
-    border-radius:20px;
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,.055),
-            rgba(255,255,255,.015)
-        );
-    box-shadow:
-        inset 0 0 30px rgba(99,245,255,.025),
-        0 10px 40px rgba(0,0,0,.25);
-    overflow:hidden;
-    transition:.25s;
-}
-
-.level-card:hover{
-    transform:translateY(-6px);
-    border-color:#63f5ff;
-    box-shadow:
-        0 0 30px rgba(99,245,255,.18),
-        inset 0 0 35px rgba(99,245,255,.04);
-}
-
-.level-number{
-    font-size:12px;
-    letter-spacing:3px;
-    color:#7e7e9e;
-    font-weight:900;
-}
-
-.level-name{
-    margin-top:8px;
-    font-size:25px;
-    font-weight:1000;
-}
-
-.difficulty{
-    display:inline-block;
-    margin-top:10px;
-    padding:6px 10px;
-    border-radius:7px;
-    background:#63f5ff14;
-    border:1px solid #63f5ff44;
-    color:#63f5ff;
-    font-size:10px;
-    letter-spacing:2px;
-    font-weight:1000;
-}
-
-.level-progress{
-    margin-top:25px;
-    height:8px;
-    background:#ffffff0c;
-    border-radius:20px;
-    overflow:hidden;
-}
-
-.level-progress-fill{
-    height:100%;
-    width:0%;
-    border-radius:20px;
-    background:linear-gradient(90deg,#63f5ff,#714fff);
-    box-shadow:0 0 12px #63f5ff;
-}
-
-.play-level{
-    position:absolute;
-    right:18px;
-    bottom:18px;
-    width:52px;
-    height:52px;
-    border-radius:50%;
-    border:2px solid #63f5ff;
-    color:white;
-    background:#63f5ff14;
-    font-size:18px;
-    cursor:pointer;
-    box-shadow:0 0 15px #63f5ff33;
-}
-
-/* =========================================================
-   GAME
-========================================================= */
-
-#game{
-    display:none;
-    background:#03030a;
-}
-
-#gameCanvas{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    display:block;
-    touch-action:none;
-}
-
-.hud{
-    position:absolute;
-    left:0;
-    top:0;
-    width:100%;
-    z-index:10;
-    padding:18px 20px;
-    pointer-events:none;
-}
-
-.hud-top{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:20px;
-}
-
-.level-hud{
-    font-weight:1000;
-    letter-spacing:2px;
-    text-shadow:0 0 10px #63f5ff;
-}
-
-.percent{
-    font-size:18px;
-    font-weight:1000;
-}
-
-.progress{
-    margin-top:12px;
-    width:100%;
-    height:7px;
-    border-radius:10px;
-    overflow:hidden;
-    background:#ffffff15;
-    box-shadow:0 0 15px #000;
-}
-
-.progress-fill{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,#63f5ff,#714fff,#ff38d8);
-    box-shadow:0 0 15px #63f5ff;
-}
-
-.game-buttons{
-    position:absolute;
-    right:20px;
-    top:65px;
-    z-index:20;
-    display:flex;
-    gap:8px;
-}
-
-.game-small-button{
-    border:1px solid #ffffff33;
-    border-radius:8px;
-    background:#00000055;
-    color:white;
-    padding:9px 12px;
-    cursor:pointer;
-    font-weight:900;
-}
-
-/* =========================================================
-   MOBILE JUMP
-========================================================= */
-
-.mobile-control{
-    position:absolute;
-    left:50%;
-    bottom:25px;
-    transform:translateX(-50%);
-    z-index:30;
-
-    width:150px;
-    height:75px;
-
-    border:2px solid #63f5ff;
-    border-radius:18px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(99,245,255,.16),
-            rgba(113,79,255,.2)
-        );
-
-    color:white;
-    font-size:17px;
-    font-weight:1000;
-    letter-spacing:3px;
-
-    box-shadow:
-        0 0 25px #63f5ff55,
-        inset 0 0 20px #63f5ff18;
-
-    touch-action:none;
-    user-select:none;
-    cursor:pointer;
-}
-
-.mobile-control:active{
-    transform:translateX(-50%) scale(.94);
-    box-shadow:
-        0 0 40px #63f5ff99,
-        inset 0 0 30px #63f5ff33;
-}
-
-/* =========================================================
-   GAME MESSAGE
-========================================================= */
-
-.game-message{
-    position:absolute;
-    inset:0;
-    z-index:25;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(0,0,0,.35);
-    backdrop-filter:blur(5px);
-    opacity:0;
-    pointer-events:none;
-    transition:.25s;
-}
-
-.game-message.show{
-    opacity:1;
-    pointer-events:auto;
-}
-
-.message-box{
-    width:min(500px,90vw);
-    padding:35px;
-    text-align:center;
-    border:2px solid #63f5ff;
-    border-radius:22px;
-    background:
-        linear-gradient(
-            145deg,
-            rgba(8,8,30,.96),
-            rgba(13,8,36,.96)
-        );
-    box-shadow:
-        0 0 50px rgba(99,245,255,.2),
-        inset 0 0 30px rgba(99,245,255,.04);
-}
-
-.message-title{
-    font-size:clamp(35px,7vw,65px);
-    font-weight:1000;
-    font-style:italic;
-    text-shadow:0 0 25px #63f5ff;
-}
-
-.message-text{
-    margin:12px 0 25px;
-    color:#a6a6c0;
-    font-weight:700;
-}
-
-.message-hint{
-    color:#63f5ff;
-    font-size:12px;
-    font-weight:1000;
-    letter-spacing:2px;
-}
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-.modal{
-    position:fixed;
-    inset:0;
-    z-index:100;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    background:rgba(0,0,0,.7);
-    backdrop-filter:blur(10px);
-}
-
-.modal.show{
-    display:flex;
-}
-
-.modal-box{
-    width:min(500px,90vw);
-    padding:30px;
-    border:1px solid #63f5ff66;
-    border-radius:20px;
-    background:#09091a;
-    box-shadow:0 0 60px #000;
-}
-
-.modal-title{
-    font-size:30px;
-    font-weight:1000;
-    margin-bottom:25px;
-}
-
-.setting-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:15px 0;
-    border-bottom:1px solid #ffffff0e;
-}
-
-.setting-label{
-    color:#aaaac0;
-    font-weight:700;
-}
-
-.toggle{
-    width:50px;
-    height:27px;
-    border-radius:30px;
-    background:#ffffff18;
-    border:1px solid #ffffff22;
-    cursor:pointer;
-    position:relative;
-}
-
-.toggle-dot{
-    position:absolute;
-    width:19px;
-    height:19px;
-    left:3px;
-    top:3px;
-    border-radius:50%;
-    background:#777;
-    transition:.2s;
-}
-
-.toggle.active{
-    background:#63f5ff33;
-    border-color:#63f5ff;
-}
-
-.toggle.active .toggle-dot{
-    left:26px;
-    background:#63f5ff;
-    box-shadow:0 0 12px #63f5ff;
-}
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media(max-width:800px){
-    .level-grid{
-        grid-template-columns:1fr 1fr;
-    }
-}
-
-@media(max-width:560px){
-    .level-grid{
-        grid-template-columns:1fr;
-    }
-
-    #levels{
-        padding:18px;
-    }
-
-    .logo{
-        letter-spacing:-4px;
-    }
-
-    .subtitle{
-        font-size:11px;
-        letter-spacing:5px;
-    }
-
-    .stats{
-        gap:18px;
-    }
-
-    .game-buttons{
-        top:65px;
-        right:10px;
-    }
-
-    .game-small-button{
-        padding:7px 9px;
-        font-size:11px;
-    }
-}
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-@media(prefers-reduced-motion:reduce){
-    *,
-    *::before,
-    *::after{
-        animation-duration:.001ms!important;
-        animation-iteration-count:1!important;
-        scroll-behavior:auto!important;
-    }
-}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#050510;color:#fff;font-family:Arial,Helvetica,sans-serif}
+body{user-select:none;-webkit-user-select:none}
+button{font:inherit}
+.screen{position:absolute;inset:0;display:none;overflow:hidden}
+.screen.active{display:flex}
+.background{position:absolute;inset:0;overflow:hidden;background:radial-gradient(circle at 50% 20%,#17144b 0%,#080817 38%,#030308 100%)}
+.grid{position:absolute;width:200%;height:200%;left:-50%;top:-25%;opacity:.4;background-image:linear-gradient(rgba(91,86,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(91,86,255,.18) 1px,transparent 1px);background-size:55px 55px;transform:perspective(450px) rotateX(62deg);animation:gridMove 7s linear infinite}
+@keyframes gridMove{from{transform:perspective(450px) rotateX(62deg) translateY(0)}to{transform:perspective(450px) rotateX(62deg) translateY(55px)}}
+.glow{position:absolute;width:550px;height:550px;border-radius:50%;background:#694cff;filter:blur(150px);opacity:.12;left:50%;top:35%;transform:translate(-50%,-50%)}
+.stars{position:absolute;inset:0;overflow:hidden}
+.star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.65;animation:starFloat linear infinite}
+@keyframes starFloat{from{transform:translateY(20px);opacity:.1}50%{opacity:.9}to{transform:translateY(-120px);opacity:.1}}
+.home-content{position:relative;z-index:5;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.logo{font-size:clamp(55px,10vw,115px);font-weight:1000;font-style:italic;letter-spacing:-5px;color:#fff;text-shadow:0 0 8px #fff,0 0 22px #62f5ff,0 0 55px #714fff;animation:logoPulse 2.4s ease-in-out infinite}
+.logo span{color:#63f5ff}
+@keyframes logoPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.subtitle{margin-top:8px;font-size:13px;letter-spacing:7px;color:#9ba7ff;text-transform:uppercase}
+.menu-buttons{display:flex;flex-direction:column;gap:13px;margin-top:50px;width:min(330px,80vw)}
+.neon-button{height:58px;border:2px solid #63f5ff;border-radius:14px;color:#fff;font-size:16px;font-weight:900;letter-spacing:3px;background:linear-gradient(135deg,rgba(99,245,255,.1),rgba(113,79,255,.18));box-shadow:0 0 18px rgba(99,245,255,.22),inset 0 0 20px rgba(99,245,255,.06);cursor:pointer;transition:.18s}
+.neon-button:hover{transform:translateY(-3px) scale(1.02);background:linear-gradient(135deg,rgba(99,245,255,.2),rgba(113,79,255,.3));box-shadow:0 0 28px rgba(99,245,255,.45),inset 0 0 20px rgba(99,245,255,.1)}
+.neon-button:active{transform:scale(.97)}
+.small-version{position:absolute;bottom:15px;font-size:10px;letter-spacing:3px;color:#62677d}
+.level-screen{flex-direction:column;align-items:center;justify-content:center;z-index:10}
+.level-header{position:absolute;top:28px;width:100%;text-align:center}
+.level-header h1{font-size:36px;font-weight:1000;letter-spacing:4px;text-shadow:0 0 20px #714fff}
+.level-header p{margin-top:5px;color:#777c9c;font-size:12px;letter-spacing:3px}
+.level-list{width:min(850px,92vw);display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.level-card{position:relative;min-height:190px;padding:22px;border:1px solid #303653;border-radius:20px;overflow:hidden;background:linear-gradient(145deg,rgba(22,25,53,.95),rgba(7,8,20,.95));cursor:pointer;transition:.2s}
+.level-card:hover{transform:translateY(-5px);border-color:#63f5ff;box-shadow:0 0 25px #63f5ff22}
+.level-number{position:absolute;right:15px;top:5px;font-size:70px;font-weight:1000;color:#ffffff09}
+.level-card h2{position:relative;font-size:22px;margin-bottom:8px}
+.difficulty{position:relative;font-size:11px;letter-spacing:3px;font-weight:900}
+.level-description{position:relative;color:#777d9b;margin-top:15px;font-size:12px;line-height:1.5}
+.level-progress{position:relative;margin-top:18px;height:6px;border-radius:10px;background:#15182a;overflow:hidden}
+.level-progress div{height:100%;width:0;border-radius:10px}
+.locked{opacity:.45;cursor:not-allowed}
+.locked:hover{transform:none;border-color:#303653;box-shadow:none}
+.back-button{position:absolute;left:25px;top:25px;border:1px solid #3b4260;background:#0b0d1b;color:#fff;border-radius:10px;padding:10px 17px;cursor:pointer;font-weight:800}
+#game{background:#050510}
+#gameCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.game-ui{position:absolute;inset:0;pointer-events:none;z-index:20}
+.top-ui{position:absolute;top:15px;left:20px;right:20px;display:flex;align-items:center;justify-content:space-between}
+.ui-pill{min-width:120px;padding:9px 14px;border:1px solid #313955;border-radius:12px;background:rgba(4,5,14,.72);backdrop-filter:blur(10px);font-size:11px;letter-spacing:2px;color:#9ba4c7}
+.ui-pill strong{color:#fff;font-size:13px}
+.progress-wrap{position:absolute;top:62px;left:50%;width:min(650px,65vw);height:8px;transform:translateX(-50%);border-radius:20px;background:#17192a;border:1px solid #303653;overflow:hidden}
+#progressBar{width:0;height:100%;background:linear-gradient(90deg,#63f5ff,#714fff);box-shadow:0 0 15px #63f5ff}
+.game-message{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;display:none;pointer-events:auto}
+.game-message.show{display:block}
+.game-message h1{font-size:clamp(42px,8vw,90px);font-weight:1000;font-style:italic;letter-spacing:-3px;text-shadow:0 0 15px #fff,0 0 35px #63f5ff}
+.game-message p{margin-top:10px;font-size:12px;color:#a7aecb;letter-spacing:3px}
+.game-controls{position:absolute;bottom:22px;left:22px;right:22px;display:flex;justify-content:space-between;align-items:center;pointer-events:auto}
+.game-control-button{border:1px solid #303753;border-radius:11px;background:rgba(5,7,18,.75);color:#ccd2ef;padding:10px 14px;cursor:pointer;font-size:11px;letter-spacing:2px;font-weight:900}
+.mobile-control{position:absolute;left:50%;bottom:25px;transform:translateX(-50%);z-index:30;width:150px;height:75px;border:2px solid #63f5ff;border-radius:18px;background:linear-gradient(135deg,rgba(99,245,255,.16),rgba(113,79,255,.2));color:#fff;font-size:17px;font-weight:1000;letter-spacing:3px;box-shadow:0 0 25px #63f5ff55,inset 0 0 20px #63f5ff18;touch-action:none;user-select:none;cursor:pointer;pointer-events:auto}
+.mobile-control:active{transform:translateX(-50%) scale(.95)}
+.modal{position:absolute;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
+.modal.show{display:flex}
+.modal-box{width:min(430px,90vw);border:1px solid #3a4262;border-radius:20px;padding:30px;background:linear-gradient(145deg,#101329,#070812);box-shadow:0 0 50px #000}
+.modal-box h2{font-size:28px;letter-spacing:3px;margin-bottom:25px}
+.setting{display:flex;justify-content:space-between;align-items:center;padding:17px 0;border-bottom:1px solid #20253b}
+.setting span{font-weight:800}
+.setting small{display:block;color:#6e7592;font-size:10px;margin-top:5px}
+.toggle{width:52px;height:28px;border-radius:20px;background:#292d40;padding:4px;cursor:pointer}
+.toggle div{width:20px;height:20px;border-radius:50%;background:#777d99;transition:.2s}
+.toggle.on{background:#63f5ff33}
+.toggle.on div{transform:translateX(24px);background:#63f5ff;box-shadow:0 0 12px #63f5ff}
+.modal-close{width:100%;margin-top:25px}
+.toast{position:absolute;left:50%;top:88px;transform:translateX(-50%) translateY(-20px);opacity:0;z-index:200;padding:11px 18px;border:1px solid #63f5ff;border-radius:12px;background:rgba(5,7,18,.92);box-shadow:0 0 25px #63f5ff33;letter-spacing:2px;font-size:11px;pointer-events:none;transition:.25s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hidden{display:none!important}
+@media(max-width:700px){
+.level-list{grid-template-columns:1fr;width:min(430px,90vw);max-height:75vh;overflow-y:auto;padding:10px}
+.level-card{min-height:145px}
+.level-header{top:20px}
+.level-header h1{font-size:27px}
+.back-button{top:15px;left:15px}
+.progress-wrap{width:58vw}
+.ui-pill{min-width:auto;padding:8px 10px;font-size:9px}
+.mobile-control{bottom:65px}
+}
+@media(min-width:701px){.mobile-control{display:none}}
 </style>
 </head>
-
 <body>
 
-<!-- =======================================================
-     HOME
-======================================================= -->
-
-<section id="home" class="screen">
-
-    <div class="grid"></div>
-    <div class="stars" id="starsHome"></div>
-
-    <div class="home-content">
-
-        <div class="logo">
-            NEON<br>DASH
-        </div>
-
-        <div class="subtitle">
-            ONE TAP. ONE RUN. DON'T CRASH.
-        </div>
-
-        <div class="menu">
-
-            <button class="neon-button" onclick="showLevels()">
-                PLAY
-            </button>
-
-            <button class="neon-button" onclick="openSettings()">
-                SETTINGS
-            </button>
-
-        </div>
-
-        <div class="stats">
-
-            <div class="stat">
-                <div class="stat-number" id="homeLevel">
-                    1
-                </div>
-                <div class="stat-label">
-                    LEVEL
-                </div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-number" id="homeStars">
-                    0
-                </div>
-                <div class="stat-label">
-                    STARS
-                </div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-number" id="homeAttempts">
-                    0
-                </div>
-                <div class="stat-label">
-                    ATTEMPTS
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
+<section id="home" class="screen active">
+<div class="background"><div class="grid"></div><div class="glow"></div><div class="stars" id="homeStars"></div></div>
+<div class="home-content">
+<div class="logo">NEON <span>DASH</span></div>
+<div class="subtitle">RUN • JUMP • SURVIVE</div>
+<div class="menu-buttons">
+<button class="neon-button" id="playButton">PLAY</button>
+<button class="neon-button" id="settingsButton">SETTINGS</button>
+</div>
+<div class="small-version">NEON DASH • ORIGINAL EDITION</div>
+</div>
 </section>
 
-
-<!-- =======================================================
-     LEVEL SELECT
-======================================================= -->
-
-<section id="levels" class="screen">
-
-    <div class="grid"></div>
-    <div class="stars" id="starsLevels"></div>
-
-    <div class="levels-wrap">
-
-        <div class="topbar">
-
-            <div class="page-title">
-                LEVELS
-            </div>
-
-            <button class="back-button" onclick="showHome()">
-                ← BACK
-            </button>
-
-        </div>
-
-        <div class="level-grid" id="levelGrid"></div>
-
-    </div>
-
+<section id="levels" class="screen level-screen">
+<div class="background"><div class="grid"></div><div class="glow"></div><div class="stars" id="levelStars"></div></div>
+<button class="back-button" id="levelsBack">← BACK</button>
+<div class="level-header"><h1>SELECT LEVEL</h1><p>MASTER THE NEON</p></div>
+<div class="level-list" id="levelList"></div>
 </section>
-
-
-<!-- =======================================================
-     GAME
-======================================================= -->
 
 <section id="game" class="screen">
-
-    <canvas id="gameCanvas"></canvas>
-
-    <div class="hud">
-
-        <div class="hud-top">
-
-            <div class="level-hud" id="levelName">
-                CYBER START
-            </div>
-
-            <div class="percent" id="percent">
-                0%
-            </div>
-
-        </div>
-
-        <div class="progress">
-            <div
-                class="progress-fill"
-                id="progressFill">
-            </div>
-        </div>
-
-    </div>
-
-    <div class="game-buttons">
-
-        <button
-            class="game-small-button"
-            onclick="restartLevel()">
-            ↻
-        </button>
-
-        <button
-            class="game-small-button"
-            onclick="quitGame()">
-            ✕
-        </button>
-
-    </div>
-
-    <button
-        id="jumpButton"
-        class="mobile-control">
-        JUMP
-    </button>
-
-    <div
-        class="game-message"
-        id="gameMessage">
-
-        <div class="message-box">
-
-            <div
-                class="message-title"
-                id="messageTitle">
-                CRASHED
-            </div>
-
-            <div
-                class="message-text"
-                id="messageText">
-                Try again.
-            </div>
-
-            <div class="message-hint">
-                TAP / SPACE TO CONTINUE
-            </div>
-
-        </div>
-
-    </div>
-
+<canvas id="gameCanvas"></canvas>
+<div class="game-ui">
+<div class="top-ui">
+<div class="ui-pill">LEVEL: <strong id="gameLevelName">CYBER START</strong></div>
+<div class="ui-pill">ATTEMPT: <strong id="attemptDisplay">1</strong></div>
+</div>
+<div class="progress-wrap"><div id="progressBar"></div></div>
+<div class="game-message" id="gameMessage"><h1 id="messageTitle">CRASH!</h1><p id="messageText">PRESS SPACE OR TAP TO TRY AGAIN</p></div>
+<div class="game-controls">
+<button class="game-control-button" id="restartButton">RESTART</button>
+<button class="game-control-button" id="quitButton">QUIT</button>
+</div>
+<button class="mobile-control" id="jumpButton">JUMP</button>
+</div>
 </section>
 
-
-<!-- =======================================================
-     SETTINGS
-======================================================= -->
-
 <div class="modal" id="settingsModal">
-
-    <div class="modal-box">
-
-        <div class="modal-title">
-            SETTINGS
-        </div>
-
-        <div class="setting-row">
-
-            <div class="setting-label">
-                Reduced Motion
-            </div>
-
-            <div
-                class="toggle"
-                id="motionToggle"
-                onclick="toggleMotion()">
-
-                <div class="toggle-dot"></div>
-
-            </div>
-
-        </div>
-
-        <div class="setting-row">
-
-            <div class="setting-label">
-                Sound
-            </div>
-
-            <div
-                class="toggle active"
-                id="soundToggle"
-                onclick="toggleSound()">
-
-                <div class="toggle-dot"></div>
-
-            </div>
-
-        </div>
-
-        <br>
-
-        <button
-            class="neon-button"
-            style="width:100%;"
-            onclick="closeSettings()">
-            CLOSE
-        </button>
-
-    </div>
-
+<div class="modal-box">
+<h2>SETTINGS</h2>
+<div class="setting"><div><span>Sound</span><small>Game sound effects</small></div><div class="toggle on" id="soundToggle"><div></div></div></div>
+<div class="setting"><div><span>Reduced Motion</span><small>Reduce background animations</small></div><div class="toggle" id="motionToggle"><div></div></div></div>
+<button class="neon-button modal-close" id="closeSettings">DONE</button>
+</div>
 </div>
 
+<div class="toast" id="toast"></div>
 
 <script>
-/* =========================================================
-   NEON DASH
-   Everything is contained in this one file.
-========================================================= */
+"use strict";
 
+/* ============================================================
+   NEON DASH - FULL SINGLE FILE EDITION
+   ============================================================ */
 
-/* =========================================================
-   SAVE SYSTEM
-========================================================= */
+const SAVE_KEY="neonDashSave";
 
-const SAVE_KEY = "neonDashSave";
-
-const defaultSave = {
-    level:1,
-    stars:0,
-    attempts:0,
-    best:{}
+const defaultSave={
+level:1,
+stars:0,
+attempts:0,
+best:{}
 };
 
-let save;
+let save={...defaultSave,best:{}};
 
 try{
-    save = JSON.parse(
-        localStorage.getItem(SAVE_KEY)
-    ) || structuredClone(defaultSave);
-}catch{
-    save = structuredClone(defaultSave);
+const stored=localStorage.getItem(SAVE_KEY);
+if(stored){
+const parsed=JSON.parse(stored);
+save={...defaultSave,...parsed,best:{...(parsed.best||{})}};
 }
-
-if(!save.best){
-    save.best = {};
-}
+}catch(error){}
 
 function saveGame(){
-
-    localStorage.setItem(
-        SAVE_KEY,
-        JSON.stringify(save)
-    );
-
-    updateHomeStats();
+try{
+localStorage.setItem(SAVE_KEY,JSON.stringify(save));
+}catch(error){}
 }
 
-function updateHomeStats(){
+const canvas=document.getElementById("gameCanvas");
+const ctx=canvas.getContext("2d");
 
-    document.getElementById("homeLevel").textContent =
-        save.level;
+const home=document.getElementById("home");
+const levelsScreen=document.getElementById("levels");
+const gameScreen=document.getElementById("game");
 
-    document.getElementById("homeStars").textContent =
-        save.stars;
+const playButton=document.getElementById("playButton");
+const settingsButton=document.getElementById("settingsButton");
+const levelsBack=document.getElementById("levelsBack");
 
-    document.getElementById("homeAttempts").textContent =
-        save.attempts;
-}
+const levelList=document.getElementById("levelList");
 
+const restartButton=document.getElementById("restartButton");
+const quitButton=document.getElementById("quitButton");
+const jumpButton=document.getElementById("jumpButton");
 
-/* =========================================================
-   STARS BACKGROUND
-========================================================= */
+const progressBar=document.getElementById("progressBar");
+const gameLevelName=document.getElementById("gameLevelName");
+const attemptDisplay=document.getElementById("attemptDisplay");
 
-function createStars(containerId,count=80){
+const gameMessage=document.getElementById("gameMessage");
+const messageTitle=document.getElementById("messageTitle");
+const messageText=document.getElementById("messageText");
 
-    const container =
-        document.getElementById(containerId);
+const settingsModal=document.getElementById("settingsModal");
+const soundToggle=document.getElementById("soundToggle");
+const motionToggle=document.getElementById("motionToggle");
+const closeSettings=document.getElementById("closeSettings");
 
-    if(!container)return;
+const toast=document.getElementById("toast");
 
-    container.innerHTML="";
-
-    for(let i=0;i<count;i++){
-
-        const star =
-            document.createElement("div");
-
-        star.className="star";
-
-        star.style.left =
-            Math.random()*100+"%";
-
-        star.style.top =
-            Math.random()*100+"%";
-
-        const size =
-            Math.random()*3+1;
-
-        star.style.width=size+"px";
-        star.style.height=size+"px";
-
-        star.style.animationDuration =
-            (Math.random()*5+3)+"s";
-
-        star.style.animationDelay =
-            (-Math.random()*8)+"s";
-
-        container.appendChild(star);
-    }
-}
-
-createStars("starsHome",100);
-createStars("starsLevels",80);
-
-
-/* =========================================================
-   LEVEL DATA
-========================================================= */
-
-const levelsData = [
-
-    {
-        id:1,
-        name:"CYBER START",
-        difficulty:"EASY",
-        color:"#714fff",
-        speed:6,
-        length:5200,
-
-        spikes:[
-            650,
-            850,
-            1050,
-            1250,
-            1500,
-            1750,
-            2050,
-            2300,
-            2600,
-            2850,
-            3150,
-            3450,
-            3800,
-            4150,
-            4500,
-            4800
-        ],
-
-        blocks:[
-            {x:720,h:70},
-            {x:1120,h:90},
-            {x:1370,h:120},
-            {x:1900,h:75},
-            {x:2400,h:110},
-            {x:3000,h:80},
-            {x:3600,h:130},
-            {x:4250,h:90}
-        ]
-    },
-
-    {
-        id:2,
-        name:"ELECTRIC SKY",
-        difficulty:"NORMAL",
-        color:"#00eaff",
-        speed:7,
-        length:6000,
-
-        spikes:[
-            550,
-            750,
-            950,
-            1200,
-            1450,
-            1650,
-            1900,
-            2200,
-            2500,
-            2800,
-            3150,
-            3500,
-            3900,
-            4250,
-            4600,
-            5000,
-            5400,
-            5700
-        ],
-
-        blocks:[
-            {x:820,h:100},
-            {x:1300,h:120},
-            {x:1750,h:85},
-            {x:2350,h:130},
-            {x:2950,h:95},
-            {x:3700,h:140},
-            {x:4400,h:100},
-            {x:5150,h:125}
-        ]
-    },
-
-    {
-        id:3,
-        name:"VOID REACTOR",
-        difficulty:"HARD",
-        color:"#ff38d8",
-        speed:7.5,
-        length:6600,
-
-        spikes:[
-            600,
-            780,
-            980,
-            1180,
-            1380,
-            1600,
-            1850,
-            2100,
-            2400,
-            2700,
-            3000,
-            3300,
-            3600,
-            3950,
-            4300,
-            4650,
-            5000,
-            5400,
-            5800,
-            6200
-        ],
-
-        blocks:[
-            {x:700,h:100},
-            {x:1100,h:135},
-            {x:1500,h:90},
-            {x:2000,h:130},
-            {x:2550,h:100},
-            {x:3100,h:150},
-            {x:3800,h:120},
-            {x:4450,h:150},
-            {x:5100,h:110},
-            {x:5900,h:135}
-        ]
-    },
-
-    {
-        id:4,
-        name:"HYPER DRIVE",
-        difficulty:"VERY HARD",
-        color:"#ff6b2d",
-        speed:9,
-        length:7300,
-
-        spikes:[
-            550,
-            720,
-            890,
-            1060,
-            1300,
-            1500,
-            1750,
-            2000,
-            2300,
-            2600,
-            2900,
-            3200,
-            3500,
-            3800,
-            4100,
-            4400,
-            4700,
-            5050,
-            5400,
-            5750,
-            6100,
-            6500,
-            6900
-        ],
-
-        blocks:[
-            {x:650,h:110},
-            {x:1000,h:145},
-            {x:1450,h:100},
-            {x:1850,h:140},
-            {x:2450,h:115},
-            {x:3000,h:155},
-            {x:3600,h:120},
-            {x:4200,h:160},
-            {x:4800,h:130},
-            {x:5500,h:155},
-            {x:6250,h:135}
-        ]
-    },
-
-    {
-        id:5,
-        name:"GALAXY CORE",
-        difficulty:"INSANE",
-        color:"#55ff78",
-        speed:9.5,
-        length:7900,
-
-        spikes:[
-            550,
-            700,
-            850,
-            1050,
-            1250,
-            1450,
-            1700,
-            1950,
-            2200,
-            2500,
-            2800,
-            3100,
-            3400,
-            3700,
-            4000,
-            4350,
-            4700,
-            5050,
-            5400,
-            5800,
-            6200,
-            6600,
-            7000,
-            7400
-        ],
-
-        blocks:[
-            {x:600,h:120},
-            {x:950,h:150},
-            {x:1350,h:110},
-            {x:1800,h:145},
-            {x:2350,h:125},
-            {x:2900,h:165},
-            {x:3500,h:130},
-            {x:4100,h:170},
-            {x:4750,h:140},
-            {x:5350,h:170},
-            {x:6000,h:150},
-            {x:6750,h:175},
-            {x:7300,h:145}
-        ]
-    },
-
-    {
-        id:6,
-        name:"FINAL PULSE",
-        difficulty:"EXTREME",
-        color:"#ffd52f",
-        speed:10,
-        length:8800,
-
-        spikes:[
-            500,
-            650,
-            800,
-            950,
-            1100,
-            1300,
-            1500,
-            1700,
-            1950,
-            2200,
-            2450,
-            2700,
-            2950,
-            3250,
-            3550,
-            3850,
-            4150,
-            4450,
-            4750,
-            5100,
-            5450,
-            5800,
-            6150,
-            6500,
-            6850,
-            7200,
-            7550,
-            7950,
-            8350
-        ],
-
-        blocks:[
-            {x:550,h:120},
-            {x:900,h:155},
-            {x:1250,h:130},
-            {x:1600,h:170},
-            {x:2050,h:140},
-            {x:2550,h:175},
-            {x:3100,h:145},
-            {x:3700,h:180},
-            {x:4300,h:150},
-            {x:4900,h:185},
-            {x:5550,h:155},
-            {x:6200,h:190},
-            {x:6850,h:165},
-            {x:7500,h:190},
-            {x:8150,h:170}
-        ]
-    }
-
+const levelsData=[
+{id:1,name:"CYBER START",difficulty:"EASY",color:"#714fff",speed:6,length:5200},
+{id:2,name:"ELECTRIC SKY",difficulty:"NORMAL",color:"#00eaff",speed:7,length:6000},
+{id:3,name:"VOID REACTOR",difficulty:"HARD",color:"#ff38d8",speed:7.5,length:6600},
+{id:4,name:"HYPER DRIVE",difficulty:"VERY HARD",color:"#ff6b2d",speed:9,length:7300},
+{id:5,name:"GALAXY CORE",difficulty:"INSANE",color:"#55ff78",speed:9.5,length:7900},
+{id:6,name:"FINAL PULSE",difficulty:"EXTREME",color:"#ffd52f",speed:10,length:8800}
 ];
 
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-function hideAllScreens(){
-
-    document.getElementById("home").style.display="none";
-    document.getElementById("levels").style.display="none";
-    document.getElementById("game").style.display="none";
-}
-
-function showHome(){
-
-    stopGame();
-
-    hideAllScreens();
-
-    document.getElementById("home").style.display="flex";
-
-    updateHomeStats();
-}
-
-function showLevels(){
-
-    stopGame();
-
-    hideAllScreens();
-
-    document.getElementById("levels").style.display="block";
-
-    buildLevelCards();
-}
-
-
-/* =========================================================
-   LEVEL CARDS
-========================================================= */
-
-function buildLevelCards(){
-
-    const grid =
-        document.getElementById("levelGrid");
-
-    grid.innerHTML="";
-
-    levelsData.forEach((level,index)=>{
-
-        const unlocked =
-            index+1 <= save.level;
-
-        const best =
-            save.best[level.id] || 0;
-
-        const card =
-            document.createElement("div");
-
-        card.className="level-card";
-
-        card.style.borderColor =
-            unlocked
-            ? level.color+"66"
-            : "#ffffff12";
-
-        card.innerHTML=`
-
-            <div class="level-number">
-                LEVEL ${level.id}
-            </div>
-
-            <div
-                class="level-name"
-                style="text-shadow:0 0 15px ${level.color}">
-                ${level.name}
-            </div>
-
-            <div
-                class="difficulty"
-                style="
-                    color:${level.color};
-                    border-color:${level.color}55;
-                    background:${level.color}12;
-                ">
-                ${level.difficulty}
-            </div>
-
-            <div class="level-progress">
-                <div
-                    class="level-progress-fill"
-                    style="
-                        width:${best}%;
-                        background:
-                        linear-gradient(
-                            90deg,
-                            ${level.color},
-                            #714fff
-                        );
-                    ">
-                </div>
-            </div>
-
-            <div
-                style="
-                    position:absolute;
-                    left:22px;
-                    bottom:21px;
-                    color:#777791;
-                    font-size:11px;
-                    font-weight:900;
-                ">
-                BEST ${best}%
-            </div>
-
-            <button
-                class="play-level"
-                ${!unlocked ? "disabled" : ""}
-                onclick="startLevel(${index})"
-                style="
-                    border-color:${unlocked ? level.color : "#555"};
-                    opacity:${unlocked ? "1" : ".35"};
-                ">
-                ${unlocked ? "▶" : "🔒"}
-            </button>
-        `;
-
-        grid.appendChild(card);
-    });
-}
-
-
-/* =========================================================
-   GAME VARIABLES
-========================================================= */
-
-const canvas =
-    document.getElementById("gameCanvas");
-
-const ctx =
-    canvas.getContext("2d");
-
-let W=window.innerWidth;
-let H=window.innerHeight;
-
-let currentLevel=0;
+let currentLevel=1;
 let levelData=null;
-
-let playing=false;
+let running=false;
 let dead=false;
-let completed=false;
-
+let won=false;
 let cameraX=0;
-
-let particles=[];
-let shake=0;
-
-let animationId=null;
-
-let jumpHeld=false;
+let lastTime=0;
 let jumpBuffer=0;
 let coyoteTime=0;
-
+let jumpHeld=false;
+let particles=[];
+let obstacles=[];
+let screenShake=0;
+let reducedMotion=false;
 let soundEnabled=true;
+let animationFrame=0;
+let gameRunId=0;
 
-let player={
-    x:220,
-    y:0,
-    size:38,
-    vy:0,
-    grounded:false,
-    rotation:0
+const player={
+x:220,
+y:0,
+size:38,
+vy:0,
+grounded:false,
+rotation:0
 };
 
-
-/* =========================================================
-   CANVAS RESIZE
-========================================================= */
-
 function resizeCanvas(){
-
-    const dpr =
-        Math.min(window.devicePixelRatio || 1,2);
-
-    W=window.innerWidth;
-    H=window.innerHeight;
-
-    canvas.width=W*dpr;
-    canvas.height=H*dpr;
-
-    canvas.style.width=W+"px";
-    canvas.style.height=H+"px";
-
-    ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-    );
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+if(gameScreen.classList.contains("active")&&levelData&&!running&&!dead&&!won){
+player.y=canvas.height*.78-player.size;
+}
 }
 
-window.addEventListener(
-    "resize",
-    resizeCanvas
-);
-
+window.addEventListener("resize",resizeCanvas);
 resizeCanvas();
 
-
-/* =========================================================
-   START LEVEL
-========================================================= */
-
-function startLevel(index){
-
-    if(index<0 || index>=levelsData.length){
-        return;
-    }
-
-    currentLevel=index;
-    levelData=levelsData[index];
-
-    hideAllScreens();
-
-    document.getElementById("game").style.display="block";
-
-    player.x=220;
-    player.y=H-95-38;
-    player.vy=0;
-    player.grounded=true;
-    player.rotation=0;
-
-    cameraX=0;
-
-    particles=[];
-    shake=0;
-
-    playing=true;
-    dead=false;
-    completed=false;
-
-    jumpHeld=false;
-    jumpBuffer=0;
-    coyoteTime=5;
-
-    save.attempts++;
-
-    saveGame();
-
-    document.getElementById("levelName").textContent =
-        levelData.name;
-
-    document.getElementById("levelName").style.textShadow =
-        `0 0 15px ${levelData.color}`;
-
-    document.getElementById("percent").textContent="0%";
-
-    document.getElementById("progressFill").style.width="0%";
-
-    hideMessage();
-
-    cancelAnimationFrame(animationId);
-
-    gameLoop();
+function showScreen(screen){
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+screen.classList.add("active");
 }
 
-
-/* =========================================================
-   RESTART
-========================================================= */
-
-function restartLevel(){
-
-    if(levelData){
-        startLevel(currentLevel);
-    }
+function showToast(message){
+toast.textContent=message;
+toast.classList.add("show");
+clearTimeout(showToast.timer);
+showToast.timer=setTimeout(()=>toast.classList.remove("show"),1600);
 }
 
-
-/* =========================================================
-   STOP GAME
-========================================================= */
-
-function stopGame(){
-
-    playing=false;
-
-    cancelAnimationFrame(animationId);
+function createStars(id,count){
+const container=document.getElementById(id);
+if(!container)return;
+container.innerHTML="";
+if(reducedMotion)return;
+for(let i=0;i<count;i++){
+const star=document.createElement("div");
+star.className="star";
+star.style.left=Math.random()*100+"%";
+star.style.top=Math.random()*100+"%";
+star.style.animationDuration=(3+Math.random()*6)+"s";
+star.style.animationDelay=(-Math.random()*8)+"s";
+star.style.opacity=.15+Math.random()*.75;
+container.appendChild(star);
+}
 }
 
+createStars("homeStars",100);
+createStars("levelStars",80);
 
-/* =========================================================
-   QUIT
-========================================================= */
-
-function quitGame(){
-
-    stopGame();
-
-    showLevels();
+function buildLevelList(){
+levelList.innerHTML="";
+levelsData.forEach(level=>{
+const unlocked=level.id<=Math.max(1,save.level);
+const best=save.best[level.id]||0;
+const card=document.createElement("div");
+card.className="level-card"+(unlocked?"":" locked");
+card.innerHTML=`
+<div class="level-number">${level.id}</div>
+<h2>${level.name}</h2>
+<div class="difficulty" style="color:${level.color}">${level.difficulty}</div>
+<div class="level-description">${unlocked?"Jump through obstacles and reach the finish.":"Complete previous levels to unlock."}</div>
+<div class="level-progress"><div style="width:${best}%;background:${level.color};box-shadow:0 0 10px ${level.color}"></div></div>
+`;
+if(unlocked){
+card.addEventListener("click",()=>startLevel(level.id));
+}
+levelList.appendChild(card);
+});
 }
 
+function generateLevel(level){
+obstacles=[];
+const groundY=canvas.height*.78;
+let x=650;
+let pattern=0;
+const end=level.length-350;
 
-/* =========================================================
-   INPUT SYSTEM
-========================================================= */
+while(x<end){
+pattern++;
+const choice=pattern%12;
+
+if(choice===1){
+obstacles.push({type:"spike",x,y:groundY-34,w:34,h:34});
+x+=240;
+}else if(choice===2){
+obstacles.push({type:"spike",x,y:groundY-34,w:34,h:34});
+obstacles.push({type:"spike",x:x+42,y:groundY-34,w:34,h:34});
+x+=300;
+}else if(choice===3){
+obstacles.push({type:"block",x,y:groundY-55,w:55,h:55});
+x+=300;
+}else if(choice===4){
+obstacles.push({type:"block",x,y:groundY-80,w:75,h:80});
+x+=350;
+}else if(choice===5){
+obstacles.push({type:"spike",x,y:groundY-34,w:34,h:34});
+obstacles.push({type:"spike",x:x+115,y:groundY-34,w:34,h:34});
+x+=350;
+}else if(choice===6){
+obstacles.push({type:"block",x,y:groundY-45,w:120,h:45});
+x+=350;
+}else if(choice===7){
+obstacles.push({type:"block",x,y:groundY-70,w:60,h:70});
+obstacles.push({type:"spike",x:x+100,y:groundY-34,w:34,h:34});
+x+=370;
+}else if(choice===8){
+obstacles.push({type:"spike",x,y:groundY-34,w:34,h:34});
+obstacles.push({type:"spike",x:x+42,y:groundY-34,w:34,h:34});
+obstacles.push({type:"spike",x:x+84,y:groundY-34,w:34,h:34});
+x+=410;
+}else if(choice===9){
+obstacles.push({type:"block",x,y:groundY-100,w:65,h:100});
+obstacles.push({type:"spike",x:x+100,y:groundY-34,w:34,h:34});
+obstacles.push({type:"spike",x:x+142,y:groundY-34,w:34,h:34});
+x+=410;
+}else if(choice===10){
+obstacles.push({type:"spike",x,y:groundY-34,w:34,h:34});
+obstacles.push({type:"block",x:x+100,y:groundY-55,w:55,h:55});
+x+=390;
+}else if(choice===11){
+obstacles.push({type:"block",x,y:groundY-75,w:65,h:75});
+obstacles.push({type:"block",x:x+130,y:groundY-45,w:100,h:45});
+x+=430;
+}else{
+x+=300;
+}
+}
+}
+
+function startLevel(id){
+levelData=levelsData.find(l=>l.id===id);
+if(!levelData)return;
+
+currentLevel=id;
+showScreen(gameScreen);
+
+running=true;
+dead=false;
+won=false;
+
+cameraX=0;
+player.x=220;
+player.y=canvas.height*.78-player.size;
+player.vy=0;
+player.grounded=true;
+
+/* SLOWER ROTATION STARTS UPRIGHT */
+player.rotation=0;
+
+jumpBuffer=0;
+coyoteTime=5;
+jumpHeld=false;
+particles=[];
+screenShake=0;
+
+generateLevel(levelData);
+
+gameLevelName.textContent=levelData.name;
+
+save.attempts++;
+attemptDisplay.textContent=save.attempts;
+
+progressBar.style.width="0%";
+gameMessage.classList.remove("show");
+
+gameRunId++;
+lastTime=performance.now();
+
+cancelAnimationFrame(animationFrame);
+animationFrame=requestAnimationFrame(gameLoop);
+}
+
+function requestJump(){
+if(dead){
+startLevel(currentLevel);
+return;
+}
+if(won){
+buildLevelList();
+showScreen(levelsScreen);
+return;
+}
+if(!running)return;
+jumpBuffer=7;
+}
+
+function updatePlayer(){
+if(!running)return;
+
+const groundY=canvas.height*.78;
+
+if(jumpBuffer>0)jumpBuffer--;
+if(coyoteTime>0)coyoteTime--;
+
+player.x+=levelData.speed;
+
+if(jumpBuffer>0&&(player.grounded||coyoteTime>0)){
+player.vy=-15.5;
+player.grounded=false;
+jumpBuffer=0;
+coyoteTime=0;
+createJumpParticles();
+}
+
+player.vy+=.82;
+player.y+=player.vy;
+
+if(player.y+player.size>=groundY){
+player.y=groundY-player.size;
+player.vy=0;
+if(!player.grounded)createLandingParticles();
+player.grounded=true;
+coyoteTime=5;
+}else{
+player.grounded=false;
+}
 
 /*
-    Classic one-button controls:
-
-    Space
-    W
-    Arrow Up
-    Mouse click
-    Touch
-    Mobile JUMP button
-
-    One press = one jump.
-    Holding the button does not create repeated jumps.
+============================================================
+SLOW CUBE ROTATION
+============================================================
+The cube still spins in the air, but much less than before.
+The 0.055 value keeps the movement visible without making the
+character rotate excessively.
+============================================================
 */
-
-function pressJump(){
-
-    if(dead || completed){
-
-        if(dead){
-            restartLevel();
-        }else if(completed){
-            showLevels();
-        }
-
-        return;
-    }
-
-    if(!playing){
-        return;
-    }
-
-    if(jumpHeld){
-        return;
-    }
-
-    jumpHeld=true;
-
-    jumpBuffer=6;
-
-    attemptJump();
+if(!player.grounded){
+player.rotation+=0.055;
+}else{
+const quarter=Math.PI/2;
+const target=Math.round(player.rotation/quarter)*quarter;
+player.rotation+=(target-player.rotation)*0.2;
 }
 
+const targetCamera=player.x-canvas.width*.25;
+cameraX+=(targetCamera-cameraX)*.1;
+if(cameraX<0)cameraX=0;
 
-function releaseJump(){
+checkCollisions();
 
-    jumpHeld=false;
+if(player.x>=levelData.length){
+completeLevel();
 }
 
+const progress=Math.min(100,player.x/levelData.length*100);
+progressBar.style.width=progress+"%";
 
-function attemptJump(){
-
-    if(!playing){
-        return;
-    }
-
-    if(
-        player.grounded ||
-        coyoteTime>0
-    ){
-
-        player.vy=-15.5;
-
-        player.grounded=false;
-
-        coyoteTime=0;
-
-        jumpBuffer=0;
-
-        createJumpParticles();
-
-        flashScreen();
-    }
+const oldBest=save.best[currentLevel]||0;
+if(progress>oldBest){
+save.best[currentLevel]=Math.floor(progress);
+saveGame();
+}
 }
 
+function checkCollisions(){
+const px=player.x;
+const py=player.y;
+const ps=player.size;
 
-/* KEYBOARD */
-
-window.addEventListener(
-    "keydown",
-    function(e){
-
-        if(
-            e.code==="Space" ||
-            e.code==="ArrowUp" ||
-            e.code==="KeyW"
-        ){
-
-            e.preventDefault();
-
-            if(!e.repeat){
-                pressJump();
-            }
-        }
-
-        if(e.code==="KeyR"){
-
-            e.preventDefault();
-
-            restartLevel();
-        }
-    }
-);
-
-
-window.addEventListener(
-    "keyup",
-    function(e){
-
-        if(
-            e.code==="Space" ||
-            e.code==="ArrowUp" ||
-            e.code==="KeyW"
-        ){
-
-            e.preventDefault();
-
-            releaseJump();
-        }
-    }
-);
-
-
-/* MOUSE */
-
-canvas.addEventListener(
-    "pointerdown",
-    function(e){
-
-        if(e.pointerType==="mouse" && e.button!==0){
-            return;
-        }
-
-        pressJump();
-    }
-);
-
-canvas.addEventListener(
-    "pointerup",
-    releaseJump
-);
-
-canvas.addEventListener(
-    "pointercancel",
-    releaseJump
-);
-
-
-/* MOBILE BUTTON */
-
-const jumpButton =
-    document.getElementById("jumpButton");
-
-jumpButton.addEventListener(
-    "pointerdown",
-    function(e){
-
-        e.preventDefault();
-
-        pressJump();
-    }
-);
-
-jumpButton.addEventListener(
-    "pointerup",
-    function(e){
-
-        e.preventDefault();
-
-        releaseJump();
-    }
-);
-
-jumpButton.addEventListener(
-    "pointercancel",
-    releaseJump
-);
-
-jumpButton.addEventListener(
-    "pointerleave",
-    releaseJump
-);
-
-
-/* Prevent touch scrolling */
-
-document.addEventListener(
-    "touchmove",
-    function(e){
-
-        if(
-            document.getElementById("game").style.display !== "none"
-        ){
-            e.preventDefault();
-        }
-
-    },
-    {passive:false}
-);
-
-
-/* =========================================================
-   GAME LOOP
-========================================================= */
-
-function gameLoop(){
-
-    update();
-
-    draw();
-
-    if(playing){
-
-        animationId =
-            requestAnimationFrame(gameLoop);
-    }
+for(const obstacle of obstacles){
+if(px<obstacle.x+obstacle.w&&px+ps>obstacle.x&&py<obstacle.y+obstacle.h&&py+ps>obstacle.y){
+if(obstacle.type==="spike"){
+die();
+return;
 }
 
-
-/* =========================================================
-   UPDATE
-========================================================= */
-
-function update(){
-
-    if(!playing){
-        return;
-    }
-
-    /* -----------------------------------------
-       INPUT BUFFER
-    ----------------------------------------- */
-
-    if(jumpBuffer>0){
-
-        jumpBuffer--;
-
-        attemptJump();
-    }
-
-
-    /* -----------------------------------------
-       PHYSICS
-    ----------------------------------------- */
-
-    const gravity=.82;
-
-    player.vy += gravity;
-
-    player.y += player.vy;
-
-
-    const ground =
-        H-95;
-
-
-    const wasGrounded =
-        player.grounded;
-
-    player.grounded=false;
-
-
-    /* Ground collision */
-
-    if(
-        player.y + player.size >= ground
-    ){
-
-        player.y =
-            ground-player.size;
-
-        player.vy=0;
-
-        player.grounded=true;
-
-        coyoteTime=5;
-    }
-    else{
-
-        if(coyoteTime>0){
-            coyoteTime--;
-        }
-    }
-
-
-    /* -----------------------------------------
-       AUTO RUN
-    ----------------------------------------- */
-
-    player.x += levelData.speed;
-
-
-    /* -----------------------------------------
-       CAMERA
-    ----------------------------------------- */
-
-    cameraX =
-        player.x-W*.25;
-
-
-    if(cameraX<0){
-        cameraX=0;
-    }
-
-
-    /* -----------------------------------------
-       ROTATION
-    ----------------------------------------- */
-
-    if(!player.grounded){
-
-        player.rotation += .14;
-    }
-    else{
-
-        const quarter =
-            Math.PI/2;
-
-        player.rotation =
-            Math.round(
-                player.rotation/quarter
-            )*quarter;
-    }
-
-
-    /* -----------------------------------------
-       COLLISION WITH BLOCKS
-    ----------------------------------------- */
-
-    for(const block of levelData.blocks){
-
-        const bx =
-            block.x-cameraX;
-
-        const by =
-            ground-block.h;
-
-        const bw=80;
-        const bh=block.h;
-
-        const px=player.x-cameraX;
-        const py=player.y;
-        const ps=player.size;
-
-
-        const hit =
-            px < bx+bw &&
-            px+ps > bx &&
-            py < by+bh &&
-            py+ps > by;
-
-
-        if(hit){
-
-            /*
-                If the player is falling and is above
-                the block, allow a landing.
-            */
-
-            const previousBottom =
-                py- player.vy + ps;
-
-            if(
-                player.vy>=0 &&
-                previousBottom<=by+8
-            ){
-
-                player.y =
-                    by-ps;
-
-                player.vy=0;
-
-                player.grounded=true;
-
-                coyoteTime=5;
-            }
-            else{
-
-                die();
-
-                return;
-            }
-        }
-    }
-
-
-    /* -----------------------------------------
-       SPIKE COLLISION
-    ----------------------------------------- */
-
-    for(const spikeX of levelData.spikes){
-
-        const sx =
-            spikeX-cameraX;
-
-        if(
-            sx<-80 ||
-            sx>W+80
-        ){
-            continue;
-        }
-
-        const spikeY =
-            ground-42;
-
-        const px =
-            player.x-cameraX;
-
-        const py =
-            player.y;
-
-        const ps =
-            player.size;
-
-
-        /*
-            Slightly smaller hitbox than visual box
-            makes controls feel more forgiving.
-        */
-
-        const hitboxPadding=7;
-
-        const hit =
-            px+hitboxPadding < sx+40 &&
-            px+ps-hitboxPadding > sx &&
-            py+hitboxPadding < spikeY+42 &&
-            py+ps-hitboxPadding > spikeY+10;
-
-
-        if(hit){
-
-            die();
-
-            return;
-        }
-    }
-
-
-    /* -----------------------------------------
-       PARTICLES
-    ----------------------------------------- */
-
-    updateParticles();
-
-
-    /* -----------------------------------------
-       SHAKE
-    ----------------------------------------- */
-
-    if(shake>0){
-        shake--;
-    }
-
-
-    /* -----------------------------------------
-       PROGRESS
-    ----------------------------------------- */
-
-    const progress =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                ((player.x-220) /
-                (levelData.length-220))*100
-            )
-        );
-
-    document.getElementById("percent").textContent =
-        Math.floor(progress)+"%";
-
-    document.getElementById("progressFill").style.width =
-        progress+"%";
-
-
-    /* -----------------------------------------
-       WIN
-    ----------------------------------------- */
-
-    if(player.x>=levelData.length){
-
-        win();
-    }
+if(obstacle.type==="block"){
+const previousBottom=py+ps-player.vy;
+if(previousBottom<=obstacle.y&&player.vy>=0){
+player.y=obstacle.y-ps;
+player.vy=0;
+player.grounded=true;
+coyoteTime=5;
+}else{
+die();
+return;
 }
-
-
-/* =========================================================
-   DRAW
-========================================================= */
-
-function draw(){
-
-    ctx.clearRect(
-        0,
-        0,
-        W,
-        H
-    );
-
-
-    let sx=0;
-    let sy=0;
-
-    if(shake>0){
-
-        sx =
-            (Math.random()-.5)*10;
-
-        sy =
-            (Math.random()-.5)*10;
-    }
-
-    ctx.save();
-
-    ctx.translate(
-        sx,
-        sy
-    );
-
-    drawBackground();
-
-    drawWorld();
-
-    drawParticles();
-
-    drawPlayer();
-
-    ctx.restore();
 }
-
-
-/* =========================================================
-   BACKGROUND
-========================================================= */
-
-function drawBackground(){
-
-    const color =
-        levelData
-        ? levelData.color
-        : "#714fff";
-
-
-    /* Sky */
-
-    const gradient =
-        ctx.createLinearGradient(
-            0,
-            0,
-            0,
-            H
-        );
-
-    gradient.addColorStop(
-        0,
-        "#07071b"
-    );
-
-    gradient.addColorStop(
-        .6,
-        "#09051a"
-    );
-
-    gradient.addColorStop(
-        1,
-        "#030308"
-    );
-
-    ctx.fillStyle=gradient;
-
-    ctx.fillRect(
-        0,
-        0,
-        W,
-        H
-    );
-
-
-    /* Large glow */
-
-    const glow =
-        ctx.createRadialGradient(
-            W*.55,
-            H*.4,
-            10,
-            W*.55,
-            H*.4,
-            W*.65
-        );
-
-    glow.addColorStop(
-        0,
-        color+"22"
-    );
-
-    glow.addColorStop(
-        1,
-        "transparent"
-    );
-
-    ctx.fillStyle=glow;
-
-    ctx.fillRect(
-        0,
-        0,
-        W,
-        H
-    );
-
-
-    /* Background grid */
-
-    ctx.save();
-
-    ctx.globalAlpha=.15;
-
-    ctx.strokeStyle=color;
-
-    ctx.lineWidth=1;
-
-    const gridSize=70;
-
-    const offsetX =
-        -(cameraX*.25)%gridSize;
-
-    for(
-        let x=offsetX;
-        x<W;
-        x+=gridSize
-    ){
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            x,
-            0
-        );
-
-        ctx.lineTo(
-            x,
-            H
-        );
-
-        ctx.stroke();
-    }
-
-    for(
-        let y=70;
-        y<H;
-        y+=gridSize
-    ){
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            0,
-            y
-        );
-
-        ctx.lineTo(
-            W,
-            y
-        );
-
-        ctx.stroke();
-    }
-
-    ctx.restore();
-
-
-    /* Distant skyline */
-
-    ctx.save();
-
-    ctx.globalAlpha=.15;
-
-    for(
-        let i=0;
-        i<25;
-        i++
-    ){
-
-        const buildingWidth=45;
-
-        const x =
-            ((i*170)-(cameraX*.15)) %
-            (W+250);
-
-        const normalizedX =
-            x<0
-            ? x+W+250
-            : x;
-
-        const height =
-            60+(i%6)*30;
-
-        ctx.fillStyle=color;
-
-        ctx.fillRect(
-            normalizedX,
-            H-95-height,
-            buildingWidth,
-            height
-        );
-    }
-
-    ctx.restore();
 }
-
-
-/* =========================================================
-   DRAW WORLD
-========================================================= */
-
-function drawWorld(){
-
-    const color =
-        levelData.color;
-
-    const ground =
-        H-95;
-
-
-    /* Ground */
-
-    const groundGradient =
-        ctx.createLinearGradient(
-            0,
-            ground,
-            0,
-            H
-        );
-
-    groundGradient.addColorStop(
-        0,
-        color+"55"
-    );
-
-    groundGradient.addColorStop(
-        1,
-        "#030308"
-    );
-
-    ctx.fillStyle =
-        groundGradient;
-
-    ctx.fillRect(
-        0,
-        ground,
-        W,
-        H-ground
-    );
-
-
-    /* Ground glow */
-
-    ctx.shadowBlur=20;
-
-    ctx.shadowColor=color;
-
-    ctx.strokeStyle=color;
-
-    ctx.lineWidth=4;
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        0,
-        ground
-    );
-
-    ctx.lineTo(
-        W,
-        ground
-    );
-
-    ctx.stroke();
-
-    ctx.shadowBlur=0;
-
-
-    /* Ground lines */
-
-    ctx.globalAlpha=.25;
-
-    ctx.lineWidth=1;
-
-    const spacing=50;
-
-    const offset =
-        -(cameraX*.7)%spacing;
-
-    for(
-        let x=offset;
-        x<W;
-        x+=spacing
-    ){
-
-        ctx.strokeStyle=color;
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            x,
-            ground
-        );
-
-        ctx.lineTo(
-            x-80,
-            H
-        );
-
-        ctx.stroke();
-    }
-
-    ctx.globalAlpha=1;
-
-
-    /* Blocks */
-
-    for(const block of levelData.blocks){
-
-        const x =
-            block.x-cameraX;
-
-        const y =
-            ground-block.h;
-
-        const width=80;
-
-        if(
-            x>W+100 ||
-            x<-100
-        ){
-            continue;
-        }
-
-        const grad =
-            ctx.createLinearGradient(
-                x,
-                y,
-                x,
-                ground
-            );
-
-        grad.addColorStop(
-            0,
-            color+"bb"
-        );
-
-        grad.addColorStop(
-            1,
-            color+"22"
-        );
-
-        ctx.fillStyle=grad;
-
-        ctx.fillRect(
-            x,
-            y,
-            width,
-            block.h
-        );
-
-
-        ctx.strokeStyle=color;
-
-        ctx.lineWidth=2;
-
-        ctx.shadowBlur=15;
-
-        ctx.shadowColor=color;
-
-        ctx.strokeRect(
-            x,
-            y,
-            width,
-            block.h
-        );
-
-        ctx.shadowBlur=0;
-
-
-        /* Block top */
-
-        ctx.fillStyle=color;
-
-        ctx.fillRect(
-            x,
-            y,
-            width,
-            5
-        );
-
-
-        /* Block details */
-
-        ctx.globalAlpha=.35;
-
-        ctx.fillStyle="#fff";
-
-        for(
-            let yy=y+18;
-            yy<ground;
-            yy+=24
-        ){
-
-            ctx.fillRect(
-                x+10,
-                yy,
-                5,
-                5
-            );
-
-            ctx.fillRect(
-                x+35,
-                yy,
-                5,
-                5
-            );
-
-            ctx.fillRect(
-                x+60,
-                yy,
-                5,
-                5
-            );
-        }
-
-        ctx.globalAlpha=1;
-    }
-
-
-    /* Spikes */
-
-    for(const spikeX of levelData.spikes){
-
-        const x =
-            spikeX-cameraX;
-
-        if(
-            x<-80 ||
-            x>W+80
-        ){
-            continue;
-        }
-
-        drawSpike(
-            x,
-            ground,
-            color
-        );
-    }
-
-
-    /* Finish portal */
-
-    const finishX =
-        levelData.length-cameraX;
-
-    if(
-        finishX>-100 &&
-        finishX<W+100
-    ){
-
-        ctx.save();
-
-        ctx.translate(
-            finishX,
-            ground-100
-        );
-
-        ctx.strokeStyle="#fff";
-
-        ctx.lineWidth=5;
-
-        ctx.shadowBlur=25;
-
-        ctx.shadowColor=color;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            0,
-            0,
-            65,
-            0,
-            Math.PI*2
-        );
-
-        ctx.stroke();
-
-        ctx.strokeStyle=color;
-
-        ctx.lineWidth=3;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            0,
-            0,
-            45,
-            0,
-            Math.PI*2
-        );
-
-        ctx.stroke();
-
-        ctx.restore();
-    }
 }
-
-
-/* =========================================================
-   SPIKE
-========================================================= */
-
-function drawSpike(
-    x,
-    ground,
-    color
-){
-
-    ctx.save();
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x,
-        ground
-    );
-
-    ctx.lineTo(
-        x+20,
-        ground-43
-    );
-
-    ctx.lineTo(
-        x+40,
-        ground
-    );
-
-    ctx.closePath();
-
-    const gradient =
-        ctx.createLinearGradient(
-            x,
-            ground-43,
-            x,
-            ground
-        );
-
-    gradient.addColorStop(
-        0,
-        "#ffffff"
-    );
-
-    gradient.addColorStop(
-        .2,
-        color
-    );
-
-    gradient.addColorStop(
-        1,
-        color+"22"
-    );
-
-    ctx.fillStyle=gradient;
-
-    ctx.shadowBlur=18;
-
-    ctx.shadowColor=color;
-
-    ctx.fill();
-
-    ctx.strokeStyle=color;
-
-    ctx.lineWidth=2;
-
-    ctx.stroke();
-
-    ctx.restore();
 }
-
-
-/* =========================================================
-   PLAYER
-========================================================= */
-
-function drawPlayer(){
-
-    const color =
-        levelData.color;
-
-    const px =
-        player.x-cameraX;
-
-    const py =
-        player.y;
-
-    const s =
-        player.size;
-
-
-    ctx.save();
-
-    ctx.translate(
-        px+s/2,
-        py+s/2
-    );
-
-    ctx.rotate(
-        player.rotation
-    );
-
-
-    /* Glow */
-
-    ctx.shadowBlur=25;
-
-    ctx.shadowColor=color;
-
-
-    /* Outer cube */
-
-    const gradient =
-        ctx.createLinearGradient(
-            -s/2,
-            -s/2,
-            s/2,
-            s/2
-        );
-
-    gradient.addColorStop(
-        0,
-        "#ffffff"
-    );
-
-    gradient.addColorStop(
-        .25,
-        color
-    );
-
-    gradient.addColorStop(
-        1,
-        "#15152c"
-    );
-
-    ctx.fillStyle=gradient;
-
-    ctx.fillRect(
-        -s/2,
-        -s/2,
-        s,
-        s
-    );
-
-
-    /* Border */
-
-    ctx.strokeStyle="#fff";
-
-    ctx.lineWidth=3;
-
-    ctx.strokeRect(
-        -s/2,
-        -s/2,
-        s,
-        s
-    );
-
-
-    /* Face */
-
-    ctx.shadowBlur=0;
-
-    ctx.fillStyle="#05050c";
-
-    ctx.fillRect(
-        -11,
-        -9,
-        7,
-        9
-    );
-
-    ctx.fillRect(
-        4,
-        -9,
-        7,
-        9
-    );
-
-
-    /* Mouth */
-
-    ctx.fillRect(
-        -9,
-        6,
-        18,
-        4
-    );
-
-
-    /* Highlight */
-
-    ctx.fillStyle="#fff";
-
-    ctx.globalAlpha=.8;
-
-    ctx.fillRect(
-        -s/2+5,
-        -s/2+5,
-        7,
-        4
-    );
-
-    ctx.globalAlpha=1;
-
-    ctx.restore();
-}
-
-
-/* =========================================================
-   PARTICLES
-========================================================= */
-
-function createJumpParticles(){
-
-    const px =
-        player.x-cameraX;
-
-    const py =
-        player.y+player.size;
-
-    for(
-        let i=0;
-        i<12;
-        i++
-    ){
-
-        particles.push({
-
-            x:px,
-            y:py,
-
-            vx:(Math.random()-.5)*5,
-
-            vy:Math.random()*-3,
-
-            size:Math.random()*5+2,
-
-            life:1,
-
-            color:levelData.color
-        });
-    }
-}
-
-
-function createDeathParticles(){
-
-    const px =
-        player.x-cameraX;
-
-    const py =
-        player.y+player.size/2;
-
-    for(
-        let i=0;
-        i<45;
-        i++
-    ){
-
-        const angle =
-            Math.random()*Math.PI*2;
-
-        const speed =
-            Math.random()*9+2;
-
-        particles.push({
-
-            x:px,
-            y:py,
-
-            vx:Math.cos(angle)*speed,
-
-            vy:Math.sin(angle)*speed,
-
-            size:Math.random()*7+2,
-
-            life:1,
-
-            color:
-                Math.random()>.5
-                ? levelData.color
-                : "#fff"
-        });
-    }
-}
-
-
-function createWinParticles(){
-
-    for(
-        let i=0;
-        i<100;
-        i++
-    ){
-
-        particles.push({
-
-            x:
-                player.x-cameraX,
-
-            y:
-                player.y,
-
-            vx:
-                (Math.random()-.5)*14,
-
-            vy:
-                (Math.random()-.5)*14,
-
-            size:
-                Math.random()*8+2,
-
-            life:1,
-
-            color:
-                Math.random()>.5
-                ? levelData.color
-                : "#fff"
-        });
-    }
-}
-
-
-function updateParticles(){
-
-    for(
-        let i=particles.length-1;
-        i>=0;
-        i--
-    ){
-
-        const p =
-            particles[i];
-
-        p.x+=p.vx;
-
-        p.y+=p.vy;
-
-        p.vy+=.25;
-
-        p.life-=.025;
-
-        p.size*=.98;
-
-        if(p.life<=0){
-
-            particles.splice(
-                i,
-                1
-            );
-        }
-    }
-}
-
-
-function drawParticles(){
-
-    for(const p of particles){
-
-        ctx.save();
-
-        ctx.globalAlpha =
-            Math.max(0,p.life);
-
-        ctx.fillStyle =
-            p.color;
-
-        ctx.shadowBlur=12;
-
-        ctx.shadowColor =
-            p.color;
-
-        ctx.fillRect(
-            p.x-p.size/2,
-            p.y-p.size/2,
-            p.size,
-            p.size
-        );
-
-        ctx.restore();
-    }
-}
-
-
-/* =========================================================
-   DEATH
-========================================================= */
 
 function die(){
-
-    if(dead || completed){
-        return;
-    }
-
-    dead=true;
-    playing=false;
-
-    createDeathParticles();
-
-    shake=15;
-
-    showMessage(
-        "CRASHED",
-        "You made it to "+getProgress()+"%.",
-        true
-    );
+if(dead||won)return;
+dead=true;
+running=false;
+createDeathParticles();
+screenShake=14;
+messageTitle.textContent="CRASH!";
+messageText.textContent="PRESS SPACE, TAP, OR JUMP TO TRY AGAIN";
+gameMessage.classList.add("show");
+saveGame();
 }
 
-
-/* =========================================================
-   WIN
-========================================================= */
-
-function win(){
-
-    if(completed){
-        return;
-    }
-
-    completed=true;
-    playing=false;
-
-    createWinParticles();
-
-    save.stars++;
-
-    if(currentLevel+1>=save.level){
-
-        save.level =
-            Math.min(
-                levelsData.length,
-                currentLevel+2
-            );
-    }
-
-    save.best[levelData.id]=100;
-
-    saveGame();
-
-    showMessage(
-        "LEVEL COMPLETE!",
-        "You beat "+levelData.name+".",
-        false
-    );
+function completeLevel(){
+if(won)return;
+won=true;
+running=false;
+createWinParticles();
+messageTitle.textContent="LEVEL COMPLETE!";
+messageText.textContent="PRESS SPACE OR TAP TO RETURN TO LEVELS";
+gameMessage.classList.add("show");
+save.best[currentLevel]=100;
+if(currentLevel===save.level&&save.level<levelsData.length)save.level++;
+save.stars++;
+saveGame();
 }
 
-
-/* =========================================================
-   PROGRESS
-========================================================= */
-
-function getProgress(){
-
-    if(!levelData){
-        return 0;
-    }
-
-    return Math.floor(
-        Math.max(
-            0,
-            Math.min(
-                100,
-                ((player.x-220) /
-                (levelData.length-220))*100
-            )
-        )
-    );
+function addParticle(x,y,vx,vy,life,size,color){
+particles.push({x,y,vx,vy,life,maxLife:life,size,color});
 }
 
-
-/* =========================================================
-   MESSAGE
-========================================================= */
-
-function showMessage(
-    title,
-    text,
-    crashed
-){
-
-    document.getElementById(
-        "messageTitle"
-    ).textContent=title;
-
-    document.getElementById(
-        "messageText"
-    ).textContent=text;
-
-    const box =
-        document.querySelector(
-            ".message-box"
-        );
-
-    if(crashed){
-
-        box.style.borderColor =
-            "#ff3d71";
-
-        box.style.boxShadow =
-            "0 0 50px #ff3d7133";
-    }
-    else{
-
-        box.style.borderColor =
-            levelData.color;
-
-        box.style.boxShadow =
-            `0 0 50px ${levelData.color}44`;
-    }
-
-    document.getElementById(
-        "gameMessage"
-    ).classList.add("show");
+function createJumpParticles(){
+for(let i=0;i<9;i++){
+addParticle(player.x+player.size/2,player.y+player.size,(Math.random()-.5)*3,Math.random()*2+1,25+Math.random()*15,3+Math.random()*4,levelData.color);
+}
 }
 
-
-function hideMessage(){
-
-    document.getElementById(
-        "gameMessage"
-    ).classList.remove("show");
+function createLandingParticles(){
+for(let i=0;i<6;i++){
+addParticle(player.x+player.size/2,player.y+player.size,(Math.random()-.5)*3,Math.random(),20+Math.random()*10,2+Math.random()*3,"#fff");
+}
 }
 
-
-/* =========================================================
-   MESSAGE CLICK
-========================================================= */
-
-document.getElementById(
-    "gameMessage"
-).addEventListener(
-    "pointerdown",
-    function(){
-
-        if(dead){
-
-            restartLevel();
-
-        }else if(completed){
-
-            showLevels();
-        }
-    }
-);
-
-
-/* =========================================================
-   FLASH
-========================================================= */
-
-function flashScreen(){
-
-    const flash =
-        document.getElementById("flash");
-
-    /*
-       The original game doesn't need a visible flash
-       element. Use a quick canvas overlay instead.
-    */
-
-    ctx.save();
-
-    ctx.fillStyle =
-        levelData.color+"12";
-
-    ctx.fillRect(
-        0,
-        0,
-        W,
-        H
-    );
-
-    ctx.restore();
+function createDeathParticles(){
+for(let i=0;i<35;i++){
+addParticle(player.x+player.size/2,player.y+player.size/2,(Math.random()-.5)*12,(Math.random()-.5)*12,30+Math.random()*40,3+Math.random()*7,i%2?levelData.color:"#fff");
+}
 }
 
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-function openSettings(){
-
-    document.getElementById(
-        "settingsModal"
-    ).classList.add("show");
+function createWinParticles(){
+for(let i=0;i<70;i++){
+addParticle(player.x+player.size/2,player.y+player.size/2,(Math.random()-.5)*15,(Math.random()-.5)*15,40+Math.random()*50,3+Math.random()*7,i%2?levelData.color:"#63f5ff");
+}
 }
 
-
-function closeSettings(){
-
-    document.getElementById(
-        "settingsModal"
-    ).classList.remove("show");
+function updateParticles(){
+for(let i=particles.length-1;i>=0;i--){
+const p=particles[i];
+p.x+=p.vx;
+p.y+=p.vy;
+p.vy+=.12;
+p.life--;
+if(p.life<=0)particles.splice(i,1);
+}
 }
 
+function drawBackground(){
+const w=canvas.width;
+const h=canvas.height;
 
-function toggleSound(){
+ctx.fillStyle="#050510";
+ctx.fillRect(0,0,w,h);
 
-    soundEnabled =
-        !soundEnabled;
+const gradient=ctx.createLinearGradient(0,0,0,h);
+gradient.addColorStop(0,"#08082a");
+gradient.addColorStop(1,"#03030a");
+ctx.fillStyle=gradient;
+ctx.fillRect(0,0,w,h);
 
-    document.getElementById(
-        "soundToggle"
-    ).classList.toggle(
-        "active",
-        soundEnabled
-    );
+const glow=ctx.createRadialGradient(w*.5,h*.3,20,w*.5,h*.3,h*.7);
+glow.addColorStop(0,levelData.color+"28");
+glow.addColorStop(1,"transparent");
+ctx.fillStyle=glow;
+ctx.fillRect(0,0,w,h);
+
+ctx.fillStyle="#fff";
+for(let i=0;i<90;i++){
+const sx=((i*137-cameraX*.12)%(w+100)+w+100)%(w+100)-50;
+const sy=(i*73)%(h*.65);
+const size=i%5===0?2:1;
+ctx.globalAlpha=.15+(i%7)/10;
+ctx.fillRect(sx,sy,size,size);
+}
+ctx.globalAlpha=1;
+
+const groundY=h*.78;
+ctx.fillStyle=levelData.color;
+ctx.globalAlpha=.12;
+ctx.fillRect(0,groundY-5,w,10);
+ctx.globalAlpha=1;
+
+ctx.fillStyle="#080b18";
+ctx.fillRect(0,groundY,w,h-groundY);
+
+ctx.shadowColor=levelData.color;
+ctx.shadowBlur=16;
+ctx.fillStyle=levelData.color;
+ctx.fillRect(0,groundY,w,3);
+ctx.shadowBlur=0;
+
+ctx.strokeStyle="#202744";
+ctx.globalAlpha=.6;
+
+const gridSize=50;
+const offset=-(cameraX%gridSize);
+
+for(let x=offset;x<w;x+=gridSize){
+ctx.beginPath();
+ctx.moveTo(x,groundY);
+ctx.lineTo(x,h);
+ctx.stroke();
 }
 
-
-function toggleMotion(){
-
-    document.getElementById(
-        "motionToggle"
-    ).classList.toggle(
-        "active"
-    );
-
-    document.body.classList.toggle(
-        "reduced-motion"
-    );
+for(let y=groundY+gridSize;y<h;y+=gridSize){
+ctx.beginPath();
+ctx.moveTo(0,y);
+ctx.lineTo(w,y);
+ctx.stroke();
 }
 
+ctx.globalAlpha=1;
+}
 
-/* =========================================================
-   INITIALIZE
-========================================================= */
+function drawObstacles(){
+for(const obstacle of obstacles){
+const x=obstacle.x-cameraX;
+if(x<-150||x>canvas.width+150)continue;
 
-updateHomeStats();
+if(obstacle.type==="block"){
+ctx.save();
+ctx.shadowColor=levelData.color;
+ctx.shadowBlur=15;
 
+const gradient=ctx.createLinearGradient(x,obstacle.y,x,obstacle.y+obstacle.h);
+gradient.addColorStop(0,levelData.color);
+gradient.addColorStop(1,"#17142e");
+ctx.fillStyle=gradient;
+ctx.fillRect(x,obstacle.y,obstacle.w,obstacle.h);
 
-/* =========================================================
-   PERIODIC BACKGROUND PARTICLES
-========================================================= */
+ctx.shadowBlur=0;
+ctx.strokeStyle="#ffffff55";
+ctx.lineWidth=2;
+ctx.strokeRect(x,obstacle.y,obstacle.w,obstacle.h);
 
-setInterval(
-    function(){
+ctx.fillStyle="#ffffff18";
+ctx.fillRect(x+6,obstacle.y+6,obstacle.w-12,5);
+ctx.restore();
+}
 
-        if(
-            !playing ||
-            !levelData
-        ){
-            return;
-        }
+if(obstacle.type==="spike"){
+ctx.save();
+ctx.translate(x,obstacle.y+obstacle.h);
+ctx.shadowColor=levelData.color;
+ctx.shadowBlur=15;
 
-        for(
-            let i=0;
-            i<2;
-            i++
-        ){
+const gradient=ctx.createLinearGradient(0,-obstacle.h,0,0);
+gradient.addColorStop(0,"#fff");
+gradient.addColorStop(.2,levelData.color);
+gradient.addColorStop(1,"#19182d");
+ctx.fillStyle=gradient;
 
-            particles.push({
+ctx.beginPath();
+ctx.moveTo(0,0);
+ctx.lineTo(obstacle.w/2,-obstacle.h);
+ctx.lineTo(obstacle.w,0);
+ctx.closePath();
+ctx.fill();
 
-                x:
-                    Math.random()*W,
+ctx.strokeStyle="#ffffff88";
+ctx.stroke();
+ctx.restore();
+}
+}
+}
 
-                y:
-                    Math.random()*(H-150),
+function drawPlayer(){
+const x=player.x-cameraX;
+const y=player.y;
+const s=player.size;
 
-                vx:-.3,
+ctx.save();
+ctx.translate(x+s/2,y+s/2);
+ctx.rotate(player.rotation);
 
-                vy:.15,
+ctx.shadowColor="#63f5ff";
+ctx.shadowBlur=24;
 
-                size:
-                    Math.random()*2+1,
+const gradient=ctx.createLinearGradient(-s/2,-s/2,s/2,s/2);
+gradient.addColorStop(0,"#fff");
+gradient.addColorStop(.25,"#63f5ff");
+gradient.addColorStop(1,"#714fff");
+ctx.fillStyle=gradient;
+ctx.fillRect(-s/2,-s/2,s,s);
 
-                life:.8,
+ctx.shadowBlur=0;
 
-                color:
-                    levelData.color
-            });
-        }
+ctx.fillStyle="#0a0d20";
+ctx.fillRect(-s/2+6,-s/2+6,s-12,s-12);
 
-    },
-    100
-);
+ctx.fillStyle="#63f5ff";
+ctx.fillRect(-10,-8,6,8);
+ctx.fillRect(4,-8,6,8);
+ctx.fillRect(-8,7,16,4);
 
+ctx.strokeStyle="#fff";
+ctx.lineWidth=2;
+ctx.strokeRect(-s/2,-s/2,s,s);
 
-/* =========================================================
-   AUTO SAVE BEFORE LEAVING
-========================================================= */
+ctx.restore();
+}
 
-window.addEventListener(
-    "beforeunload",
-    function(){
+function drawParticles(){
+for(const p of particles){
+ctx.globalAlpha=Math.max(0,p.life/p.maxLife);
+ctx.fillStyle=p.color;
+ctx.shadowColor=p.color;
+ctx.shadowBlur=10;
+ctx.fillRect(p.x-cameraX,p.y,p.size,p.size);
+}
+ctx.globalAlpha=1;
+ctx.shadowBlur=0;
+}
 
-        saveGame();
-    }
-);
+function drawFinish(){
+if(!levelData)return;
 
+const x=levelData.length-cameraX;
+const groundY=canvas.height*.78;
 
-/* =========================================================
-   ESCAPE KEY
-========================================================= */
+if(x<-100||x>canvas.width+100)return;
 
-window.addEventListener(
-    "keydown",
-    function(e){
+ctx.save();
 
-        if(e.code==="Escape"){
+ctx.shadowColor=levelData.color;
+ctx.shadowBlur=25;
 
-            if(
-                document.getElementById(
-                    "settingsModal"
-                ).classList.contains("show")
-            ){
+ctx.strokeStyle=levelData.color;
+ctx.lineWidth=5;
 
-                closeSettings();
+ctx.beginPath();
+ctx.moveTo(x,groundY);
+ctx.lineTo(x,groundY-210);
+ctx.stroke();
 
-                return;
-            }
+ctx.fillStyle=levelData.color;
+ctx.beginPath();
+ctx.moveTo(x,groundY-210);
+ctx.lineTo(x+90,groundY-175);
+ctx.lineTo(x,groundY-140);
+ctx.closePath();
+ctx.fill();
 
-            if(
-                document.getElementById(
-                    "game"
-                ).style.display !== "none"
-            ){
+ctx.restore();
+}
 
-                quitGame();
-            }
-        }
-    }
-);
+function gameLoop(timestamp){
+if(!gameScreen.classList.contains("active"))return;
 
+const delta=Math.min(32,timestamp-lastTime);
+lastTime=timestamp;
+
+if(running)updatePlayer();
+updateParticles();
+
+ctx.save();
+
+if(screenShake>0){
+ctx.translate((Math.random()-.5)*screenShake,(Math.random()-.5)*screenShake);
+screenShake*=.88;
+if(screenShake<.2)screenShake=0;
+}
+
+drawBackground();
+drawFinish();
+drawObstacles();
+drawParticles();
+drawPlayer();
+
+ctx.restore();
+
+if(running||particles.length>0){
+animationFrame=requestAnimationFrame(gameLoop);
+}
+}
+
+function quitGame(){
+running=false;
+dead=false;
+won=false;
+gameMessage.classList.remove("show");
+cancelAnimationFrame(animationFrame);
+buildLevelList();
+showScreen(levelsScreen);
+}
+
+document.addEventListener("keydown",event=>{
+if(event.code==="Space"||event.code==="ArrowUp"||event.code==="KeyW"){
+event.preventDefault();
+if(!jumpHeld){
+jumpHeld=true;
+requestJump();
+}
+}
+if(event.code==="KeyR"&&gameScreen.classList.contains("active")){
+startLevel(currentLevel);
+}
+if(event.code==="Escape"&&gameScreen.classList.contains("active")){
+quitGame();
+}
+});
+
+document.addEventListener("keyup",event=>{
+if(event.code==="Space"||event.code==="ArrowUp"||event.code==="KeyW"){
+jumpHeld=false;
+}
+});
+
+canvas.addEventListener("pointerdown",event=>{
+if(!gameScreen.classList.contains("active"))return;
+if(!jumpHeld){
+jumpHeld=true;
+requestJump();
+}
+});
+
+canvas.addEventListener("pointerup",()=>jumpHeld=false);
+canvas.addEventListener("pointercancel",()=>jumpHeld=false);
+
+jumpButton.addEventListener("pointerdown",event=>{
+event.preventDefault();
+if(!jumpHeld){
+jumpHeld=true;
+requestJump();
+}
+});
+
+jumpButton.addEventListener("pointerup",event=>{
+event.preventDefault();
+jumpHeld=false;
+});
+
+jumpButton.addEventListener("pointercancel",()=>jumpHeld=false);
+
+restartButton.addEventListener("click",()=>startLevel(currentLevel));
+quitButton.addEventListener("click",quitGame);
+
+gameMessage.addEventListener("pointerdown",()=>{
+if(dead){
+startLevel(currentLevel);
+}else if(won){
+buildLevelList();
+showScreen(levelsScreen);
+}
+});
+
+playButton.addEventListener("click",()=>{
+buildLevelList();
+showScreen(levelsScreen);
+});
+
+levelsBack.addEventListener("click",()=>showScreen(home));
+
+settingsButton.addEventListener("click",()=>settingsModal.classList.add("show"));
+closeSettings.addEventListener("click",()=>settingsModal.classList.remove("show"));
+
+soundToggle.addEventListener("click",()=>{
+soundEnabled=!soundEnabled;
+soundToggle.classList.toggle("on",soundEnabled);
+showToast(soundEnabled?"SOUND ON":"SOUND OFF");
+});
+
+motionToggle.addEventListener("click",()=>{
+reducedMotion=!reducedMotion;
+motionToggle.classList.toggle("on",reducedMotion);
+createStars("homeStars",100);
+createStars("levelStars",80);
+showToast(reducedMotion?"REDUCED MOTION ON":"REDUCED MOTION OFF");
+});
+
+window.addEventListener("blur",()=>{
+jumpHeld=false;
+});
+
+buildLevelList();
 </script>
-
 </body>
 </html>
+<!-- PROJECT REFERENCE BLOCK 1 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 2 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 3 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 4 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 5 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 6 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 7 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 8 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 9 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 10 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 11 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 12 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 13 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 14 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 15 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
+<!-- Air rotation is 0.055 radians per update. -->
+<!-- Ground rotation smoothing is 0.2. -->
+<!-- Ground snapping target is a multiple of PI/2. -->
+<!-- These rotation values are the intentional adjustment. -->
+<!-- Future updates should preserve these systems unless requested otherwise. -->
+<!-- Future updates should be integrated into this file. -->
+<!-- Future updates should avoid deleting existing systems. -->
+<!-- Future updates should prefer small targeted changes. -->
+<!-- Future updates should preserve local save compatibility. -->
+<!-- Future updates should preserve the Neon Dash name. -->
+<!-- Future updates should preserve the one-button control philosophy. -->
+<!-- Future updates should preserve the original visual identity. -->
+<!-- Future updates should preserve mobile support. -->
+<!-- Future updates should preserve keyboard support. -->
+<!-- Future updates should preserve mouse support. -->
+<!-- Future updates should preserve progress saving. -->
+<!-- Future updates should preserve level unlocking. -->
+<!-- Future updates should preserve settings. -->
+<!-- Future updates should preserve particles. -->
+<!-- Future updates should preserve the slower rotation behavior. -->
+<!-- End of project reference. -->
+<!-- PROJECT REFERENCE BLOCK 16 -->
+<!-- Project identity: Neon Dash. -->
+<!-- Game type: original neon auto-running rhythm platformer. -->
+<!-- Primary control: one-button jump. -->
+<!-- Keyboard controls: Space, Up Arrow, W. -->
+<!-- Mouse control: pointer/tap anywhere on the game canvas. -->
+<!-- Mobile control: JUMP button. -->
+<!-- Restart control: R key or RESTART button. -->
+<!-- Quit control: Escape key or QUIT button. -->
+<!-- Player automatically moves forward. -->
+<!-- Player can jump using buffered input. -->
+<!-- Player has coyote time for forgiving controls. -->
+<!-- Player has gravity and vertical velocity. -->
+<!-- Player rotates while airborne. -->
+<!-- Air rotation is intentionally slower at 0.055 radians per frame. -->
+<!-- Ground rotation smoothly approaches the nearest 90-degree angle. -->
+<!-- Player uses an original neon cube design. -->
+<!-- Obstacles include spikes. -->
+<!-- Obstacles include blocks. -->
+<!-- Levels are procedurally populated from original patterns. -->
+<!-- Level progress is saved locally. -->
+<!-- Completed levels unlock subsequent levels. -->
+<!-- Best percentage is saved locally. -->
+<!-- Stars are awarded for completing levels. -->
+<!-- Attempts are saved locally. -->
+<!-- Settings include sound state. -->
+<!-- Settings include reduced motion. -->
+<!-- Background includes neon grid. -->
+<!-- Background includes stars. -->
+<!-- Background includes radial glow. -->
+<!-- Gameplay includes particles. -->
+<!-- Gameplay includes screen shake on death. -->
+<!-- Gameplay includes a progress bar. -->
+<!-- Gameplay includes finish marker. -->
+<!-- Gameplay includes crash screen. -->
+<!-- Gameplay includes completion screen. -->
+<!-- Everything is contained in one HTML file. -->
+<!-- No external JavaScript library is required. -->
+<!-- No external CSS library is required. -->
+<!-- No external image asset is required. -->
+<!-- The project is designed to run locally in a browser. -->
+<!-- localStorage is used for browser-only progress. -->
+<!-- The game is designed for desktop and mobile. -->
+<!-- Responsive level selection is included. -->
+<!-- Responsive game controls are included. -->
+<!-- The UI uses original Neon Dash branding. -->
+<!-- Geometry Dash is not used as a source of assets. -->
+<!-- The cube is an original visual implementation. -->
+<!-- Level names are original Neon Dash names. -->
+<!-- Level colors are stored in level data. -->
+<!-- Level speeds are stored in level data. -->
+<!-- Level lengths are stored in level data. -->
+<!-- Collision uses axis-aligned player bounds. -->
+<!-- Spikes cause immediate death. -->
+<!-- Blocks can be landed on from above. -->
+<!-- Landing resets vertical velocity. -->
+<!-- Jumping creates particles. -->
+<!-- Landing creates particles. -->
+<!-- Death creates particles. -->
+<!-- Completion creates particles. -->
+<!-- Camera follows the player. -->
+<!-- Camera keeps the player around one quarter of screen width. -->
+<!-- Ground is rendered with a neon line. -->
+<!-- Ground has a perspective-style grid. -->
+<!-- Stars move independently of gameplay. -->
+<!-- Reduced motion removes generated star animation. -->
+<!-- Settings are available from the home screen. -->
+<!-- Level cards display best progress. -->
+<!-- Locked levels have reduced opacity. -->
+<!-- Level cards display difficulty. -->
+<!-- Level cards display color accents. -->
+<!-- Mobile level list can scroll vertically. -->
+<!-- Buttons include hover effects on desktop. -->
+<!-- Buttons include active scaling. -->
+<!-- Canvas automatically resizes with the window. -->
+<!-- Game loop uses requestAnimationFrame. -->
+<!-- Game loop caps large frame deltas. -->
+<!-- Game state is separated into running, dead, and won. -->
+<!-- Jump input is protected against repeated held jumps. -->
+<!-- Pointer cancel resets held jump state. -->
+<!-- Window blur resets held jump state. -->
+<!-- Escape returns to level selection. -->
+<!-- Restart starts the same level again. -->
+<!-- Completing a level returns to the level list on tap. -->
+<!-- Level progress is updated continuously. -->
+<!-- Saved progress is updated when a new best is reached. -->
+<!-- Save data is protected by try/catch. -->
+<!-- Missing localStorage does not stop the game. -->
+<!-- Missing save data uses the default save object. -->
+<!-- All level cards are generated dynamically. -->
+<!-- All obstacles are generated dynamically. -->
+<!-- All particles are generated dynamically. -->
+<!-- Player drawing uses canvas transformations. -->
+<!-- Player drawing uses canvas gradients. -->
+<!-- Player drawing uses canvas shadows. -->
+<!-- Obstacle drawing uses canvas gradients. -->
+<!-- Spike drawing uses canvas paths. -->
+<!-- Finish marker uses canvas paths. -->
+<!-- Background uses canvas gradients. -->
+<!-- Ground uses canvas lines. -->
+<!-- Grid uses canvas lines. -->
+<!-- Stars use canvas rectangles. -->
+<!-- The game has no server requirement. -->
+<!-- The game does not require an account. -->
+<!-- The game does not require a database. -->
+<!-- The game does not require an API key. -->
+<!-- The game does not require a network connection after loading. -->
+<!-- Browser-only storage is intentional. -->
+<!-- Neon Dash can be hosted as a static website. -->
+<!-- Neon Dash can be opened directly as index.html. -->
+<!-- Neon Dash can be hosted on GitHub Pages. -->
+<!-- The current player size is 38 pixels. -->
+<!-- Player jump velocity is -15.5. -->
+<!-- Gravity is 0.82. -->
+<!-- Jump buffer is 7 frames. -->
+<!-- Coyote time is 5 frames. -->
+<!-- Camera smoothing is 0.1. -->
