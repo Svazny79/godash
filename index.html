@@ -2,858 +2,1548 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>NEON DASH</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#070713">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<title>Neon Dash</title>
 
 <style>
 *{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  user-select:none;
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
 }
 
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#050510;
-  color:white;
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#05050d;
+    color:white;
+    font-family:Arial,Helvetica,sans-serif;
 }
 
 button{
-  font-family:inherit;
-  cursor:pointer;
+    font-family:inherit;
 }
 
 .hidden{
-  display:none!important;
+    display:none!important;
 }
 
-/* =========================
-   HOME
-========================= */
+/* =========================================================
+   BACKGROUND
+========================================================= */
 
-#home{
-  position:absolute;
-  inset:0;
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 50% 40%,#25145e 0%,#100b2c 38%,#050510 75%);
+body{
+    background:
+        radial-gradient(circle at 50% 25%,#17134b 0%,#08081b 38%,#030308 100%);
+}
+
+.screen{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
 }
 
 .grid{
-  position:absolute;
-  inset:0;
-  opacity:.25;
-  background-image:
-    linear-gradient(#5b43ff22 1px,transparent 1px),
-    linear-gradient(90deg,#5b43ff22 1px,transparent 1px);
-  background-size:55px 55px;
-  transform:perspective(500px) rotateX(55deg) scale(1.5);
-  transform-origin:center bottom;
-  animation:gridMove 5s linear infinite;
+    position:absolute;
+    inset:-50%;
+    background-image:
+        linear-gradient(rgba(91,239,255,.09) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(91,239,255,.09) 1px,transparent 1px);
+    background-size:70px 70px;
+    transform:perspective(500px) rotateX(62deg);
+    transform-origin:center;
+    animation:gridMove 4s linear infinite;
+    opacity:.55;
 }
 
 @keyframes gridMove{
-  from{background-position:0 0,0 0}
-  to{background-position:0 55px,55px 0}
+    from{
+        background-position:0 0;
+    }
+    to{
+        background-position:0 70px;
+    }
 }
 
 .stars{
-  position:absolute;
-  inset:0;
-  background-image:
-    radial-gradient(circle,#fff 1px,transparent 2px),
-    radial-gradient(circle,#8d7dff 1px,transparent 2px);
-  background-size:90px 90px,137px 137px;
-  opacity:.4;
-  animation:stars 12s linear infinite;
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
 }
 
-@keyframes stars{
-  to{background-position:90px 90px,-137px 137px}
+.star{
+    position:absolute;
+    width:2px;
+    height:2px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 0 8px #fff;
+    animation:starMove linear infinite;
+}
+
+@keyframes starMove{
+    from{
+        transform:translateY(0);
+        opacity:.2;
+    }
+    50%{
+        opacity:1;
+    }
+    to{
+        transform:translateY(110vh);
+        opacity:.1;
+    }
+}
+
+/* =========================================================
+   HOME
+========================================================= */
+
+#home{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
 }
 
 .home-content{
-  position:relative;
-  z-index:2;
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+    position:relative;
+    z-index:5;
+    width:min(900px,94vw);
 }
 
 .logo{
-  font-size:clamp(55px,10vw,110px);
-  font-weight:1000;
-  letter-spacing:-6px;
-  font-style:italic;
-  text-transform:uppercase;
-  color:white;
-  text-shadow:
-    0 0 10px #6c4cff,
-    0 0 30px #6c4cff,
-    0 0 70px #2b10ff;
-  animation:logoFloat 2.5s ease-in-out infinite;
+    font-size:clamp(58px,11vw,125px);
+    font-weight:1000;
+    font-style:italic;
+    letter-spacing:-7px;
+    line-height:.9;
+    color:#fff;
+    text-shadow:
+        0 0 8px #63f5ff,
+        0 0 30px #63f5ff,
+        0 0 70px #714fff;
+    animation:logoPulse 2.2s ease-in-out infinite;
 }
 
-.logo span{
-  color:#63f5ff;
-}
-
-@keyframes logoFloat{
-  50%{transform:translateY(-8px) scale(1.02)}
+@keyframes logoPulse{
+    0%,100%{
+        filter:brightness(1);
+        transform:scale(1);
+    }
+    50%{
+        filter:brightness(1.3);
+        transform:scale(1.015);
+    }
 }
 
 .subtitle{
-  margin-top:8px;
-  color:#aaa8d4;
-  letter-spacing:7px;
-  font-size:13px;
+    margin-top:18px;
+    font-size:15px;
+    font-weight:900;
+    letter-spacing:8px;
+    color:#8df8ff;
+    text-shadow:0 0 15px #63f5ff;
 }
 
 .menu{
-  display:flex;
-  flex-direction:column;
-  gap:13px;
-  width:min(360px,85vw);
-  margin-top:42px;
+    margin:45px auto 0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:15px;
 }
 
-.menu button,
-.level-card,
-.small-button{
-  border:1px solid #7e65ff;
-  color:white;
-  background:linear-gradient(135deg,#211758,#100d25);
-  box-shadow:
-    0 0 15px #563dff44,
-    inset 0 0 20px #654cff12;
-  border-radius:12px;
-  transition:.18s;
+.neon-button{
+    position:relative;
+    width:min(360px,85vw);
+    padding:17px 25px;
+    border:2px solid #63f5ff;
+    border-radius:14px;
+    color:white;
+    background:
+        linear-gradient(135deg,
+            rgba(99,245,255,.12),
+            rgba(113,79,255,.18));
+    box-shadow:
+        0 0 15px rgba(99,245,255,.25),
+        inset 0 0 20px rgba(99,245,255,.05);
+    font-size:17px;
+    font-weight:1000;
+    letter-spacing:3px;
+    cursor:pointer;
+    transition:.2s;
+    overflow:hidden;
 }
 
-.menu button{
-  padding:17px;
-  font-size:18px;
-  font-weight:800;
-  letter-spacing:2px;
+.neon-button::before{
+    content:"";
+    position:absolute;
+    left:-100%;
+    top:0;
+    width:100%;
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.2),
+        transparent
+    );
+    transition:.45s;
 }
 
-.menu button:hover{
-  transform:scale(1.04);
-  background:linear-gradient(135deg,#5137bd,#17102f);
-  box-shadow:0 0 30px #654cff99;
+.neon-button:hover::before{
+    left:100%;
+}
+
+.neon-button:hover{
+    transform:translateY(-3px) scale(1.02);
+    box-shadow:
+        0 0 25px rgba(99,245,255,.5),
+        0 0 60px rgba(113,79,255,.25),
+        inset 0 0 20px rgba(99,245,255,.1);
+}
+
+.neon-button:active{
+    transform:scale(.97);
 }
 
 .stats{
-  position:absolute;
-  bottom:22px;
-  display:flex;
-  gap:30px;
-  color:#a8a5ce;
-  font-size:13px;
+    margin-top:30px;
+    display:flex;
+    justify-content:center;
+    gap:35px;
+    flex-wrap:wrap;
 }
 
-.stats b{
-  color:#63f5ff;
+.stat{
+    min-width:110px;
 }
 
-/* =========================
+.stat-number{
+    font-size:25px;
+    font-weight:1000;
+    color:#63f5ff;
+    text-shadow:0 0 12px #63f5ff;
+}
+
+.stat-label{
+    margin-top:4px;
+    color:#8888a9;
+    font-size:10px;
+    letter-spacing:2px;
+    font-weight:900;
+}
+
+/* =========================================================
    LEVEL SELECT
-========================= */
+========================================================= */
 
 #levels{
-  position:absolute;
-  inset:0;
-  z-index:10;
-  background:
-    radial-gradient(circle at 50% 20%,#24135d,#070714 70%);
-  padding:35px;
-  overflow:auto;
+    display:none;
+    padding:30px;
+    overflow:auto;
+}
+
+.levels-wrap{
+    position:relative;
+    z-index:5;
+    width:min(1050px,100%);
+    margin:auto;
+}
+
+.topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    margin-bottom:30px;
 }
 
 .page-title{
-  text-align:center;
-  font-size:42px;
-  font-weight:1000;
-  letter-spacing:3px;
-  text-shadow:0 0 25px #624aff;
+    font-size:clamp(30px,6vw,58px);
+    font-weight:1000;
+    font-style:italic;
+    text-shadow:0 0 25px #63f5ff;
+}
+
+.back-button{
+    padding:12px 18px;
+    border:1px solid #63f5ff;
+    border-radius:10px;
+    color:white;
+    background:#63f5ff12;
+    cursor:pointer;
+    font-weight:900;
 }
 
 .level-grid{
-  width:min(1050px,95vw);
-  margin:35px auto;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-  gap:18px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
 }
 
 .level-card{
-  min-height:210px;
-  padding:20px;
-  position:relative;
-  overflow:hidden;
+    position:relative;
+    min-height:220px;
+    padding:22px;
+    border:1px solid rgba(99,245,255,.3);
+    border-radius:20px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.055),
+            rgba(255,255,255,.015)
+        );
+    box-shadow:
+        inset 0 0 30px rgba(99,245,255,.025),
+        0 10px 40px rgba(0,0,0,.25);
+    overflow:hidden;
+    transition:.25s;
 }
 
 .level-card:hover{
-  transform:translateY(-5px);
-  box-shadow:0 0 30px #664dff77;
+    transform:translateY(-6px);
+    border-color:#63f5ff;
+    box-shadow:
+        0 0 30px rgba(99,245,255,.18),
+        inset 0 0 35px rgba(99,245,255,.04);
 }
 
 .level-number{
-  color:#63f5ff;
-  font-size:12px;
-  letter-spacing:3px;
+    font-size:12px;
+    letter-spacing:3px;
+    color:#7e7e9e;
+    font-weight:900;
 }
 
-.level-card h2{
-  margin-top:8px;
-  font-size:25px;
-}
-
-.level-card p{
-  margin-top:7px;
-  color:#aaa8c7;
-  font-size:13px;
+.level-name{
+    margin-top:8px;
+    font-size:25px;
+    font-weight:1000;
 }
 
 .difficulty{
-  margin-top:22px;
-  display:flex;
-  gap:4px;
+    display:inline-block;
+    margin-top:10px;
+    padding:6px 10px;
+    border-radius:7px;
+    background:#63f5ff14;
+    border:1px solid #63f5ff44;
+    color:#63f5ff;
+    font-size:10px;
+    letter-spacing:2px;
+    font-weight:1000;
 }
 
-.difficulty i{
-  width:14px;
-  height:14px;
-  transform:rotate(45deg);
-  background:#6c54ff;
-  box-shadow:0 0 8px #6c54ff;
+.level-progress{
+    margin-top:25px;
+    height:8px;
+    background:#ffffff0c;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.level-progress-fill{
+    height:100%;
+    width:0%;
+    border-radius:20px;
+    background:linear-gradient(90deg,#63f5ff,#714fff);
+    box-shadow:0 0 12px #63f5ff;
 }
 
 .play-level{
-  margin-top:18px;
-  padding:10px 16px;
-  border:0;
-  border-radius:8px;
-  background:#63f5ff;
-  color:#061016;
-  font-weight:900;
+    position:absolute;
+    right:18px;
+    bottom:18px;
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    border:2px solid #63f5ff;
+    color:white;
+    background:#63f5ff14;
+    font-size:18px;
+    cursor:pointer;
+    box-shadow:0 0 15px #63f5ff33;
 }
 
-.back{
-  position:fixed;
-  left:25px;
-  top:20px;
-  padding:10px 18px;
-  z-index:20;
-}
-
-/* =========================
+/* =========================================================
    GAME
-========================= */
+========================================================= */
 
 #game{
-  position:absolute;
-  inset:0;
-  background:#070711;
+    display:none;
+    background:#03030a;
 }
 
 #gameCanvas{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+    touch-action:none;
 }
 
 .hud{
-  position:absolute;
-  top:16px;
-  left:50%;
-  transform:translateX(-50%);
-  width:min(700px,80vw);
-  z-index:5;
-  text-align:center;
-  pointer-events:none;
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    z-index:10;
+    padding:18px 20px;
+    pointer-events:none;
 }
 
 .hud-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:14px;
-  font-weight:900;
-  letter-spacing:2px;
-  margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+}
+
+.level-hud{
+    font-weight:1000;
+    letter-spacing:2px;
+    text-shadow:0 0 10px #63f5ff;
+}
+
+.percent{
+    font-size:18px;
+    font-weight:1000;
 }
 
 .progress{
-  height:9px;
-  border:1px solid #ffffff33;
-  background:#ffffff12;
-  border-radius:20px;
-  overflow:hidden;
+    margin-top:12px;
+    width:100%;
+    height:7px;
+    border-radius:10px;
+    overflow:hidden;
+    background:#ffffff15;
+    box-shadow:0 0 15px #000;
 }
 
 .progress-fill{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#714fff,#63f5ff);
-  box-shadow:0 0 15px #654dff;
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#63f5ff,#714fff,#ff38d8);
+    box-shadow:0 0 15px #63f5ff;
 }
 
 .game-buttons{
-  position:absolute;
-  right:18px;
-  top:15px;
-  z-index:8;
+    position:absolute;
+    right:20px;
+    top:65px;
+    z-index:20;
+    display:flex;
+    gap:8px;
 }
 
-.small-button{
-  padding:9px 14px;
-  color:white;
+.game-small-button{
+    border:1px solid #ffffff33;
+    border-radius:8px;
+    background:#00000055;
+    color:white;
+    padding:9px 12px;
+    cursor:pointer;
+    font-weight:900;
 }
 
-#gameMessage{
-  position:absolute;
-  inset:0;
-  z-index:4;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  pointer-events:none;
-  opacity:0;
+/* =========================================================
+   MOBILE JUMP
+========================================================= */
+
+.mobile-control{
+    position:absolute;
+    left:50%;
+    bottom:25px;
+    transform:translateX(-50%);
+    z-index:30;
+
+    width:150px;
+    height:75px;
+
+    border:2px solid #63f5ff;
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(99,245,255,.16),
+            rgba(113,79,255,.2)
+        );
+
+    color:white;
+    font-size:17px;
+    font-weight:1000;
+    letter-spacing:3px;
+
+    box-shadow:
+        0 0 25px #63f5ff55,
+        inset 0 0 20px #63f5ff18;
+
+    touch-action:none;
+    user-select:none;
+    cursor:pointer;
+}
+
+.mobile-control:active{
+    transform:translateX(-50%) scale(.94);
+    box-shadow:
+        0 0 40px #63f5ff99,
+        inset 0 0 30px #63f5ff33;
+}
+
+/* =========================================================
+   GAME MESSAGE
+========================================================= */
+
+.game-message{
+    position:absolute;
+    inset:0;
+    z-index:25;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.35);
+    backdrop-filter:blur(5px);
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
+}
+
+.game-message.show{
+    opacity:1;
+    pointer-events:auto;
 }
 
 .message-box{
-  text-align:center;
-  transform:scale(.8);
-  transition:.3s;
+    width:min(500px,90vw);
+    padding:35px;
+    text-align:center;
+    border:2px solid #63f5ff;
+    border-radius:22px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(8,8,30,.96),
+            rgba(13,8,36,.96)
+        );
+    box-shadow:
+        0 0 50px rgba(99,245,255,.2),
+        inset 0 0 30px rgba(99,245,255,.04);
 }
 
-.message-box h1{
-  font-size:60px;
-  text-shadow:0 0 30px #63f5ff;
+.message-title{
+    font-size:clamp(35px,7vw,65px);
+    font-weight:1000;
+    font-style:italic;
+    text-shadow:0 0 25px #63f5ff;
 }
 
-.message-box p{
-  color:#bbb8d3;
-  margin-top:10px;
+.message-text{
+    margin:12px 0 25px;
+    color:#a6a6c0;
+    font-weight:700;
 }
 
-/* =========================
-   CONTROLS
-========================= */
-
-.mobile-control{
-  position:absolute;
-  bottom:25px;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:8;
-  width:100px;
-  height:100px;
-  border-radius:50%;
-  border:2px solid #63f5ff;
-  background:#63f5ff16;
-  box-shadow:0 0 30px #63f5ff44;
-  color:white;
-  font-size:14px;
-  font-weight:bold;
+.message-hint{
+    color:#63f5ff;
+    font-size:12px;
+    font-weight:1000;
+    letter-spacing:2px;
 }
 
-/* =========================
+/* =========================================================
    SETTINGS
-========================= */
+========================================================= */
 
 .modal{
-  position:absolute;
-  inset:0;
-  z-index:100;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#0009;
-  backdrop-filter:blur(10px);
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.7);
+    backdrop-filter:blur(10px);
+}
+
+.modal.show{
+    display:flex;
 }
 
 .modal-box{
-  width:min(450px,90vw);
-  padding:30px;
-  border:1px solid #705aff;
-  border-radius:20px;
-  background:#100c25;
-  box-shadow:0 0 50px #563dff55;
+    width:min(500px,90vw);
+    padding:30px;
+    border:1px solid #63f5ff66;
+    border-radius:20px;
+    background:#09091a;
+    box-shadow:0 0 60px #000;
 }
 
-.modal-box h2{
-  font-size:30px;
-  margin-bottom:20px;
+.modal-title{
+    font-size:30px;
+    font-weight:1000;
+    margin-bottom:25px;
 }
 
-.setting{
-  padding:14px 0;
-  border-bottom:1px solid #ffffff12;
-  color:#bbb7d0;
+.setting-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 0;
+    border-bottom:1px solid #ffffff0e;
 }
 
-.close{
-  margin-top:20px;
-  width:100%;
-  padding:13px;
-  border:0;
-  border-radius:9px;
-  background:#63f5ff;
-  font-weight:900;
+.setting-label{
+    color:#aaaac0;
+    font-weight:700;
 }
 
-/* =========================
-   FLASH
-========================= */
-
-#flash{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  z-index:20;
-  background:white;
-  opacity:0;
+.toggle{
+    width:50px;
+    height:27px;
+    border-radius:30px;
+    background:#ffffff18;
+    border:1px solid #ffffff22;
+    cursor:pointer;
+    position:relative;
 }
 
-@media(max-width:600px){
-  .logo{
-    letter-spacing:-3px;
-  }
+.toggle-dot{
+    position:absolute;
+    width:19px;
+    height:19px;
+    left:3px;
+    top:3px;
+    border-radius:50%;
+    background:#777;
+    transition:.2s;
+}
 
-  .subtitle{
-    letter-spacing:4px;
-  }
+.toggle.active{
+    background:#63f5ff33;
+    border-color:#63f5ff;
+}
 
-  #levels{
-    padding:65px 15px 20px;
-  }
+.toggle.active .toggle-dot{
+    left:26px;
+    background:#63f5ff;
+    box-shadow:0 0 12px #63f5ff;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:800px){
+    .level-grid{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:560px){
+    .level-grid{
+        grid-template-columns:1fr;
+    }
+
+    #levels{
+        padding:18px;
+    }
+
+    .logo{
+        letter-spacing:-4px;
+    }
+
+    .subtitle{
+        font-size:11px;
+        letter-spacing:5px;
+    }
+
+    .stats{
+        gap:18px;
+    }
+
+    .game-buttons{
+        top:65px;
+        right:10px;
+    }
+
+    .game-small-button{
+        padding:7px 9px;
+        font-size:11px;
+    }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+    *,
+    *::before,
+    *::after{
+        animation-duration:.001ms!important;
+        animation-iteration-count:1!important;
+        scroll-behavior:auto!important;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<!-- =========================
- HOME
-========================= -->
+<!-- =======================================================
+     HOME
+======================================================= -->
 
-<section id="home">
+<section id="home" class="screen">
 
-  <div class="grid"></div>
-  <div class="stars"></div>
+    <div class="grid"></div>
+    <div class="stars" id="starsHome"></div>
 
-  <div class="home-content">
+    <div class="home-content">
 
-    <div class="logo">NEON <span>DASH</span></div>
-    <div class="subtitle">JUMP • FLY • SURVIVE</div>
+        <div class="logo">
+            NEON<br>DASH
+        </div>
 
-    <div class="menu">
-      <button onclick="showLevels()">▶ PLAY</button>
-      <button onclick="openSettings()">⚙ SETTINGS</button>
-      <button onclick="showStats()">🏆 STATS</button>
+        <div class="subtitle">
+            ONE TAP. ONE RUN. DON'T CRASH.
+        </div>
+
+        <div class="menu">
+
+            <button class="neon-button" onclick="showLevels()">
+                PLAY
+            </button>
+
+            <button class="neon-button" onclick="openSettings()">
+                SETTINGS
+            </button>
+
+        </div>
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-number" id="homeLevel">
+                    1
+                </div>
+                <div class="stat-label">
+                    LEVEL
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-number" id="homeStars">
+                    0
+                </div>
+                <div class="stat-label">
+                    STARS
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-number" id="homeAttempts">
+                    0
+                </div>
+                <div class="stat-label">
+                    ATTEMPTS
+                </div>
+            </div>
+
+        </div>
+
     </div>
-
-    <div class="stats">
-      <div>LEVEL <b id="homeLevel">1</b></div>
-      <div>STARS <b id="homeStars">0</b></div>
-      <div>BEST <b id="homeBest">0%</b></div>
-    </div>
-
-  </div>
-</section>
-
-<!-- =========================
- LEVEL SELECT
-========================= -->
-
-<section id="levels" class="hidden">
-
-  <button class="small-button back" onclick="goHome()">← BACK</button>
-
-  <div class="page-title">SELECT LEVEL</div>
-
-  <div class="level-grid">
-
-    <div class="level-card">
-      <div class="level-number">LEVEL 01</div>
-      <h2>Cyber Start</h2>
-      <p>Warm up. The neon world begins here.</p>
-      <div class="difficulty">
-        <i></i><i></i><i></i>
-      </div>
-      <button class="play-level" onclick="startLevel(0)">PLAY</button>
-    </div>
-
-    <div class="level-card">
-      <div class="level-number">LEVEL 02</div>
-      <h2>Electric Sky</h2>
-      <p>More spikes. Faster jumps. Higher risk.</p>
-      <div class="difficulty">
-        <i></i><i></i><i></i><i></i>
-      </div>
-      <button class="play-level" onclick="startLevel(1)">PLAY</button>
-    </div>
-
-    <div class="level-card">
-      <div class="level-number">LEVEL 03</div>
-      <h2>Void Reactor</h2>
-      <p>The reactor is unstable. Don't fall.</p>
-      <div class="difficulty">
-        <i></i><i></i><i></i><i></i><i></i>
-      </div>
-      <button class="play-level" onclick="startLevel(2)">PLAY</button>
-    </div>
-
-    <div class="level-card">
-      <div class="level-number">LEVEL 04</div>
-      <h2>Hyper Drive</h2>
-      <p>Speed mode activated.</p>
-      <div class="difficulty">
-        <i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
-      <button class="play-level" onclick="startLevel(3)">PLAY</button>
-    </div>
-
-    <div class="level-card">
-      <div class="level-number">LEVEL 05</div>
-      <h2>Galaxy Core</h2>
-      <p>Only the best runners reach the core.</p>
-      <div class="difficulty">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
-      <button class="play-level" onclick="startLevel(4)">PLAY</button>
-    </div>
-
-    <div class="level-card">
-      <div class="level-number">LEVEL 06</div>
-      <h2>Final Pulse</h2>
-      <p>Everything you've learned leads here.</p>
-      <div class="difficulty">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
-      <button class="play-level" onclick="startLevel(5)">PLAY</button>
-    </div>
-
-  </div>
-</section>
-
-<!-- =========================
- GAME
-========================= -->
-
-<section id="game" class="hidden">
-
-  <canvas id="gameCanvas"></canvas>
-
-  <div class="hud">
-    <div class="hud-top">
-      <span id="levelName">CYBER START</span>
-      <span id="percent">0%</span>
-    </div>
-
-    <div class="progress">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-  </div>
-
-  <div class="game-buttons">
-    <button class="small-button" onclick="quitGame()">✕</button>
-  </div>
-
-  <button class="mobile-control" id="jumpButton">JUMP</button>
-
-  <div id="gameMessage">
-    <div class="message-box">
-      <h1 id="messageTitle">READY</h1>
-      <p id="messageText">Press SPACE or tap JUMP</p>
-    </div>
-  </div>
-
-  <div id="flash"></div>
 
 </section>
 
-<!-- =========================
- SETTINGS
-========================= -->
 
-<div id="settings" class="modal hidden">
+<!-- =======================================================
+     LEVEL SELECT
+======================================================= -->
 
-  <div class="modal-box">
+<section id="levels" class="screen">
 
-    <h2>SETTINGS</h2>
+    <div class="grid"></div>
+    <div class="stars" id="starsLevels"></div>
 
-    <div class="setting">
-      🎨 Neon graphics enabled
+    <div class="levels-wrap">
+
+        <div class="topbar">
+
+            <div class="page-title">
+                LEVELS
+            </div>
+
+            <button class="back-button" onclick="showHome()">
+                ← BACK
+            </button>
+
+        </div>
+
+        <div class="level-grid" id="levelGrid"></div>
+
     </div>
 
-    <div class="setting">
-      🔊 Sound effects ready
+</section>
+
+
+<!-- =======================================================
+     GAME
+======================================================= -->
+
+<section id="game" class="screen">
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="hud">
+
+        <div class="hud-top">
+
+            <div class="level-hud" id="levelName">
+                CYBER START
+            </div>
+
+            <div class="percent" id="percent">
+                0%
+            </div>
+
+        </div>
+
+        <div class="progress">
+            <div
+                class="progress-fill"
+                id="progressFill">
+            </div>
+        </div>
+
     </div>
 
-    <div class="setting">
-      💾 Progress automatically saved
+    <div class="game-buttons">
+
+        <button
+            class="game-small-button"
+            onclick="restartLevel()">
+            ↻
+        </button>
+
+        <button
+            class="game-small-button"
+            onclick="quitGame()">
+            ✕
+        </button>
+
     </div>
 
-    <button class="close" onclick="closeSettings()">CLOSE</button>
+    <button
+        id="jumpButton"
+        class="mobile-control">
+        JUMP
+    </button>
 
-  </div>
+    <div
+        class="game-message"
+        id="gameMessage">
+
+        <div class="message-box">
+
+            <div
+                class="message-title"
+                id="messageTitle">
+                CRASHED
+            </div>
+
+            <div
+                class="message-text"
+                id="messageText">
+                Try again.
+            </div>
+
+            <div class="message-hint">
+                TAP / SPACE TO CONTINUE
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =======================================================
+     SETTINGS
+======================================================= -->
+
+<div class="modal" id="settingsModal">
+
+    <div class="modal-box">
+
+        <div class="modal-title">
+            SETTINGS
+        </div>
+
+        <div class="setting-row">
+
+            <div class="setting-label">
+                Reduced Motion
+            </div>
+
+            <div
+                class="toggle"
+                id="motionToggle"
+                onclick="toggleMotion()">
+
+                <div class="toggle-dot"></div>
+
+            </div>
+
+        </div>
+
+        <div class="setting-row">
+
+            <div class="setting-label">
+                Sound
+            </div>
+
+            <div
+                class="toggle active"
+                id="soundToggle"
+                onclick="toggleSound()">
+
+                <div class="toggle-dot"></div>
+
+            </div>
+
+        </div>
+
+        <br>
+
+        <button
+            class="neon-button"
+            style="width:100%;"
+            onclick="closeSettings()">
+            CLOSE
+        </button>
+
+    </div>
 
 </div>
 
+
 <script>
+/* =========================================================
+   NEON DASH
+   Everything is contained in this one file.
+========================================================= */
+
 
 /* =========================================================
-   SAVE DATA
+   SAVE SYSTEM
 ========================================================= */
 
 const SAVE_KEY = "neonDashSave";
 
-let save = JSON.parse(
-  localStorage.getItem(SAVE_KEY) ||
-  '{"level":1,"stars":0,"best":0,"attempts":0}'
-);
+const defaultSave = {
+    level:1,
+    stars:0,
+    attempts:0,
+    best:{}
+};
+
+let save;
+
+try{
+    save = JSON.parse(
+        localStorage.getItem(SAVE_KEY)
+    ) || structuredClone(defaultSave);
+}catch{
+    save = structuredClone(defaultSave);
+}
+
+if(!save.best){
+    save.best = {};
+}
 
 function saveGame(){
-  localStorage.setItem(SAVE_KEY,JSON.stringify(save));
-  updateHomeStats();
+
+    localStorage.setItem(
+        SAVE_KEY,
+        JSON.stringify(save)
+    );
+
+    updateHomeStats();
 }
 
 function updateHomeStats(){
-  document.getElementById("homeLevel").textContent=save.level;
-  document.getElementById("homeStars").textContent=save.stars;
-  document.getElementById("homeBest").textContent=save.best+"%";
+
+    document.getElementById("homeLevel").textContent =
+        save.level;
+
+    document.getElementById("homeStars").textContent =
+        save.stars;
+
+    document.getElementById("homeAttempts").textContent =
+        save.attempts;
 }
 
-updateHomeStats();
+
+/* =========================================================
+   STARS BACKGROUND
+========================================================= */
+
+function createStars(containerId,count=80){
+
+    const container =
+        document.getElementById(containerId);
+
+    if(!container)return;
+
+    container.innerHTML="";
+
+    for(let i=0;i<count;i++){
+
+        const star =
+            document.createElement("div");
+
+        star.className="star";
+
+        star.style.left =
+            Math.random()*100+"%";
+
+        star.style.top =
+            Math.random()*100+"%";
+
+        const size =
+            Math.random()*3+1;
+
+        star.style.width=size+"px";
+        star.style.height=size+"px";
+
+        star.style.animationDuration =
+            (Math.random()*5+3)+"s";
+
+        star.style.animationDelay =
+            (-Math.random()*8)+"s";
+
+        container.appendChild(star);
+    }
+}
+
+createStars("starsHome",100);
+createStars("starsLevels",80);
+
+
+/* =========================================================
+   LEVEL DATA
+========================================================= */
+
+const levelsData = [
+
+    {
+        id:1,
+        name:"CYBER START",
+        difficulty:"EASY",
+        color:"#714fff",
+        speed:6,
+        length:5200,
+
+        spikes:[
+            650,
+            850,
+            1050,
+            1250,
+            1500,
+            1750,
+            2050,
+            2300,
+            2600,
+            2850,
+            3150,
+            3450,
+            3800,
+            4150,
+            4500,
+            4800
+        ],
+
+        blocks:[
+            {x:720,h:70},
+            {x:1120,h:90},
+            {x:1370,h:120},
+            {x:1900,h:75},
+            {x:2400,h:110},
+            {x:3000,h:80},
+            {x:3600,h:130},
+            {x:4250,h:90}
+        ]
+    },
+
+    {
+        id:2,
+        name:"ELECTRIC SKY",
+        difficulty:"NORMAL",
+        color:"#00eaff",
+        speed:7,
+        length:6000,
+
+        spikes:[
+            550,
+            750,
+            950,
+            1200,
+            1450,
+            1650,
+            1900,
+            2200,
+            2500,
+            2800,
+            3150,
+            3500,
+            3900,
+            4250,
+            4600,
+            5000,
+            5400,
+            5700
+        ],
+
+        blocks:[
+            {x:820,h:100},
+            {x:1300,h:120},
+            {x:1750,h:85},
+            {x:2350,h:130},
+            {x:2950,h:95},
+            {x:3700,h:140},
+            {x:4400,h:100},
+            {x:5150,h:125}
+        ]
+    },
+
+    {
+        id:3,
+        name:"VOID REACTOR",
+        difficulty:"HARD",
+        color:"#ff38d8",
+        speed:7.5,
+        length:6600,
+
+        spikes:[
+            600,
+            780,
+            980,
+            1180,
+            1380,
+            1600,
+            1850,
+            2100,
+            2400,
+            2700,
+            3000,
+            3300,
+            3600,
+            3950,
+            4300,
+            4650,
+            5000,
+            5400,
+            5800,
+            6200
+        ],
+
+        blocks:[
+            {x:700,h:100},
+            {x:1100,h:135},
+            {x:1500,h:90},
+            {x:2000,h:130},
+            {x:2550,h:100},
+            {x:3100,h:150},
+            {x:3800,h:120},
+            {x:4450,h:150},
+            {x:5100,h:110},
+            {x:5900,h:135}
+        ]
+    },
+
+    {
+        id:4,
+        name:"HYPER DRIVE",
+        difficulty:"VERY HARD",
+        color:"#ff6b2d",
+        speed:9,
+        length:7300,
+
+        spikes:[
+            550,
+            720,
+            890,
+            1060,
+            1300,
+            1500,
+            1750,
+            2000,
+            2300,
+            2600,
+            2900,
+            3200,
+            3500,
+            3800,
+            4100,
+            4400,
+            4700,
+            5050,
+            5400,
+            5750,
+            6100,
+            6500,
+            6900
+        ],
+
+        blocks:[
+            {x:650,h:110},
+            {x:1000,h:145},
+            {x:1450,h:100},
+            {x:1850,h:140},
+            {x:2450,h:115},
+            {x:3000,h:155},
+            {x:3600,h:120},
+            {x:4200,h:160},
+            {x:4800,h:130},
+            {x:5500,h:155},
+            {x:6250,h:135}
+        ]
+    },
+
+    {
+        id:5,
+        name:"GALAXY CORE",
+        difficulty:"INSANE",
+        color:"#55ff78",
+        speed:9.5,
+        length:7900,
+
+        spikes:[
+            550,
+            700,
+            850,
+            1050,
+            1250,
+            1450,
+            1700,
+            1950,
+            2200,
+            2500,
+            2800,
+            3100,
+            3400,
+            3700,
+            4000,
+            4350,
+            4700,
+            5050,
+            5400,
+            5800,
+            6200,
+            6600,
+            7000,
+            7400
+        ],
+
+        blocks:[
+            {x:600,h:120},
+            {x:950,h:150},
+            {x:1350,h:110},
+            {x:1800,h:145},
+            {x:2350,h:125},
+            {x:2900,h:165},
+            {x:3500,h:130},
+            {x:4100,h:170},
+            {x:4750,h:140},
+            {x:5350,h:170},
+            {x:6000,h:150},
+            {x:6750,h:175},
+            {x:7300,h:145}
+        ]
+    },
+
+    {
+        id:6,
+        name:"FINAL PULSE",
+        difficulty:"EXTREME",
+        color:"#ffd52f",
+        speed:10,
+        length:8800,
+
+        spikes:[
+            500,
+            650,
+            800,
+            950,
+            1100,
+            1300,
+            1500,
+            1700,
+            1950,
+            2200,
+            2450,
+            2700,
+            2950,
+            3250,
+            3550,
+            3850,
+            4150,
+            4450,
+            4750,
+            5100,
+            5450,
+            5800,
+            6150,
+            6500,
+            6850,
+            7200,
+            7550,
+            7950,
+            8350
+        ],
+
+        blocks:[
+            {x:550,h:120},
+            {x:900,h:155},
+            {x:1250,h:130},
+            {x:1600,h:170},
+            {x:2050,h:140},
+            {x:2550,h:175},
+            {x:3100,h:145},
+            {x:3700,h:180},
+            {x:4300,h:150},
+            {x:4900,h:185},
+            {x:5550,h:155},
+            {x:6200,h:190},
+            {x:6850,h:165},
+            {x:7500,h:190},
+            {x:8150,h:170}
+        ]
+    }
+
+];
+
 
 /* =========================================================
    NAVIGATION
 ========================================================= */
 
-const home=document.getElementById("home");
-const levels=document.getElementById("levels");
-const game=document.getElementById("game");
+function hideAllScreens(){
+
+    document.getElementById("home").style.display="none";
+    document.getElementById("levels").style.display="none";
+    document.getElementById("game").style.display="none";
+}
+
+function showHome(){
+
+    stopGame();
+
+    hideAllScreens();
+
+    document.getElementById("home").style.display="flex";
+
+    updateHomeStats();
+}
 
 function showLevels(){
-  home.classList.add("hidden");
-  levels.classList.remove("hidden");
+
+    stopGame();
+
+    hideAllScreens();
+
+    document.getElementById("levels").style.display="block";
+
+    buildLevelCards();
 }
 
-function goHome(){
-  levels.classList.add("hidden");
-  game.classList.add("hidden");
-  home.classList.remove("hidden");
-}
-
-function openSettings(){
-  document.getElementById("settings").classList.remove("hidden");
-}
-
-function closeSettings(){
-  document.getElementById("settings").classList.add("hidden");
-}
-
-function showStats(){
-  alert(
-    "NEON DASH STATS\n\n"+
-    "Highest Level: "+save.level+
-    "\nStars: "+save.stars+
-    "\nBest Run: "+save.best+"%"+
-    "\nAttempts: "+save.attempts
-  );
-}
 
 /* =========================================================
-   CANVAS
+   LEVEL CARDS
 ========================================================= */
 
-const canvas=document.getElementById("gameCanvas");
-const ctx=canvas.getContext("2d");
+function buildLevelCards(){
+
+    const grid =
+        document.getElementById("levelGrid");
+
+    grid.innerHTML="";
+
+    levelsData.forEach((level,index)=>{
+
+        const unlocked =
+            index+1 <= save.level;
+
+        const best =
+            save.best[level.id] || 0;
+
+        const card =
+            document.createElement("div");
+
+        card.className="level-card";
+
+        card.style.borderColor =
+            unlocked
+            ? level.color+"66"
+            : "#ffffff12";
+
+        card.innerHTML=`
+
+            <div class="level-number">
+                LEVEL ${level.id}
+            </div>
+
+            <div
+                class="level-name"
+                style="text-shadow:0 0 15px ${level.color}">
+                ${level.name}
+            </div>
+
+            <div
+                class="difficulty"
+                style="
+                    color:${level.color};
+                    border-color:${level.color}55;
+                    background:${level.color}12;
+                ">
+                ${level.difficulty}
+            </div>
+
+            <div class="level-progress">
+                <div
+                    class="level-progress-fill"
+                    style="
+                        width:${best}%;
+                        background:
+                        linear-gradient(
+                            90deg,
+                            ${level.color},
+                            #714fff
+                        );
+                    ">
+                </div>
+            </div>
+
+            <div
+                style="
+                    position:absolute;
+                    left:22px;
+                    bottom:21px;
+                    color:#777791;
+                    font-size:11px;
+                    font-weight:900;
+                ">
+                BEST ${best}%
+            </div>
+
+            <button
+                class="play-level"
+                ${!unlocked ? "disabled" : ""}
+                onclick="startLevel(${index})"
+                style="
+                    border-color:${unlocked ? level.color : "#555"};
+                    opacity:${unlocked ? "1" : ".35"};
+                ">
+                ${unlocked ? "▶" : "🔒"}
+            </button>
+        `;
+
+        grid.appendChild(card);
+    });
+}
+
+
+/* =========================================================
+   GAME VARIABLES
+========================================================= */
+
+const canvas =
+    document.getElementById("gameCanvas");
+
+const ctx =
+    canvas.getContext("2d");
 
 let W=window.innerWidth;
 let H=window.innerHeight;
 
-function resize(){
-  W=canvas.width=window.innerWidth;
-  H=canvas.height=window.innerHeight;
-}
-
-window.addEventListener("resize",resize);
-resize();
-
-/* =========================================================
-   LEVELS
-========================================================= */
-
-const levelsData=[
-
-{
-  name:"CYBER START",
-  color:"#714fff",
-  speed:6,
-  length:5000,
-  spikes:[
-    650,900,1150,1500,1800,2100,
-    2500,2750,3100,3500,3800,4200,4550
-  ],
-  blocks:[
-    {x:1200,h:80},
-    {x:1600,h:120},
-    {x:2300,h:90},
-    {x:3000,h:130},
-    {x:4000,h:100}
-  ]
-},
-
-{
-  name:"ELECTRIC SKY",
-  color:"#00eaff",
-  speed:7,
-  length:5700,
-  spikes:[
-    550,800,1050,1300,1600,1850,
-    2200,2450,2700,2950,3300,3600,
-    3900,4200,4500,4900,5250
-  ],
-  blocks:[
-    {x:1000,h:100},
-    {x:1450,h:140},
-    {x:2000,h:100},
-    {x:2800,h:150},
-    {x:3400,h:110},
-    {x:4400,h:140}
-  ]
-},
-
-{
-  name:"VOID REACTOR",
-  color:"#ff38d8",
-  speed:7.5,
-  length:6300,
-  spikes:[
-    500,750,1000,1250,1550,1800,
-    2100,2400,2700,3000,3400,3650,
-    4000,4300,4600,4900,5200,5550,5900
-  ],
-  blocks:[
-    {x:900,h:120},
-    {x:1350,h:160},
-    {x:1950,h:120},
-    {x:2500,h:160},
-    {x:3200,h:130},
-    {x:3800,h:170},
-    {x:4700,h:140},
-    {x:5400,h:170}
-  ]
-},
-
-{
-  name:"HYPER DRIVE",
-  color:"#ff6b2d",
-  speed:9,
-  length:7000,
-  spikes:[
-    500,700,900,1150,1400,1650,
-    1900,2200,2450,2700,3000,3250,
-    3500,3800,4100,4400,4700,5000,
-    5400,5700,6100,6500
-  ],
-  blocks:[
-    {x:800,h:100},
-    {x:1500,h:150},
-    {x:2300,h:120},
-    {x:3100,h:160},
-    {x:4000,h:140},
-    {x:4900,h:180},
-    {x:5800,h:150}
-  ]
-},
-
-{
-  name:"GALAXY CORE",
-  color:"#55ff78",
-  speed:9.5,
-  length:7600,
-  spikes:[
-    450,650,850,1050,1300,1550,1800,
-    2050,2350,2600,2900,3150,3450,
-    3750,4050,4350,4650,4950,5300,
-    5600,5900,6200,6500,6850,7200
-  ],
-  blocks:[
-    {x:750,h:130},
-    {x:1200,h:170},
-    {x:1950,h:120},
-    {x:2700,h:180},
-    {x:3400,h:150},
-    {x:4300,h:190},
-    {x:5100,h:160},
-    {x:6000,h:190},
-    {x:6900,h:160}
-  ]
-},
-
-{
-  name:"FINAL PULSE",
-  color:"#ffd52f",
-  speed:10,
-  length:8500,
-  spikes:[
-    450,650,850,1050,1250,1450,
-    1650,1900,2150,2400,2650,2900,
-    3150,3400,3650,3900,4200,4500,
-    4800,5100,5400,5700,6000,6300,
-    6600,6900,7200,7500,7900,8200
-  ],
-  blocks:[
-    {x:700,h:150},
-    {x:1100,h:190},
-    {x:1750,h:150},
-    {x:2500,h:200},
-    {x:3300,h:170},
-    {x:4100,h:210},
-    {x:5000,h:180},
-    {x:5900,h:220},
-    {x:6800,h:190},
-    {x:7600,h:230}
-  ]
-}
-
-];
-
-/* =========================================================
-   GAME STATE
-========================================================= */
-
 let currentLevel=0;
 let levelData=null;
+
 let playing=false;
 let dead=false;
-
-let player={
-  x:220,
-  y:0,
-  size:38,
-  vy:0,
-  grounded:false,
-  rotation:0
-};
+let completed=false;
 
 let cameraX=0;
-let gameStart=0;
+
 let particles=[];
 let shake=0;
+
+let animationId=null;
+
+let jumpHeld=false;
+let jumpBuffer=0;
+let coyoteTime=0;
+
+let soundEnabled=true;
+
+let player={
+    x:220,
+    y:0,
+    size:38,
+    vy:0,
+    grounded:false,
+    rotation:0
+};
+
+
+/* =========================================================
+   CANVAS RESIZE
+========================================================= */
+
+function resizeCanvas(){
+
+    const dpr =
+        Math.min(window.devicePixelRatio || 1,2);
+
+    W=window.innerWidth;
+    H=window.innerHeight;
+
+    canvas.width=W*dpr;
+    canvas.height=H*dpr;
+
+    canvas.style.width=W+"px";
+    canvas.style.height=H+"px";
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+}
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+resizeCanvas();
+
 
 /* =========================================================
    START LEVEL
@@ -861,668 +1551,81 @@ let shake=0;
 
 function startLevel(index){
 
-  currentLevel=index;
-  levelData=levelsData[index];
+    if(index<0 || index>=levelsData.length){
+        return;
+    }
 
-  levels.classList.add("hidden");
-  home.classList.add("hidden");
-  game.classList.remove("hidden");
+    currentLevel=index;
+    levelData=levelsData[index];
 
-  player.x=220;
-  player.y=H-130;
-  player.vy=0;
-  player.rotation=0;
+    hideAllScreens();
 
-  cameraX=0;
-  particles=[];
-  shake=0;
-  dead=false;
-  playing=true;
+    document.getElementById("game").style.display="block";
 
-  save.attempts++;
-  saveGame();
-
-  document.getElementById("levelName").textContent=levelData.name;
-  document.getElementById("percent").textContent="0%";
-  document.getElementById("progressFill").style.width="0%";
-
-  requestAnimationFrame(gameLoop);
-}
-
-/* =========================================================
-   INPUT
-========================================================= */
-
-function jump(){
-
-  if(!playing)return;
-
-  if(dead){
-    startLevel(currentLevel);
-    return;
-  }
-
-  if(player.grounded){
-
-    player.vy=-15;
-    player.grounded=false;
-
-    createParticles(
-      player.x-cameraX,
-      player.y+player.size,
-      10
-    );
-
-  }
-}
-
-window.addEventListener("keydown",e=>{
-
-  if(
-    e.code==="Space" ||
-    e.code==="ArrowUp" ||
-    e.code==="KeyW"
-  ){
-    e.preventDefault();
-    jump();
-  }
-
-});
-
-document.getElementById("jumpButton").addEventListener(
-  "pointerdown",
-  jump
-);
-
-/* =========================================================
-   PARTICLES
-========================================================= */
-
-function createParticles(x,y,count){
-
-  for(let i=0;i<count;i++){
-
-    particles.push({
-      x,
-      y,
-      vx:(Math.random()-.5)*7,
-      vy:(Math.random()-.8)*7,
-      life:1,
-      size:Math.random()*5+2
-    });
-
-  }
-}
-
-function updateParticles(){
-
-  for(let p of particles){
-
-    p.x+=p.vx;
-    p.y+=p.vy;
-    p.vy+=.15;
-    p.life-=.035;
-
-  }
-
-  particles=particles.filter(p=>p.life>0);
-}
-
-function drawParticles(){
-
-  for(let p of particles){
-
-    ctx.globalAlpha=p.life;
-    ctx.fillStyle=levelData.color;
-
-    ctx.fillRect(
-      p.x,
-      p.y,
-      p.size,
-      p.size
-    );
-
-  }
-
-  ctx.globalAlpha=1;
-}
-
-/* =========================================================
-   COLLISION
-========================================================= */
-
-function rectHit(a,b){
-
-  return(
-    a.x < b.x+b.w &&
-    a.x+a.w > b.x &&
-    a.y < b.y+b.h &&
-    a.y+a.h > b.y
-  );
-
-}
-
-/* =========================================================
-   DEATH
-========================================================= */
-
-function die(){
-
-  if(dead)return;
-
-  dead=true;
-  playing=false;
-  shake=20;
-
-  createParticles(
-    player.x-cameraX+player.size/2,
-    player.y+player.size/2,
-    35
-  );
-
-  flash();
-
-  const percent=Math.floor(
-    (player.x/levelData.length)*100
-  );
-
-  if(percent>save.best){
-    save.best=percent;
-    saveGame();
-  }
-
-  showMessage(
-    "CRASH!",
-    percent+"% COMPLETE • TAP TO RETRY"
-  );
-
-}
-
-/* =========================================================
-   WIN
-========================================================= */
-
-function win(){
-
-  playing=false;
-  dead=true;
-
-  save.stars+=5;
-
-  if(currentLevel+1>=save.level){
-    save.level=Math.min(6,currentLevel+2);
-  }
-
-  save.best=100;
-  saveGame();
-
-  createParticles(
-    W/2,
-    H/2,
-    100
-  );
-
-  showMessage(
-    "LEVEL COMPLETE!",
-    "+5 STARS • TAP TO PLAY AGAIN"
-  );
-
-}
-
-/* =========================================================
-   MESSAGE
-========================================================= */
-
-function showMessage(title,text){
-
-  const box=document.getElementById("gameMessage");
-  const titleEl=document.getElementById("messageTitle");
-  const textEl=document.getElementById("messageText");
-
-  titleEl.textContent=title;
-  textEl.textContent=text;
-
-  box.style.opacity="1";
-
-  setTimeout(()=>{
-    box.querySelector(".message-box").style.transform=
-      "scale(1)";
-  },20);
-
-}
-
-/* =========================================================
-   FLASH
-========================================================= */
-
-function flash(){
-
-  const f=document.getElementById("flash");
-
-  f.style.opacity=".7";
-
-  setTimeout(()=>{
-    f.style.opacity="0";
-  },80);
-
-}
-
-/* =========================================================
-   GAME LOOP
-========================================================= */
-
-function gameLoop(){
-
-  update();
-
-  draw();
-
-  if(playing || particles.length>0){
-    requestAnimationFrame(gameLoop);
-  }
-
-}
-
-/* =========================================================
-   UPDATE
-========================================================= */
-
-function update(){
-
-  updateParticles();
-
-  if(!playing)return;
-
-  const gravity=.8;
-
-  player.vy+=gravity;
-  player.y+=player.vy;
-
-  const ground=H-95;
-
-  player.grounded=false;
-
-  if(player.y+player.size>=ground){
-
-    player.y=ground-player.size;
+    player.x=220;
+    player.y=H-95-38;
     player.vy=0;
     player.grounded=true;
+    player.rotation=0;
 
-  }
+    cameraX=0;
 
-  player.x+=levelData.speed;
+    particles=[];
+    shake=0;
 
-  cameraX=player.x-W*.25;
+    playing=true;
+    dead=false;
+    completed=false;
 
-  player.rotation+=.13;
+    jumpHeld=false;
+    jumpBuffer=0;
+    coyoteTime=5;
 
-  /* spikes */
+    save.attempts++;
 
-  for(const sx of levelData.spikes){
+    saveGame();
 
-    const spike={
-      x:sx,
-      y:H-95-42,
-      w:42,
-      h:42
-    };
+    document.getElementById("levelName").textContent =
+        levelData.name;
 
-    const hitbox={
-      x:player.x+5,
-      y:player.y+5,
-      w:player.size-10,
-      h:player.size-10
-    };
+    document.getElementById("levelName").style.textShadow =
+        `0 0 15px ${levelData.color}`;
 
-    if(rectHit(hitbox,spike)){
-      die();
-      return;
+    document.getElementById("percent").textContent="0%";
+
+    document.getElementById("progressFill").style.width="0%";
+
+    hideMessage();
+
+    cancelAnimationFrame(animationId);
+
+    gameLoop();
+}
+
+
+/* =========================================================
+   RESTART
+========================================================= */
+
+function restartLevel(){
+
+    if(levelData){
+        startLevel(currentLevel);
     }
-
-  }
-
-  /* blocks */
-
-  for(const block of levelData.blocks){
-
-    const b={
-      x:block.x,
-      y:H-95-block.h,
-      w:70,
-      h:block.h
-    };
-
-    const p={
-      x:player.x,
-      y:player.y,
-      w:player.size,
-      h:player.size
-    };
-
-    if(rectHit(p,b)){
-
-      if(player.vy>0 &&
-         player.y+player.size-player.vy<=b.y){
-
-        player.y=b.y-player.size;
-        player.vy=0;
-        player.grounded=true;
-
-      }else{
-        die();
-        return;
-      }
-
-    }
-
-  }
-
-  /* progress */
-
-  const percent=Math.min(
-    100,
-    Math.floor(player.x/levelData.length*100)
-  );
-
-  document.getElementById("percent").textContent=percent+"%";
-  document.getElementById("progressFill").style.width=
-    percent+"%";
-
-  if(percent>save.best && currentLevel===0){
-    save.best=percent;
-  }
-
-  if(player.x>=levelData.length){
-    win();
-  }
-
 }
+
 
 /* =========================================================
-   DRAW
+   STOP GAME
 ========================================================= */
 
-function draw(){
+function stopGame(){
 
-  ctx.clearRect(0,0,W,H);
+    playing=false;
 
-  drawBackground();
-
-  ctx.save();
-
-  if(shake>0){
-
-    ctx.translate(
-      (Math.random()-.5)*shake,
-      (Math.random()-.5)*shake
-    );
-
-    shake*=.85;
-
-    if(shake<.5)shake=0;
-
-  }
-
-  drawWorld();
-
-  drawPlayer();
-
-  drawParticles();
-
-  ctx.restore();
-
+    cancelAnimationFrame(animationId);
 }
 
-/* =========================================================
-   BACKGROUND
-========================================================= */
-
-function drawBackground(){
-
-  const gradient=ctx.createLinearGradient(0,0,0,H);
-
-  gradient.addColorStop(0,"#07051b");
-  gradient.addColorStop(.5,"#0b0b28");
-  gradient.addColorStop(1,"#05050d");
-
-  ctx.fillStyle=gradient;
-  ctx.fillRect(0,0,W,H);
-
-  /* giant glow */
-
-  const glow=ctx.createRadialGradient(
-    W*.5,H*.35,10,
-    W*.5,H*.35,H*.7
-  );
-
-  glow.addColorStop(0,levelData.color+"22");
-  glow.addColorStop(1,"transparent");
-
-  ctx.fillStyle=glow;
-  ctx.fillRect(0,0,W,H);
-
-  /* background grid */
-
-  ctx.globalAlpha=.13;
-  ctx.strokeStyle=levelData.color;
-  ctx.lineWidth=1;
-
-  const gridSize=60;
-
-  let offset=-(cameraX*.25)%gridSize;
-
-  for(let x=offset;x<W;x+=gridSize){
-
-    ctx.beginPath();
-    ctx.moveTo(x,0);
-    ctx.lineTo(x,H);
-    ctx.stroke();
-
-  }
-
-  for(let y=0;y<H;y+=gridSize){
-
-    ctx.beginPath();
-    ctx.moveTo(0,y);
-    ctx.lineTo(W,y);
-    ctx.stroke();
-
-  }
-
-  ctx.globalAlpha=1;
-
-}
-
-/* =========================================================
-   WORLD
-========================================================= */
-
-function drawWorld(){
-
-  const groundY=H-95;
-
-  /* ground glow */
-
-  ctx.shadowBlur=20;
-  ctx.shadowColor=levelData.color;
-  ctx.fillStyle="#121128";
-
-  ctx.fillRect(0,groundY,W,95);
-
-  ctx.shadowBlur=0;
-
-  ctx.fillStyle=levelData.color;
-
-  ctx.fillRect(0,groundY,W,4);
-
-  /* moving floor lines */
-
-  ctx.globalAlpha=.35;
-
-  const spacing=90;
-
-  let offset=-(cameraX%spacing);
-
-  for(let x=offset;x<W;x+=spacing){
-
-    ctx.fillRect(x,groundY+25,40,2);
-    ctx.fillRect(x+45,groundY+55,20,2);
-
-  }
-
-  ctx.globalAlpha=1;
-
-  /* blocks */
-
-  for(const block of levelData.blocks){
-
-    const x=block.x-cameraX;
-
-    if(x<-100 || x>W+100)continue;
-
-    ctx.shadowBlur=20;
-    ctx.shadowColor=levelData.color;
-
-    ctx.fillStyle="#151329";
-    ctx.fillRect(
-      x,
-      groundY-block.h,
-      70,
-      block.h
-    );
-
-    ctx.strokeStyle=levelData.color;
-    ctx.lineWidth=3;
-
-    ctx.strokeRect(
-      x,
-      groundY-block.h,
-      70,
-      block.h
-    );
-
-    ctx.shadowBlur=0;
-
-    for(let yy=groundY-block.h+15;yy<groundY;yy+=28){
-
-      ctx.globalAlpha=.25;
-      ctx.fillStyle=levelData.color;
-
-      ctx.fillRect(
-        x+10,
-        yy,
-        50,
-        3
-      );
-
-    }
-
-    ctx.globalAlpha=1;
-
-  }
-
-  /* spikes */
-
-  for(const sx of levelData.spikes){
-
-    const x=sx-cameraX;
-
-    if(x<-60 || x>W+60)continue;
-
-    ctx.beginPath();
-
-    ctx.moveTo(x,H-95);
-    ctx.lineTo(x+21,H-137);
-    ctx.lineTo(x+42,H-95);
-    ctx.closePath();
-
-    ctx.shadowBlur=18;
-    ctx.shadowColor="#ff397f";
-    ctx.fillStyle="#ff397f";
-    ctx.fill();
-
-    ctx.shadowBlur=0;
-
-    ctx.strokeStyle="#fff";
-    ctx.globalAlpha=.6;
-    ctx.stroke();
-
-    ctx.globalAlpha=1;
-
-  }
-
-}
-
-/* =========================================================
-   PLAYER
-========================================================= */
-
-function drawPlayer(){
-
-  const x=player.x-cameraX;
-  const y=player.y;
-
-  ctx.save();
-
-  ctx.translate(
-    x+player.size/2,
-    y+player.size/2
-  );
-
-  ctx.rotate(player.rotation);
-
-  ctx.shadowBlur=30;
-  ctx.shadowColor=levelData.color;
-
-  const gradient=ctx.createLinearGradient(
-    -20,-20,
-    20,20
-  );
-
-  gradient.addColorStop(0,"#ffffff");
-  gradient.addColorStop(.3,levelData.color);
-  gradient.addColorStop(1,"#3215a0");
-
-  ctx.fillStyle=gradient;
-
-  ctx.fillRect(
-    -player.size/2,
-    -player.size/2,
-    player.size,
-    player.size
-  );
-
-  ctx.shadowBlur=0;
-
-  ctx.strokeStyle="white";
-  ctx.lineWidth=2;
-  ctx.strokeRect(
-    -player.size/2,
-    -player.size/2,
-    player.size,
-    player.size
-  );
-
-  /* eyes */
-
-  ctx.fillStyle="#07101b";
-
-  ctx.fillRect(-11,-8,7,7);
-  ctx.fillRect(4,-8,7,7);
-
-  ctx.fillStyle="white";
-
-  ctx.fillRect(-9,-7,2,2);
-  ctx.fillRect(6,-7,2,2);
-
-  /* mouth */
-
-  ctx.fillStyle="#07101b";
-  ctx.fillRect(-9,7,18,4);
-
-  ctx.restore();
-
-}
 
 /* =========================================================
    QUIT
@@ -1530,70 +1633,1752 @@ function drawPlayer(){
 
 function quitGame(){
 
-  playing=false;
-  dead=false;
+    stopGame();
 
-  game.classList.add("hidden");
-  goHome();
-
+    showLevels();
 }
 
+
 /* =========================================================
-   CLICK AFTER GAME OVER
+   INPUT SYSTEM
 ========================================================= */
 
-document.getElementById("gameMessage").addEventListener(
-  "pointerdown",
-  ()=>{
+/*
+    Classic one-button controls:
 
-    if(dead){
-      startLevel(currentLevel);
+    Space
+    W
+    Arrow Up
+    Mouse click
+    Touch
+    Mobile JUMP button
+
+    One press = one jump.
+    Holding the button does not create repeated jumps.
+*/
+
+function pressJump(){
+
+    if(dead || completed){
+
+        if(dead){
+            restartLevel();
+        }else if(completed){
+            showLevels();
+        }
+
+        return;
     }
 
-  }
+    if(!playing){
+        return;
+    }
+
+    if(jumpHeld){
+        return;
+    }
+
+    jumpHeld=true;
+
+    jumpBuffer=6;
+
+    attemptJump();
+}
+
+
+function releaseJump(){
+
+    jumpHeld=false;
+}
+
+
+function attemptJump(){
+
+    if(!playing){
+        return;
+    }
+
+    if(
+        player.grounded ||
+        coyoteTime>0
+    ){
+
+        player.vy=-15.5;
+
+        player.grounded=false;
+
+        coyoteTime=0;
+
+        jumpBuffer=0;
+
+        createJumpParticles();
+
+        flashScreen();
+    }
+}
+
+
+/* KEYBOARD */
+
+window.addEventListener(
+    "keydown",
+    function(e){
+
+        if(
+            e.code==="Space" ||
+            e.code==="ArrowUp" ||
+            e.code==="KeyW"
+        ){
+
+            e.preventDefault();
+
+            if(!e.repeat){
+                pressJump();
+            }
+        }
+
+        if(e.code==="KeyR"){
+
+            e.preventDefault();
+
+            restartLevel();
+        }
+    }
 );
 
+
+window.addEventListener(
+    "keyup",
+    function(e){
+
+        if(
+            e.code==="Space" ||
+            e.code==="ArrowUp" ||
+            e.code==="KeyW"
+        ){
+
+            e.preventDefault();
+
+            releaseJump();
+        }
+    }
+);
+
+
+/* MOUSE */
+
+canvas.addEventListener(
+    "pointerdown",
+    function(e){
+
+        if(e.pointerType==="mouse" && e.button!==0){
+            return;
+        }
+
+        pressJump();
+    }
+);
+
+canvas.addEventListener(
+    "pointerup",
+    releaseJump
+);
+
+canvas.addEventListener(
+    "pointercancel",
+    releaseJump
+);
+
+
+/* MOBILE BUTTON */
+
+const jumpButton =
+    document.getElementById("jumpButton");
+
+jumpButton.addEventListener(
+    "pointerdown",
+    function(e){
+
+        e.preventDefault();
+
+        pressJump();
+    }
+);
+
+jumpButton.addEventListener(
+    "pointerup",
+    function(e){
+
+        e.preventDefault();
+
+        releaseJump();
+    }
+);
+
+jumpButton.addEventListener(
+    "pointercancel",
+    releaseJump
+);
+
+jumpButton.addEventListener(
+    "pointerleave",
+    releaseJump
+);
+
+
+/* Prevent touch scrolling */
+
+document.addEventListener(
+    "touchmove",
+    function(e){
+
+        if(
+            document.getElementById("game").style.display !== "none"
+        ){
+            e.preventDefault();
+        }
+
+    },
+    {passive:false}
+);
+
+
 /* =========================================================
-   PARALLAX PARTICLES
+   GAME LOOP
 ========================================================= */
 
-setInterval(()=>{
+function gameLoop(){
 
-  if(!levelData || !playing)return;
+    update();
 
-  createParticles(
-    Math.random()*W,
-    Math.random()*H*.65,
-    1
-  );
+    draw();
 
-},100);
+    if(playing){
+
+        animationId =
+            requestAnimationFrame(gameLoop);
+    }
+}
+
 
 /* =========================================================
-   HIDE MESSAGE WHEN STARTING
+   UPDATE
 ========================================================= */
 
-const originalStartLevel=startLevel;
+function update(){
 
-startLevel=function(index){
+    if(!playing){
+        return;
+    }
 
-  const box=document.getElementById("gameMessage");
+    /* -----------------------------------------
+       INPUT BUFFER
+    ----------------------------------------- */
 
-  box.style.opacity="0";
+    if(jumpBuffer>0){
 
-  const inner=box.querySelector(".message-box");
+        jumpBuffer--;
 
-  inner.style.transform="scale(.8)";
+        attemptJump();
+    }
 
-  originalStartLevel(index);
 
-};
+    /* -----------------------------------------
+       PHYSICS
+    ----------------------------------------- */
+
+    const gravity=.82;
+
+    player.vy += gravity;
+
+    player.y += player.vy;
+
+
+    const ground =
+        H-95;
+
+
+    const wasGrounded =
+        player.grounded;
+
+    player.grounded=false;
+
+
+    /* Ground collision */
+
+    if(
+        player.y + player.size >= ground
+    ){
+
+        player.y =
+            ground-player.size;
+
+        player.vy=0;
+
+        player.grounded=true;
+
+        coyoteTime=5;
+    }
+    else{
+
+        if(coyoteTime>0){
+            coyoteTime--;
+        }
+    }
+
+
+    /* -----------------------------------------
+       AUTO RUN
+    ----------------------------------------- */
+
+    player.x += levelData.speed;
+
+
+    /* -----------------------------------------
+       CAMERA
+    ----------------------------------------- */
+
+    cameraX =
+        player.x-W*.25;
+
+
+    if(cameraX<0){
+        cameraX=0;
+    }
+
+
+    /* -----------------------------------------
+       ROTATION
+    ----------------------------------------- */
+
+    if(!player.grounded){
+
+        player.rotation += .14;
+    }
+    else{
+
+        const quarter =
+            Math.PI/2;
+
+        player.rotation =
+            Math.round(
+                player.rotation/quarter
+            )*quarter;
+    }
+
+
+    /* -----------------------------------------
+       COLLISION WITH BLOCKS
+    ----------------------------------------- */
+
+    for(const block of levelData.blocks){
+
+        const bx =
+            block.x-cameraX;
+
+        const by =
+            ground-block.h;
+
+        const bw=80;
+        const bh=block.h;
+
+        const px=player.x-cameraX;
+        const py=player.y;
+        const ps=player.size;
+
+
+        const hit =
+            px < bx+bw &&
+            px+ps > bx &&
+            py < by+bh &&
+            py+ps > by;
+
+
+        if(hit){
+
+            /*
+                If the player is falling and is above
+                the block, allow a landing.
+            */
+
+            const previousBottom =
+                py- player.vy + ps;
+
+            if(
+                player.vy>=0 &&
+                previousBottom<=by+8
+            ){
+
+                player.y =
+                    by-ps;
+
+                player.vy=0;
+
+                player.grounded=true;
+
+                coyoteTime=5;
+            }
+            else{
+
+                die();
+
+                return;
+            }
+        }
+    }
+
+
+    /* -----------------------------------------
+       SPIKE COLLISION
+    ----------------------------------------- */
+
+    for(const spikeX of levelData.spikes){
+
+        const sx =
+            spikeX-cameraX;
+
+        if(
+            sx<-80 ||
+            sx>W+80
+        ){
+            continue;
+        }
+
+        const spikeY =
+            ground-42;
+
+        const px =
+            player.x-cameraX;
+
+        const py =
+            player.y;
+
+        const ps =
+            player.size;
+
+
+        /*
+            Slightly smaller hitbox than visual box
+            makes controls feel more forgiving.
+        */
+
+        const hitboxPadding=7;
+
+        const hit =
+            px+hitboxPadding < sx+40 &&
+            px+ps-hitboxPadding > sx &&
+            py+hitboxPadding < spikeY+42 &&
+            py+ps-hitboxPadding > spikeY+10;
+
+
+        if(hit){
+
+            die();
+
+            return;
+        }
+    }
+
+
+    /* -----------------------------------------
+       PARTICLES
+    ----------------------------------------- */
+
+    updateParticles();
+
+
+    /* -----------------------------------------
+       SHAKE
+    ----------------------------------------- */
+
+    if(shake>0){
+        shake--;
+    }
+
+
+    /* -----------------------------------------
+       PROGRESS
+    ----------------------------------------- */
+
+    const progress =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                ((player.x-220) /
+                (levelData.length-220))*100
+            )
+        );
+
+    document.getElementById("percent").textContent =
+        Math.floor(progress)+"%";
+
+    document.getElementById("progressFill").style.width =
+        progress+"%";
+
+
+    /* -----------------------------------------
+       WIN
+    ----------------------------------------- */
+
+    if(player.x>=levelData.length){
+
+        win();
+    }
+}
+
 
 /* =========================================================
-   INITIAL
+   DRAW
+========================================================= */
+
+function draw(){
+
+    ctx.clearRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    let sx=0;
+    let sy=0;
+
+    if(shake>0){
+
+        sx =
+            (Math.random()-.5)*10;
+
+        sy =
+            (Math.random()-.5)*10;
+    }
+
+    ctx.save();
+
+    ctx.translate(
+        sx,
+        sy
+    );
+
+    drawBackground();
+
+    drawWorld();
+
+    drawParticles();
+
+    drawPlayer();
+
+    ctx.restore();
+}
+
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+function drawBackground(){
+
+    const color =
+        levelData
+        ? levelData.color
+        : "#714fff";
+
+
+    /* Sky */
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            H
+        );
+
+    gradient.addColorStop(
+        0,
+        "#07071b"
+    );
+
+    gradient.addColorStop(
+        .6,
+        "#09051a"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#030308"
+    );
+
+    ctx.fillStyle=gradient;
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    /* Large glow */
+
+    const glow =
+        ctx.createRadialGradient(
+            W*.55,
+            H*.4,
+            10,
+            W*.55,
+            H*.4,
+            W*.65
+        );
+
+    glow.addColorStop(
+        0,
+        color+"22"
+    );
+
+    glow.addColorStop(
+        1,
+        "transparent"
+    );
+
+    ctx.fillStyle=glow;
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    /* Background grid */
+
+    ctx.save();
+
+    ctx.globalAlpha=.15;
+
+    ctx.strokeStyle=color;
+
+    ctx.lineWidth=1;
+
+    const gridSize=70;
+
+    const offsetX =
+        -(cameraX*.25)%gridSize;
+
+    for(
+        let x=offsetX;
+        x<W;
+        x+=gridSize
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            0
+        );
+
+        ctx.lineTo(
+            x,
+            H
+        );
+
+        ctx.stroke();
+    }
+
+    for(
+        let y=70;
+        y<H;
+        y+=gridSize
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            y
+        );
+
+        ctx.lineTo(
+            W,
+            y
+        );
+
+        ctx.stroke();
+    }
+
+    ctx.restore();
+
+
+    /* Distant skyline */
+
+    ctx.save();
+
+    ctx.globalAlpha=.15;
+
+    for(
+        let i=0;
+        i<25;
+        i++
+    ){
+
+        const buildingWidth=45;
+
+        const x =
+            ((i*170)-(cameraX*.15)) %
+            (W+250);
+
+        const normalizedX =
+            x<0
+            ? x+W+250
+            : x;
+
+        const height =
+            60+(i%6)*30;
+
+        ctx.fillStyle=color;
+
+        ctx.fillRect(
+            normalizedX,
+            H-95-height,
+            buildingWidth,
+            height
+        );
+    }
+
+    ctx.restore();
+}
+
+
+/* =========================================================
+   DRAW WORLD
+========================================================= */
+
+function drawWorld(){
+
+    const color =
+        levelData.color;
+
+    const ground =
+        H-95;
+
+
+    /* Ground */
+
+    const groundGradient =
+        ctx.createLinearGradient(
+            0,
+            ground,
+            0,
+            H
+        );
+
+    groundGradient.addColorStop(
+        0,
+        color+"55"
+    );
+
+    groundGradient.addColorStop(
+        1,
+        "#030308"
+    );
+
+    ctx.fillStyle =
+        groundGradient;
+
+    ctx.fillRect(
+        0,
+        ground,
+        W,
+        H-ground
+    );
+
+
+    /* Ground glow */
+
+    ctx.shadowBlur=20;
+
+    ctx.shadowColor=color;
+
+    ctx.strokeStyle=color;
+
+    ctx.lineWidth=4;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        ground
+    );
+
+    ctx.lineTo(
+        W,
+        ground
+    );
+
+    ctx.stroke();
+
+    ctx.shadowBlur=0;
+
+
+    /* Ground lines */
+
+    ctx.globalAlpha=.25;
+
+    ctx.lineWidth=1;
+
+    const spacing=50;
+
+    const offset =
+        -(cameraX*.7)%spacing;
+
+    for(
+        let x=offset;
+        x<W;
+        x+=spacing
+    ){
+
+        ctx.strokeStyle=color;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            ground
+        );
+
+        ctx.lineTo(
+            x-80,
+            H
+        );
+
+        ctx.stroke();
+    }
+
+    ctx.globalAlpha=1;
+
+
+    /* Blocks */
+
+    for(const block of levelData.blocks){
+
+        const x =
+            block.x-cameraX;
+
+        const y =
+            ground-block.h;
+
+        const width=80;
+
+        if(
+            x>W+100 ||
+            x<-100
+        ){
+            continue;
+        }
+
+        const grad =
+            ctx.createLinearGradient(
+                x,
+                y,
+                x,
+                ground
+            );
+
+        grad.addColorStop(
+            0,
+            color+"bb"
+        );
+
+        grad.addColorStop(
+            1,
+            color+"22"
+        );
+
+        ctx.fillStyle=grad;
+
+        ctx.fillRect(
+            x,
+            y,
+            width,
+            block.h
+        );
+
+
+        ctx.strokeStyle=color;
+
+        ctx.lineWidth=2;
+
+        ctx.shadowBlur=15;
+
+        ctx.shadowColor=color;
+
+        ctx.strokeRect(
+            x,
+            y,
+            width,
+            block.h
+        );
+
+        ctx.shadowBlur=0;
+
+
+        /* Block top */
+
+        ctx.fillStyle=color;
+
+        ctx.fillRect(
+            x,
+            y,
+            width,
+            5
+        );
+
+
+        /* Block details */
+
+        ctx.globalAlpha=.35;
+
+        ctx.fillStyle="#fff";
+
+        for(
+            let yy=y+18;
+            yy<ground;
+            yy+=24
+        ){
+
+            ctx.fillRect(
+                x+10,
+                yy,
+                5,
+                5
+            );
+
+            ctx.fillRect(
+                x+35,
+                yy,
+                5,
+                5
+            );
+
+            ctx.fillRect(
+                x+60,
+                yy,
+                5,
+                5
+            );
+        }
+
+        ctx.globalAlpha=1;
+    }
+
+
+    /* Spikes */
+
+    for(const spikeX of levelData.spikes){
+
+        const x =
+            spikeX-cameraX;
+
+        if(
+            x<-80 ||
+            x>W+80
+        ){
+            continue;
+        }
+
+        drawSpike(
+            x,
+            ground,
+            color
+        );
+    }
+
+
+    /* Finish portal */
+
+    const finishX =
+        levelData.length-cameraX;
+
+    if(
+        finishX>-100 &&
+        finishX<W+100
+    ){
+
+        ctx.save();
+
+        ctx.translate(
+            finishX,
+            ground-100
+        );
+
+        ctx.strokeStyle="#fff";
+
+        ctx.lineWidth=5;
+
+        ctx.shadowBlur=25;
+
+        ctx.shadowColor=color;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            65,
+            0,
+            Math.PI*2
+        );
+
+        ctx.stroke();
+
+        ctx.strokeStyle=color;
+
+        ctx.lineWidth=3;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            45,
+            0,
+            Math.PI*2
+        );
+
+        ctx.stroke();
+
+        ctx.restore();
+    }
+}
+
+
+/* =========================================================
+   SPIKE
+========================================================= */
+
+function drawSpike(
+    x,
+    ground,
+    color
+){
+
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x,
+        ground
+    );
+
+    ctx.lineTo(
+        x+20,
+        ground-43
+    );
+
+    ctx.lineTo(
+        x+40,
+        ground
+    );
+
+    ctx.closePath();
+
+    const gradient =
+        ctx.createLinearGradient(
+            x,
+            ground-43,
+            x,
+            ground
+        );
+
+    gradient.addColorStop(
+        0,
+        "#ffffff"
+    );
+
+    gradient.addColorStop(
+        .2,
+        color
+    );
+
+    gradient.addColorStop(
+        1,
+        color+"22"
+    );
+
+    ctx.fillStyle=gradient;
+
+    ctx.shadowBlur=18;
+
+    ctx.shadowColor=color;
+
+    ctx.fill();
+
+    ctx.strokeStyle=color;
+
+    ctx.lineWidth=2;
+
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+function drawPlayer(){
+
+    const color =
+        levelData.color;
+
+    const px =
+        player.x-cameraX;
+
+    const py =
+        player.y;
+
+    const s =
+        player.size;
+
+
+    ctx.save();
+
+    ctx.translate(
+        px+s/2,
+        py+s/2
+    );
+
+    ctx.rotate(
+        player.rotation
+    );
+
+
+    /* Glow */
+
+    ctx.shadowBlur=25;
+
+    ctx.shadowColor=color;
+
+
+    /* Outer cube */
+
+    const gradient =
+        ctx.createLinearGradient(
+            -s/2,
+            -s/2,
+            s/2,
+            s/2
+        );
+
+    gradient.addColorStop(
+        0,
+        "#ffffff"
+    );
+
+    gradient.addColorStop(
+        .25,
+        color
+    );
+
+    gradient.addColorStop(
+        1,
+        "#15152c"
+    );
+
+    ctx.fillStyle=gradient;
+
+    ctx.fillRect(
+        -s/2,
+        -s/2,
+        s,
+        s
+    );
+
+
+    /* Border */
+
+    ctx.strokeStyle="#fff";
+
+    ctx.lineWidth=3;
+
+    ctx.strokeRect(
+        -s/2,
+        -s/2,
+        s,
+        s
+    );
+
+
+    /* Face */
+
+    ctx.shadowBlur=0;
+
+    ctx.fillStyle="#05050c";
+
+    ctx.fillRect(
+        -11,
+        -9,
+        7,
+        9
+    );
+
+    ctx.fillRect(
+        4,
+        -9,
+        7,
+        9
+    );
+
+
+    /* Mouth */
+
+    ctx.fillRect(
+        -9,
+        6,
+        18,
+        4
+    );
+
+
+    /* Highlight */
+
+    ctx.fillStyle="#fff";
+
+    ctx.globalAlpha=.8;
+
+    ctx.fillRect(
+        -s/2+5,
+        -s/2+5,
+        7,
+        4
+    );
+
+    ctx.globalAlpha=1;
+
+    ctx.restore();
+}
+
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+function createJumpParticles(){
+
+    const px =
+        player.x-cameraX;
+
+    const py =
+        player.y+player.size;
+
+    for(
+        let i=0;
+        i<12;
+        i++
+    ){
+
+        particles.push({
+
+            x:px,
+            y:py,
+
+            vx:(Math.random()-.5)*5,
+
+            vy:Math.random()*-3,
+
+            size:Math.random()*5+2,
+
+            life:1,
+
+            color:levelData.color
+        });
+    }
+}
+
+
+function createDeathParticles(){
+
+    const px =
+        player.x-cameraX;
+
+    const py =
+        player.y+player.size/2;
+
+    for(
+        let i=0;
+        i<45;
+        i++
+    ){
+
+        const angle =
+            Math.random()*Math.PI*2;
+
+        const speed =
+            Math.random()*9+2;
+
+        particles.push({
+
+            x:px,
+            y:py,
+
+            vx:Math.cos(angle)*speed,
+
+            vy:Math.sin(angle)*speed,
+
+            size:Math.random()*7+2,
+
+            life:1,
+
+            color:
+                Math.random()>.5
+                ? levelData.color
+                : "#fff"
+        });
+    }
+}
+
+
+function createWinParticles(){
+
+    for(
+        let i=0;
+        i<100;
+        i++
+    ){
+
+        particles.push({
+
+            x:
+                player.x-cameraX,
+
+            y:
+                player.y,
+
+            vx:
+                (Math.random()-.5)*14,
+
+            vy:
+                (Math.random()-.5)*14,
+
+            size:
+                Math.random()*8+2,
+
+            life:1,
+
+            color:
+                Math.random()>.5
+                ? levelData.color
+                : "#fff"
+        });
+    }
+}
+
+
+function updateParticles(){
+
+    for(
+        let i=particles.length-1;
+        i>=0;
+        i--
+    ){
+
+        const p =
+            particles[i];
+
+        p.x+=p.vx;
+
+        p.y+=p.vy;
+
+        p.vy+=.25;
+
+        p.life-=.025;
+
+        p.size*=.98;
+
+        if(p.life<=0){
+
+            particles.splice(
+                i,
+                1
+            );
+        }
+    }
+}
+
+
+function drawParticles(){
+
+    for(const p of particles){
+
+        ctx.save();
+
+        ctx.globalAlpha =
+            Math.max(0,p.life);
+
+        ctx.fillStyle =
+            p.color;
+
+        ctx.shadowBlur=12;
+
+        ctx.shadowColor =
+            p.color;
+
+        ctx.fillRect(
+            p.x-p.size/2,
+            p.y-p.size/2,
+            p.size,
+            p.size
+        );
+
+        ctx.restore();
+    }
+}
+
+
+/* =========================================================
+   DEATH
+========================================================= */
+
+function die(){
+
+    if(dead || completed){
+        return;
+    }
+
+    dead=true;
+    playing=false;
+
+    createDeathParticles();
+
+    shake=15;
+
+    showMessage(
+        "CRASHED",
+        "You made it to "+getProgress()+"%.",
+        true
+    );
+}
+
+
+/* =========================================================
+   WIN
+========================================================= */
+
+function win(){
+
+    if(completed){
+        return;
+    }
+
+    completed=true;
+    playing=false;
+
+    createWinParticles();
+
+    save.stars++;
+
+    if(currentLevel+1>=save.level){
+
+        save.level =
+            Math.min(
+                levelsData.length,
+                currentLevel+2
+            );
+    }
+
+    save.best[levelData.id]=100;
+
+    saveGame();
+
+    showMessage(
+        "LEVEL COMPLETE!",
+        "You beat "+levelData.name+".",
+        false
+    );
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+function getProgress(){
+
+    if(!levelData){
+        return 0;
+    }
+
+    return Math.floor(
+        Math.max(
+            0,
+            Math.min(
+                100,
+                ((player.x-220) /
+                (levelData.length-220))*100
+            )
+        )
+    );
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+function showMessage(
+    title,
+    text,
+    crashed
+){
+
+    document.getElementById(
+        "messageTitle"
+    ).textContent=title;
+
+    document.getElementById(
+        "messageText"
+    ).textContent=text;
+
+    const box =
+        document.querySelector(
+            ".message-box"
+        );
+
+    if(crashed){
+
+        box.style.borderColor =
+            "#ff3d71";
+
+        box.style.boxShadow =
+            "0 0 50px #ff3d7133";
+    }
+    else{
+
+        box.style.borderColor =
+            levelData.color;
+
+        box.style.boxShadow =
+            `0 0 50px ${levelData.color}44`;
+    }
+
+    document.getElementById(
+        "gameMessage"
+    ).classList.add("show");
+}
+
+
+function hideMessage(){
+
+    document.getElementById(
+        "gameMessage"
+    ).classList.remove("show");
+}
+
+
+/* =========================================================
+   MESSAGE CLICK
+========================================================= */
+
+document.getElementById(
+    "gameMessage"
+).addEventListener(
+    "pointerdown",
+    function(){
+
+        if(dead){
+
+            restartLevel();
+
+        }else if(completed){
+
+            showLevels();
+        }
+    }
+);
+
+
+/* =========================================================
+   FLASH
+========================================================= */
+
+function flashScreen(){
+
+    const flash =
+        document.getElementById("flash");
+
+    /*
+       The original game doesn't need a visible flash
+       element. Use a quick canvas overlay instead.
+    */
+
+    ctx.save();
+
+    ctx.fillStyle =
+        levelData.color+"12";
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+    ctx.restore();
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+function openSettings(){
+
+    document.getElementById(
+        "settingsModal"
+    ).classList.add("show");
+}
+
+
+function closeSettings(){
+
+    document.getElementById(
+        "settingsModal"
+    ).classList.remove("show");
+}
+
+
+function toggleSound(){
+
+    soundEnabled =
+        !soundEnabled;
+
+    document.getElementById(
+        "soundToggle"
+    ).classList.toggle(
+        "active",
+        soundEnabled
+    );
+}
+
+
+function toggleMotion(){
+
+    document.getElementById(
+        "motionToggle"
+    ).classList.toggle(
+        "active"
+    );
+
+    document.body.classList.toggle(
+        "reduced-motion"
+    );
+}
+
+
+/* =========================================================
+   INITIALIZE
 ========================================================= */
 
 updateHomeStats();
+
+
+/* =========================================================
+   PERIODIC BACKGROUND PARTICLES
+========================================================= */
+
+setInterval(
+    function(){
+
+        if(
+            !playing ||
+            !levelData
+        ){
+            return;
+        }
+
+        for(
+            let i=0;
+            i<2;
+            i++
+        ){
+
+            particles.push({
+
+                x:
+                    Math.random()*W,
+
+                y:
+                    Math.random()*(H-150),
+
+                vx:-.3,
+
+                vy:.15,
+
+                size:
+                    Math.random()*2+1,
+
+                life:.8,
+
+                color:
+                    levelData.color
+            });
+        }
+
+    },
+    100
+);
+
+
+/* =========================================================
+   AUTO SAVE BEFORE LEAVING
+========================================================= */
+
+window.addEventListener(
+    "beforeunload",
+    function(){
+
+        saveGame();
+    }
+);
+
+
+/* =========================================================
+   ESCAPE KEY
+========================================================= */
+
+window.addEventListener(
+    "keydown",
+    function(e){
+
+        if(e.code==="Escape"){
+
+            if(
+                document.getElementById(
+                    "settingsModal"
+                ).classList.contains("show")
+            ){
+
+                closeSettings();
+
+                return;
+            }
+
+            if(
+                document.getElementById(
+                    "game"
+                ).style.display !== "none"
+            ){
+
+                quitGame();
+            }
+        }
+    }
+);
 
 </script>
 
