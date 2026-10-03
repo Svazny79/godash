@@ -307,6 +307,10 @@ let bossHits=0;
 let bossFlash=0;
 let bossDefeated=false;
 let bossProjectiles=[];
+let bossMoveTime=0;
+let bossMoveX=0;
+let bossMoveY=0;
+let winEmojis=[];
 const bossStartX=2050;
 
 /* ============================================================
@@ -700,6 +704,10 @@ bossHits=0;
 bossFlash=0;
 bossDefeated=false;
 bossProjectiles=[];
+bossMoveTime=0;
+bossMoveX=0;
+bossMoveY=0;
+winEmojis=[];
 
 generateLevel(levelData);
 
@@ -888,6 +896,7 @@ won=true;
 running=false;
 stopMusic();
 createWinParticles();
+createEmojiVictoryRain();
 messageTitle.textContent="LEVEL COMPLETE!";
 messageText.textContent="PRESS SPACE OR TAP TO RETURN TO LEVELS";
 gameMessage.classList.add("show");
@@ -1236,8 +1245,8 @@ if(!bossActive||bossDefeated||!running)return;
 ensureAudio();
 const startX=player.x+player.size+6;
 const startY=player.y+player.size/2;
-const targetX=bossStartX+canvas.width*.58;
-const targetY=canvas.height*.38;
+const targetX=bossStartX+canvas.width*.58+bossMoveX;
+const targetY=canvas.height*.38+bossMoveY;
 bossProjectiles.push({x:startX,y:startY,targetX,targetY,speed:26,life:90,trail:[]});
 if(soundEnabled&&audioCtx){
 const now=audioCtx.currentTime;
@@ -1250,6 +1259,12 @@ o.connect(g);g.connect(audioCtx.destination);o.start(now);o.stop(now+.14);
 
 function updateBoss(){
 if(!bossActive||bossDefeated)return;
+
+bossMoveTime+=0.075;
+/* The skull constantly floats and slides around the arena. */
+bossMoveX=Math.sin(bossMoveTime)*72+Math.sin(bossMoveTime*.47)*24;
+bossMoveY=Math.sin(bossMoveTime*1.35)*58+Math.cos(bossMoveTime*.62)*18;
+
 if(bossFlash>0)bossFlash--;
 for(let i=bossProjectiles.length-1;i>=0;i--){
 const p=bossProjectiles[i];
@@ -1301,10 +1316,59 @@ addParticle(bossStartX+canvas.width*.58,canvas.height*.38,(Math.random()-.5)*20,
 screenShake=18;
 }
 
+function createEmojiVictoryRain(){
+const emojis=["🎉","🥳","🔥","💥","✨","💫","😎","👑","🎊","⚡","💜","😈","🤩","🚀","🌟","💀","☠️"];
+winEmojis=[];
+for(let i=0;i<95;i++){
+  winEmojis.push({
+    x:Math.random()*canvas.width,
+    y:-40-Math.random()*canvas.height*.7,
+    vx:(Math.random()-.5)*2.2,
+    vy:2.5+Math.random()*4.5,
+    rot:(Math.random()-.5)*.5,
+    spin:(Math.random()-.5)*.12,
+    size:28+Math.random()*34,
+    emoji:emojis[i%emojis.length],
+    life:240+Math.random()*180
+  });
+}
+}
+
+function updateEmojiVictoryRain(){
+for(let i=winEmojis.length-1;i>=0;i--){
+  const e=winEmojis[i];
+  e.x+=e.vx;
+  e.y+=e.vy;
+  e.vy+=.018;
+  e.rot+=e.spin;
+  e.life--;
+  if(e.y>canvas.height+80||e.life<=0)winEmojis.splice(i,1);
+}
+}
+
+function drawEmojiVictoryRain(){
+if(!winEmojis.length)return;
+ctx.save();
+ctx.textAlign="center";
+ctx.textBaseline="middle";
+for(const e of winEmojis){
+  ctx.save();
+  ctx.translate(e.x,e.y);
+  ctx.rotate(e.rot);
+  ctx.globalAlpha=Math.min(1,e.life/45);
+  ctx.font=`${e.size}px Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif`;
+  ctx.shadowColor="#ffffff";
+  ctx.shadowBlur=18;
+  ctx.fillText(e.emoji,0,0);
+  ctx.restore();
+}
+ctx.restore();
+}
+
 function drawBoss(){
 if(currentLevel!==12)return;
-const bossX=bossStartX-cameraX+canvas.width*.58;
-const bossY=canvas.height*.38;
+const bossX=bossStartX-cameraX+canvas.width*.58+bossMoveX;
+const bossY=canvas.height*.38+bossMoveY;
 if(!bossActive&&!bossDefeated&&player.x<bossStartX-500)return;
 ctx.save();
 ctx.textAlign="center";
@@ -1314,6 +1378,7 @@ ctx.translate(bossX,bossY);
 ctx.scale(pulse,pulse);
 ctx.shadowColor="#ff3b5f";
 ctx.shadowBlur=38;
+ctx.globalAlpha=bossActive?0.98:1;
 ctx.font="170px Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif";
 ctx.fillText(bossFlash>0?"☠️":"💀",0,0);
 ctx.shadowBlur=0;
@@ -1443,6 +1508,7 @@ lastTime=timestamp;
 
 if(running)updatePlayer();
 updateParticles();
+updateEmojiVictoryRain();
 
 ctx.save();
 
@@ -1457,11 +1523,12 @@ drawFinish();
 drawObstacles();
 drawBoss();
 drawParticles();
+drawEmojiVictoryRain();
 drawPlayer();
 
 ctx.restore();
 
-if(running||particles.length>0){
+if(running||particles.length>0||winEmojis.length>0){
 animationFrame=requestAnimationFrame(gameLoop);
 }
 }
