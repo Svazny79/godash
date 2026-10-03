@@ -29,24 +29,24 @@ button{font:inherit}
 .neon-button:hover{transform:translateY(-3px) scale(1.02);background:linear-gradient(135deg,rgba(99,245,255,.2),rgba(113,79,255,.3));box-shadow:0 0 28px rgba(99,245,255,.45),inset 0 0 20px rgba(99,245,255,.1)}
 .neon-button:active{transform:scale(.97)}
 .small-version{position:absolute;bottom:15px;font-size:10px;letter-spacing:3px;color:#62677d}
-.level-screen{flex-direction:column;align-items:center;justify-content:center;z-index:10}
-.level-header{position:absolute;top:28px;width:100%;text-align:center}
+.level-screen{flex-direction:column;align-items:center;justify-content:flex-start;z-index:10;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:112px 0 45px}
+.level-header{position:absolute;top:24px;width:100%;text-align:center;z-index:3;pointer-events:none}.level-brand{font-size:11px;letter-spacing:6px;font-weight:1000;color:#63f5ff;text-shadow:0 0 14px #63f5ff;margin-bottom:5px}
 .level-header h1{font-size:36px;font-weight:1000;letter-spacing:4px;text-shadow:0 0 20px #714fff}
 .level-header p{margin-top:5px;color:#777c9c;font-size:12px;letter-spacing:3px}
-.level-list{width:min(850px,92vw);display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.level-list{width:min(850px,92vw);display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 auto;flex:none;padding-bottom:20px}
 .level-card{position:relative;min-height:190px;padding:22px;border:1px solid #303653;border-radius:20px;overflow:hidden;background:linear-gradient(145deg,rgba(22,25,53,.95),rgba(7,8,20,.95));cursor:pointer;transition:.2s}
 .level-card:hover{transform:translateY(-5px);border-color:#63f5ff;box-shadow:0 0 25px #63f5ff22}
 .level-number{position:absolute;right:15px;top:5px;font-size:70px;font-weight:1000;color:#ffffff09}
 .level-card h2{position:relative;font-size:22px;margin-bottom:8px}
 .difficulty{position:relative;font-size:11px;letter-spacing:3px;font-weight:900}
-.level-description{position:relative;color:#777d9b;margin-top:15px;font-size:12px;line-height:1.5}
+.level-description{position:relative;color:#777d9b;margin-top:15px;font-size:12px;line-height:1.5}.level-music{position:relative;margin-top:10px;color:#63f5ff;font-size:10px;letter-spacing:1.5px;font-weight:800;text-shadow:0 0 8px #63f5ff55}
 .level-progress{position:relative;margin-top:18px;height:6px;border-radius:10px;background:#15182a;overflow:hidden}
 .level-progress div{height:100%;width:0;border-radius:10px}
 .locked{opacity:.45;cursor:not-allowed}
 .locked:hover{transform:none;border-color:#303653;box-shadow:none}
 .back-button{position:absolute;left:25px;top:25px;border:1px solid #3b4260;background:#0b0d1b;color:#fff;border-radius:10px;padding:10px 17px;cursor:pointer;font-weight:800}
 #game{background:#050510}
-#gameCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#gameCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .game-ui{position:absolute;inset:0;pointer-events:none;z-index:20}
 .top-ui{position:absolute;top:15px;left:20px;right:20px;display:flex;align-items:center;justify-content:space-between}
 .ui-pill{min-width:120px;padding:9px 14px;border:1px solid #313955;border-radius:12px;background:rgba(4,5,14,.72);backdrop-filter:blur(10px);font-size:11px;letter-spacing:2px;color:#9ba4c7}
@@ -59,8 +59,6 @@ button{font:inherit}
 .game-message p{margin-top:10px;font-size:12px;color:#a7aecb;letter-spacing:3px}
 .game-controls{position:absolute;bottom:22px;left:22px;right:22px;display:flex;justify-content:space-between;align-items:center;pointer-events:auto}
 .game-control-button{border:1px solid #303753;border-radius:11px;background:rgba(5,7,18,.75);color:#ccd2ef;padding:10px 14px;cursor:pointer;font-size:11px;letter-spacing:2px;font-weight:900}
-.mobile-control{position:absolute;left:50%;bottom:25px;transform:translateX(-50%);z-index:30;width:150px;height:75px;border:2px solid #63f5ff;border-radius:18px;background:linear-gradient(135deg,rgba(99,245,255,.16),rgba(113,79,255,.2));color:#fff;font-size:17px;font-weight:1000;letter-spacing:3px;box-shadow:0 0 25px #63f5ff55,inset 0 0 20px #63f5ff18;touch-action:none;user-select:none;cursor:pointer;pointer-events:auto}
-.mobile-control:active{transform:translateX(-50%) scale(.95)}
 .modal{position:absolute;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
 .modal.show{display:flex}
 .modal-box{width:min(430px,90vw);border:1px solid #3a4262;border-radius:20px;padding:30px;background:linear-gradient(145deg,#101329,#070812);box-shadow:0 0 50px #000}
@@ -129,25 +127,22 @@ body{
 .ui-pill{
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 25px rgba(0,0,0,.22);
 }
-.mobile-control{
-    background:radial-gradient(circle at 50% 30%,rgba(255,255,255,.15),transparent 40%),
-    linear-gradient(135deg,rgba(0,234,255,.22),rgba(113,79,255,.3),rgba(255,56,216,.18));
-}
 /* ============================================================
    END VISUAL UPGRADE
    ============================================================ */
 
 @media(max-width:700px){
-.level-list{grid-template-columns:1fr;width:min(430px,90vw);max-height:75vh;overflow-y:auto;padding:10px}
+.level-screen{padding-top:105px;padding-bottom:30px}
+.level-list{grid-template-columns:1fr;width:min(430px,90vw);max-height:none;overflow:visible;padding:10px}
 .level-card{min-height:145px}
 .level-header{top:20px}
 .level-header h1{font-size:27px}
 .back-button{top:15px;left:15px}
 .progress-wrap{width:58vw}
-.ui-pill{min-width:auto;padding:8px 10px;font-size:9px}
+.ui-pill{min-width:auto;padding:8px 8px;font-size:8px}.music-pill{display:none}
 .mobile-control{bottom:65px}
 }
-@media(min-width:701px){.mobile-control{display:none}}
+
 </style>
 
 
@@ -159,7 +154,7 @@ body{
 <div class="background"><div class="grid"></div><div class="glow"></div><div class="stars" id="homeStars"></div></div>
 <div class="home-content">
 <div class="logo">NEON <span>DASH</span></div>
-<div class="subtitle">RUN • JUMP • SURVIVE</div>
+<div class="subtitle">BEAT THE NEON</div>
 <div class="menu-buttons">
 <button class="neon-button" id="playButton">PLAY</button>
 <button class="neon-button" id="settingsButton">SETTINGS</button>
@@ -171,7 +166,7 @@ body{
 <section id="levels" class="screen level-screen">
 <div class="background"><div class="grid"></div><div class="glow"></div><div class="stars" id="levelStars"></div></div>
 <button class="back-button" id="levelsBack">← BACK</button>
-<div class="level-header"><h1>SELECT LEVEL</h1><p>MASTER THE NEON</p></div>
+<div class="level-header"><div class="level-brand">NEON DASH</div><h1>SELECT LEVEL</h1><p>BEAT THE NEON • SWIPE TO EXPLORE</p></div>
 <div class="level-list" id="levelList"></div>
 </section>
 
@@ -180,6 +175,7 @@ body{
 <div class="game-ui">
 <div class="top-ui">
 <div class="ui-pill">LEVEL: <strong id="gameLevelName">CYBER START</strong></div>
+<div class="ui-pill music-pill">SONG: <strong id="musicTrackDisplay">NEON RUN</strong></div>
 <div class="ui-pill">ATTEMPT: <strong id="attemptDisplay">1</strong></div>
 </div>
 <div class="progress-wrap"><div id="progressBar"></div></div>
@@ -188,7 +184,6 @@ body{
 <button class="game-control-button" id="restartButton">RESTART</button>
 <button class="game-control-button" id="quitButton">QUIT</button>
 </div>
-<button class="mobile-control" id="jumpButton">JUMP</button>
 </div>
 </section>
 
@@ -251,7 +246,6 @@ const levelList=document.getElementById("levelList");
 
 const restartButton=document.getElementById("restartButton");
 const quitButton=document.getElementById("quitButton");
-const jumpButton=document.getElementById("jumpButton");
 
 const progressBar=document.getElementById("progressBar");
 const gameLevelName=document.getElementById("gameLevelName");
@@ -312,30 +306,16 @@ let musicRunId=0;
    Each level gets its own electronic/synthwave pattern.
 ============================================================ */
 const musicTracks={
-1:{tempo:132,wave:"triangle",bass:"sawtooth",notes:[
-  [261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,392.00,493.88],[293.66,349.23,440.00],
-  [261.63,329.63,392.00],[220.00,293.66,349.23],[246.94,329.63,392.00],[293.66,369.99,440.00]
-]},
-2:{tempo:142,wave:"square",bass:"sawtooth",notes:[
-  [329.63,415.30,493.88],[392.00,493.88,587.33],[440.00,554.37,659.25],[392.00,493.88,587.33],
-  [329.63,415.30,493.88],[293.66,369.99,440.00],[329.63,392.00,493.88],[392.00,493.88,587.33]
-]},
-3:{tempo:128,wave:"sawtooth",bass:"square",notes:[
-  [164.81,196.00,246.94],[146.83,174.61,220.00],[164.81,207.65,246.94],[130.81,164.81,196.00],
-  [164.81,196.00,246.94],[174.61,220.00,261.63],[146.83,184.99,220.00],[164.81,207.65,246.94]
-]},
-4:{tempo:154,wave:"square",bass:"sawtooth",notes:[
-  [392.00,493.88,587.33],[440.00,554.37,659.25],[493.88,622.25,739.99],[440.00,554.37,659.25],
-  [392.00,493.88,587.33],[329.63,415.30,493.88],[369.99,466.16,554.37],[440.00,554.37,659.25]
-]},
-5:{tempo:136,wave:"triangle",bass:"sine",notes:[
-  [261.63,329.63,523.25],[293.66,369.99,587.33],[329.63,415.30,659.25],[246.94,329.63,493.88],
-  [261.63,392.00,523.25],[293.66,440.00,587.33],[329.63,493.88,659.25],[392.00,523.25,783.99]
-]},
-6:{tempo:168,wave:"sawtooth",bass:"square",notes:[
-  [329.63,415.30,659.25],[392.00,493.88,783.99],[440.00,554.37,880.00],[493.88,622.25,987.77],
-  [440.00,554.37,880.00],[392.00,493.88,783.99],[329.63,415.30,659.25],[293.66,369.99,739.99]
-]}
+1:{name:"NEON RUN",tempo:132,wave:"triangle",bassWave:"sawtooth",leadWave:"square",chords:[[261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,392.00,493.88],[293.66,349.23,440.00],[261.63,329.63,392.00],[220.00,293.66,349.23],[246.94,329.63,392.00],[293.66,369.99,440.00]],bass:[130.81,146.83,164.81,146.83,130.81,110.00,123.47,146.83],lead:[523.25,587.33,659.25,587.33,523.25,493.88,523.25,587.33]},
+2:{name:"ELECTRIC RUSH",tempo:146,wave:"square",bassWave:"sawtooth",leadWave:"triangle",chords:[[329.63,415.30,493.88],[392.00,493.88,587.33],[440.00,554.37,659.25],[392.00,493.88,587.33],[329.63,415.30,493.88],[293.66,369.99,440.00],[329.63,392.00,493.88],[392.00,493.88,587.33]],bass:[164.81,196.00,220.00,196.00,164.81,146.83,164.81,196.00],lead:[659.25,739.99,783.99,739.99,659.25,587.33,659.25,739.99]},
+3:{name:"VOID BASS",tempo:124,wave:"sawtooth",bassWave:"square",leadWave:"sawtooth",chords:[[164.81,196.00,246.94],[146.83,174.61,220.00],[164.81,207.65,246.94],[130.81,164.81,196.00],[164.81,196.00,246.94],[174.61,220.00,261.63],[146.83,184.99,220.00],[164.81,207.65,246.94]],bass:[82.41,73.42,82.41,65.41,82.41,87.31,73.42,82.41],lead:[329.63,293.66,329.63,261.63,329.63,349.23,293.66,329.63]},
+4:{name:"HYPERDRIVE",tempo:158,wave:"square",bassWave:"sawtooth",leadWave:"square",chords:[[392.00,493.88,587.33],[440.00,554.37,659.25],[493.88,622.25,739.99],[440.00,554.37,659.25],[392.00,493.88,587.33],[329.63,415.30,493.88],[369.99,466.16,554.37],[440.00,554.37,659.25]],bass:[196.00,220.00,246.94,220.00,196.00,164.81,184.99,220.00],lead:[783.99,880.00,987.77,880.00,783.99,659.25,739.99,880.00]},
+5:{name:"GALAXY DRIVE",tempo:138,wave:"triangle",bassWave:"sine",leadWave:"triangle",chords:[[261.63,329.63,523.25],[293.66,369.99,587.33],[329.63,415.30,659.25],[246.94,329.63,493.88],[261.63,392.00,523.25],[293.66,440.00,587.33],[329.63,493.88,659.25],[392.00,523.25,783.99]],bass:[130.81,146.83,164.81,123.47,130.81,146.83,164.81,196.00],lead:[523.25,587.33,659.25,493.88,523.25,587.33,659.25,783.99]},
+6:{name:"FINAL PULSE",tempo:170,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[329.63,415.30,659.25],[392.00,493.88,783.99],[440.00,554.37,880.00],[493.88,622.25,987.77],[440.00,554.37,880.00],[392.00,493.88,783.99],[329.63,415.30,659.25],[293.66,369.99,739.99]],bass:[164.81,196.00,220.00,246.94,220.00,196.00,164.81,146.83],lead:[659.25,783.99,880.00,987.77,880.00,783.99,659.25,587.33]},
+7:{name:"NEON STORM",tempo:150,wave:"triangle",bassWave:"sawtooth",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[220.00,277.18,329.63],[196.00,246.94,293.66],[220.00,293.66,349.23],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,110.00,98.00,110.00,123.47],lead:[440.00,493.88,523.25,587.33,659.25,587.33,523.25,493.88]},
+8:{name:"PHANTOM CIRCUIT",tempo:136,wave:"sawtooth",bassWave:"triangle",leadWave:"square",chords:[[293.66,369.99,440.00],[261.63,329.63,392.00],[246.94,329.63,493.88],[220.00,293.66,440.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[293.66,392.00,493.88],[261.63,329.63,392.00]],bass:[146.83,130.81,123.47,110.00,146.83,164.81,146.83,130.81],lead:[587.33,523.25,493.88,440.00,587.33,659.25,587.33,523.25]},
+9:{name:"OVERDRIVE",tempo:162,wave:"square",bassWave:"sawtooth",leadWave:"sawtooth",chords:[[261.63,329.63,392.00],[311.13,392.00,466.16],[329.63,415.30,493.88],[369.99,466.16,554.37],[392.00,493.88,587.33],[369.99,466.16,554.37],[329.63,415.30,493.88],[311.13,392.00,466.16]],bass:[130.81,155.56,164.81,184.99,196.00,184.99,164.81,155.56],lead:[523.25,622.25,659.25,739.99,783.99,739.99,659.25,622.25]},
+10:{name:"NEON APOCALYPSE",tempo:178,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[293.66,369.99,440.00],[261.63,329.63,392.00],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,164.81,146.83,130.81,123.47],lead:[440.00,493.88,523.25,587.33,659.25,587.33,523.25,493.88]}
 };
 
 function ensureAudio(){
@@ -385,17 +365,28 @@ function scheduleMusicStep(runId){
   if(!ensureAudio())return;
   const track=musicTracks[levelData.id]||musicTracks[1];
   const beat=60/track.tempo;
-  const now=audioCtx.currentTime+.03;
-  const chord=track.notes[musicStep%track.notes.length];
-  const beatInBar=musicStep%4;
-  chord.forEach((freq,i)=>playMusicTone(freq,beat*.92,track.wave,musicVolume*(i===0?.07:.045),now));
-  const bassFreq=chord[0]/2;
-  playMusicTone(bassFreq,beat*.78,track.bass,musicVolume*.12,now);
-  if(beatInBar===0||beatInBar===2)playKick(now);
+  const stepTime=beat/2;
+  const now=audioCtx.currentTime+.025;
+  const step=musicStep%16;
+  const chordIndex=Math.floor(step/2)%track.chords.length;
+  const chord=track.chords[chordIndex];
+  const bass=track.bass[chordIndex%track.bass.length];
+  const lead=track.lead[chordIndex%track.lead.length];
+  const intensity=musicVolume/.18;
+  if(step%2===0){
+    chord.forEach((freq,i)=>playMusicTone(freq,beat*1.65,track.wave,musicVolume*(i===0?.060:.035),now));
+    playMusicBass(now,bass,intensity*.24);
+    playMusicTone(lead,beat*.42,track.leadWave,musicVolume*.075,now+.01);
+  }else{
+    playMusicTone(lead*2,beat*.24,track.leadWave,musicVolume*.045,now);
+  }
+  if(step%4===0)playMusicKick(now,Math.min(1.25,intensity));
+  if(step===4||step===12)playMusicSnare(now,intensity);
+  if(step%2===1)playMusicHat(now,intensity,false);
+  if(step===7||step===15)playMusicHat(now,intensity,true);
   musicStep++;
-  musicTimer=setTimeout(()=>scheduleMusicStep(runId),Math.max(35,(beat*1000)-8));
+  musicTimer=setTimeout(()=>scheduleMusicStep(runId),Math.max(25,(stepTime*1000)-5));
 }
-
 
 function playMusicKick(time, volume=1){
   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
@@ -513,6 +504,7 @@ levelList.innerHTML="";
 levelsData.forEach(level=>{
 const unlocked=true;
 const best=save.best[level.id]||0;
+const track=musicTracks[level.id]||musicTracks[1];
 const card=document.createElement("div");
 card.className="level-card"+(unlocked?"":" locked");
 card.innerHTML=`
@@ -520,6 +512,7 @@ card.innerHTML=`
 <h2>${level.name}</h2>
 <div class="difficulty" style="color:${level.color}">${level.difficulty}</div>
 <div class="level-description">${unlocked?"Jump through obstacles and reach the finish.":"Complete previous levels to unlock."}</div>
+<div class="level-music">♫ ${track.name}</div>
 <div class="level-progress"><div style="width:${best}%;background:${level.color};box-shadow:0 0 10px ${level.color}"></div></div>
 `;
 if(unlocked){
@@ -672,6 +665,9 @@ screenShake=0;
 generateLevel(levelData);
 
 gameLevelName.textContent=levelData.name;
+const currentTrack=musicTracks[levelData.id]||musicTracks[1];
+const musicTrackDisplay=document.getElementById("musicTrackDisplay");
+if(musicTrackDisplay)musicTrackDisplay.textContent=currentTrack.name;
 
 save.attempts++;
 attemptDisplay.textContent=save.attempts;
@@ -1228,21 +1224,6 @@ requestJump();
 canvas.addEventListener("pointerup",()=>jumpHeld=false);
 canvas.addEventListener("pointercancel",()=>jumpHeld=false);
 
-jumpButton.addEventListener("pointerdown",event=>{
-event.preventDefault();
-if(!jumpHeld){
-jumpHeld=true;
-requestJump();
-}
-});
-
-jumpButton.addEventListener("pointerup",event=>{
-event.preventDefault();
-jumpHeld=false;
-});
-
-jumpButton.addEventListener("pointercancel",()=>jumpHeld=false);
-
 restartButton.addEventListener("click",()=>startLevel(currentLevel));
 quitButton.addEventListener("click",quitGame);
 
@@ -1299,52 +1280,6 @@ buildLevelList();
 </script>
 <div id="beatBoostNote" style="display:none">Beat Boost enabled</div>
 
-<script>
-
-/* NEON DASH MOBILE TOUCH CONTROLS */
-(function(){
-  function neonDashTouchJump(e){
-    if(e){
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    if(typeof gameRunning !== "undefined" && gameRunning){
-      if(typeof jump === "function") jump();
-      else if(typeof player !== "undefined" && player.grounded){
-        player.vy=-15.5;
-        player.grounded=false;
-      }
-    }
-  }
-
-  function setupNeonTouch(){
-    // Tap anywhere on the gameplay canvas to jump on touch devices.
-    const gameCanvas=document.querySelector("canvas");
-    if(gameCanvas){
-      gameCanvas.style.touchAction="none";
-      gameCanvas.addEventListener("pointerdown",function(e){
-        if(e.pointerType==="touch"){
-          neonDashTouchJump(e);
-        }
-      },{passive:false});
-    }
-
-    // Prevent mobile browser scrolling/zooming while actively playing.
-    document.addEventListener("touchmove",function(e){
-      if(typeof gameRunning !== "undefined" && gameRunning){
-        e.preventDefault();
-      }
-    },{passive:false});
-  }
-
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded",setupNeonTouch);
-  }else{
-    setupNeonTouch();
-  }
-})();
-
-</script>
 </body>
 </html>
 <!-- PROJECT REFERENCE BLOCK 1 -->
