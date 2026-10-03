@@ -149,6 +149,9 @@ body{
 }
 @media(min-width:701px){.mobile-control{display:none}}
 </style>
+
+
+
 </head>
 <body>
 
@@ -389,6 +392,54 @@ function scheduleMusicStep(runId){
   musicTimer=setTimeout(()=>scheduleMusicStep(runId),Math.max(35,(beat*1000)-8));
 }
 
+
+function playMusicKick(time, volume=1){
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type="sine";
+  o.frequency.setValueAtTime(120,time);
+  o.frequency.exponentialRampToValueAtTime(48,time+0.11);
+  g.gain.setValueAtTime(0.0001,time);
+  g.gain.exponentialRampToValueAtTime(0.62*volume,time+0.006);
+  g.gain.exponentialRampToValueAtTime(0.0001,time+0.15);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(time); o.stop(time+0.16);
+}
+function playMusicSnare(time, volume=1){
+  const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*0.12,audioCtx.sampleRate);
+  const data=buffer.getChannelData(0);
+  for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,2);
+  const s=audioCtx.createBufferSource(), g=audioCtx.createGain(), f=audioCtx.createBiquadFilter();
+  s.buffer=buffer; f.type="highpass"; f.frequency.value=1100;
+  g.gain.setValueAtTime(0.0001,time); g.gain.exponentialRampToValueAtTime(0.34*volume,time+0.004);
+  g.gain.exponentialRampToValueAtTime(0.0001,time+0.12);
+  s.connect(f); f.connect(g); g.connect(audioCtx.destination); s.start(time);
+}
+function playMusicHat(time, volume=1, open=false){
+  const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*(open?0.16:0.055),audioCtx.sampleRate);
+  const data=buffer.getChannelData(0);
+  for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,4);
+  const s=audioCtx.createBufferSource(), g=audioCtx.createGain(), f=audioCtx.createBiquadFilter();
+  s.buffer=buffer; f.type="highpass"; f.frequency.value=5200;
+  g.gain.setValueAtTime(0.0001,time); g.gain.exponentialRampToValueAtTime(0.13*volume,time+0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001,time+(open?0.15:0.05));
+  s.connect(f); f.connect(g); g.connect(audioCtx.destination); s.start(time);
+}
+function playMusicBass(time,freq,volume=0.4){
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain(), f=audioCtx.createBiquadFilter();
+  o.type="sawtooth"; o.frequency.setValueAtTime(freq,time);
+  f.type="lowpass"; f.frequency.value=620;
+  g.gain.setValueAtTime(0.0001,time); g.gain.exponentialRampToValueAtTime(volume,time+0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001,time+0.18);
+  o.connect(f); f.connect(g); g.connect(audioCtx.destination); o.start(time); o.stop(time+0.2);
+}
+function playMusicSynth(time,freq,volume=0.16){
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type="square"; o.frequency.value=freq;
+  g.gain.setValueAtTime(0.0001,time); g.gain.exponentialRampToValueAtTime(volume,time+0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001,time+0.14);
+  o.connect(g); g.connect(audioCtx.destination); o.start(time); o.stop(time+0.15);
+}
+
 function startMusic(){
   stopMusic();
   if(!musicEnabled||!soundEnabled||!running)return;
@@ -477,62 +528,103 @@ levelList.appendChild(card);
 function generateLevel(level){
 obstacles=[];
 const groundY=canvas.height*.78;
-let x=650;
-let pattern=0;
-const end=level.length-350;
 
-while(x<end){
-pattern++;
-const choice=pattern%12;
+const patterns={
+1:[
+["spike",700],["spike",980],["block",1250],["spike",1550],
+["spike",1800],["block",2100],["spike",2450],["spike",2740],
+["block",3050],["spike",3400],["spike",3680]
+],
+2:[
+["spike",650],["spike2",920],["block",1250],["spike",1570],
+["block",1840],["spike2",2160],["block",2520],["spike",2860],
+["spike",3100],["block",3380],["spike2",3700],["spike",4100]
+],
+3:[
+["spike2",600],["block",900],["spike",1230],["spike2",1470],
+["block",1800],["spike3",2140],["block",2530],["spike2",2860],
+["block",3200],["spike3",3520],["spike",3980],["spike2",4260]
+],
+4:[
+["spike2",570],["block",850],["spike2",1160],["block",1480],
+["spike3",1810],["block",2200],["spike2",2500],["block",2840],
+["spike3",3160],["block",3600],["spike2",3910],["spike3",4250]
+],
+5:[
+["spike2",550],["block",820],["spike3",1120],["block",1510],
+["spike2",1810],["block",2140],["spike3",2450],["block",2870],
+["spike2",3200],["spike3",3500],["block",3930],["spike3",4260]
+],
+6:[
+["spike2",540],["spike3",820],["block",1200],["spike3",1510],
+["block",1900],["spike3",2210],["spike2",2630],["block",2960],
+["spike3",3300],["block",3690],["spike3",4010],["spike3",4390],
+["block",4770],["spike3",5100]
+]
+};
 
-if(choice===1){
-obstacles.push({type:"spike",x,y:groundY-34,w:34,h:34});
-x+=240;
-}else if(choice===2){
-obstacles.push({type:"spike",x,y:groundY-34,w:34,h:34});
-obstacles.push({type:"spike",x:x+42,y:groundY-34,w:34,h:34});
-x+=300;
-}else if(choice===3){
-obstacles.push({type:"block",x,y:groundY-55,w:55,h:55});
-x+=300;
-}else if(choice===4){
-obstacles.push({type:"block",x,y:groundY-80,w:75,h:80});
-x+=350;
-}else if(choice===5){
-obstacles.push({type:"spike",x,y:groundY-34,w:34,h:34});
-obstacles.push({type:"spike",x:x+115,y:groundY-34,w:34,h:34});
-x+=350;
-}else if(choice===6){
-obstacles.push({type:"block",x,y:groundY-45,w:120,h:45});
-x+=350;
-}else if(choice===7){
-obstacles.push({type:"block",x,y:groundY-70,w:60,h:70});
-obstacles.push({type:"spike",x:x+100,y:groundY-34,w:34,h:34});
-x+=370;
-}else if(choice===8){
-obstacles.push({type:"spike",x,y:groundY-34,w:34,h:34});
-obstacles.push({type:"spike",x:x+42,y:groundY-34,w:34,h:34});
-obstacles.push({type:"spike",x:x+84,y:groundY-34,w:34,h:34});
-x+=410;
-}else if(choice===9){
-obstacles.push({type:"block",x,y:groundY-100,w:65,h:100});
-obstacles.push({type:"spike",x:x+100,y:groundY-34,w:34,h:34});
-obstacles.push({type:"spike",x:x+142,y:groundY-34,w:34,h:34});
-x+=410;
-}else if(choice===10){
-obstacles.push({type:"spike",x,y:groundY-34,w:34,h:34});
-obstacles.push({type:"block",x:x+100,y:groundY-55,w:55,h:55});
-x+=390;
-}else if(choice===11){
-obstacles.push({type:"block",x,y:groundY-75,w:65,h:75});
-obstacles.push({type:"block",x:x+130,y:groundY-45,w:100,h:45});
-x+=430;
-}else{
-x+=300;
+const selected=patterns[level.id]||patterns[1];
+
+for(const item of selected){
+const type=item[0];
+const x=item[1];
+
+if(type==="spike"){
+obstacles.push({
+type:"spike",
+x:x,
+y:groundY-34,
+w:34,
+h:34
+});
+}else if(type==="spike2"){
+obstacles.push({
+type:"spike",
+x:x,
+y:groundY-34,
+w:34,
+h:34
+});
+obstacles.push({
+type:"spike",
+x:x+42,
+y:groundY-34,
+w:34,
+h:34
+});
+}else if(type==="spike3"){
+obstacles.push({
+type:"spike",
+x:x,
+y:groundY-34,
+w:34,
+h:34
+});
+obstacles.push({
+type:"spike",
+x:x+42,
+y:groundY-34,
+w:34,
+h:34
+});
+obstacles.push({
+type:"spike",
+x:x+84,
+y:groundY-34,
+w:34,
+h:34
+});
+}else if(type==="block"){
+obstacles.push({
+type:"block",
+x:x,
+y:groundY-55,
+w:55,
+h:55
+});
 }
 }
 }
-
 function startLevel(id){
 levelData=levelsData.find(l=>l.id===id);
 if(!levelData)return;
@@ -1190,6 +1282,54 @@ soundToggle.classList.toggle("on",soundEnabled);
 musicToggle.classList.toggle("on",musicEnabled);
 buildLevelList();
 </script>
+<div id="beatBoostNote" style="display:none">Beat Boost enabled</div>
+
+<script>
+
+/* NEON DASH MOBILE TOUCH CONTROLS */
+(function(){
+  function neonDashTouchJump(e){
+    if(e){
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if(typeof gameRunning !== "undefined" && gameRunning){
+      if(typeof jump === "function") jump();
+      else if(typeof player !== "undefined" && player.grounded){
+        player.vy=-15.5;
+        player.grounded=false;
+      }
+    }
+  }
+
+  function setupNeonTouch(){
+    // Tap anywhere on the gameplay canvas to jump on touch devices.
+    const gameCanvas=document.querySelector("canvas");
+    if(gameCanvas){
+      gameCanvas.style.touchAction="none";
+      gameCanvas.addEventListener("pointerdown",function(e){
+        if(e.pointerType==="touch"){
+          neonDashTouchJump(e);
+        }
+      },{passive:false});
+    }
+
+    // Prevent mobile browser scrolling/zooming while actively playing.
+    document.addEventListener("touchmove",function(e){
+      if(typeof gameRunning !== "undefined" && gameRunning){
+        e.preventDefault();
+      }
+    },{passive:false});
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",setupNeonTouch);
+  }else{
+    setupNeonTouch();
+  }
+})();
+
+</script>
 </body>
 </html>
 <!-- PROJECT REFERENCE BLOCK 1 -->
@@ -1198,7 +1338,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -1336,7 +1476,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -1474,7 +1614,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -1612,7 +1752,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -1750,7 +1890,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -1888,7 +2028,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -2026,7 +2166,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -2164,7 +2304,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -2302,7 +2442,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -2440,7 +2580,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -2578,7 +2718,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -2716,7 +2856,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -2854,7 +2994,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -2992,7 +3132,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -3130,7 +3270,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
@@ -3268,7 +3408,7 @@ buildLevelList();
 <!-- Primary control: one-button jump. -->
 <!-- Keyboard controls: Space, Up Arrow, W. -->
 <!-- Mouse control: pointer/tap anywhere on the game canvas. -->
-<!-- Mobile control: JUMP button. -->
+<!-- Mobile control: tap the gameplay canvas to jump; no on-screen jump button. -->
 <!-- Restart control: R key or RESTART button. -->
 <!-- Quit control: Escape key or QUIT button. -->
 <!-- Player automatically moves forward. -->
