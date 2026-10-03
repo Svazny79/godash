@@ -193,6 +193,7 @@ body{
 <div class="modal-box">
 <h2>SETTINGS</h2>
 <div class="setting"><div><span>Sound</span><small>Game sound effects</small></div><div class="toggle on" id="soundToggle"><div></div></div></div>
+<div class="setting"><div><span>Music</span><small>Neon Dash level music</small></div><div class="toggle on" id="musicToggle"><div></div></div></div>
 <div class="setting"><div><span>Reduced Motion</span><small>Reduce background animations</small></div><div class="toggle" id="motionToggle"><div></div></div></div>
 <button class="neon-button modal-close" id="closeSettings">DONE</button>
 </div>
@@ -259,6 +260,7 @@ const messageText=document.getElementById("messageText");
 
 const settingsModal=document.getElementById("settingsModal");
 const soundToggle=document.getElementById("soundToggle");
+const musicToggle=document.getElementById("musicToggle");
 const motionToggle=document.getElementById("motionToggle");
 const closeSettings=document.getElementById("closeSettings");
 
@@ -288,6 +290,114 @@ let obstacles=[];
 let screenShake=0;
 let reducedMotion=false;
 let soundEnabled=true;
+try{soundEnabled=localStorage.getItem("neonDashSound")!=="off";}catch(e){}
+let musicEnabled=true;
+try{musicEnabled=localStorage.getItem("neonDashMusic")!=="off";}catch(e){}
+let musicVolume=0.18;
+let audioCtx=null;
+let musicTimer=null;
+let musicStep=0;
+let musicRunId=0;
+
+/* ============================================================
+   NEON DASH BUILT-IN MUSIC ENGINE
+   Original Web Audio synth music — no external audio files.
+   Each level gets its own electronic/synthwave pattern.
+============================================================ */
+const musicTracks={
+1:{tempo:132,wave:"triangle",bass:"sawtooth",notes:[
+  [261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,392.00,493.88],[293.66,349.23,440.00],
+  [261.63,329.63,392.00],[220.00,293.66,349.23],[246.94,329.63,392.00],[293.66,369.99,440.00]
+]},
+2:{tempo:142,wave:"square",bass:"sawtooth",notes:[
+  [329.63,415.30,493.88],[392.00,493.88,587.33],[440.00,554.37,659.25],[392.00,493.88,587.33],
+  [329.63,415.30,493.88],[293.66,369.99,440.00],[329.63,392.00,493.88],[392.00,493.88,587.33]
+]},
+3:{tempo:128,wave:"sawtooth",bass:"square",notes:[
+  [164.81,196.00,246.94],[146.83,174.61,220.00],[164.81,207.65,246.94],[130.81,164.81,196.00],
+  [164.81,196.00,246.94],[174.61,220.00,261.63],[146.83,184.99,220.00],[164.81,207.65,246.94]
+]},
+4:{tempo:154,wave:"square",bass:"sawtooth",notes:[
+  [392.00,493.88,587.33],[440.00,554.37,659.25],[493.88,622.25,739.99],[440.00,554.37,659.25],
+  [392.00,493.88,587.33],[329.63,415.30,493.88],[369.99,466.16,554.37],[440.00,554.37,659.25]
+]},
+5:{tempo:136,wave:"triangle",bass:"sine",notes:[
+  [261.63,329.63,523.25],[293.66,369.99,587.33],[329.63,415.30,659.25],[246.94,329.63,493.88],
+  [261.63,392.00,523.25],[293.66,440.00,587.33],[329.63,493.88,659.25],[392.00,523.25,783.99]
+]},
+6:{tempo:168,wave:"sawtooth",bass:"square",notes:[
+  [329.63,415.30,659.25],[392.00,493.88,783.99],[440.00,554.37,880.00],[493.88,622.25,987.77],
+  [440.00,554.37,880.00],[392.00,493.88,783.99],[329.63,415.30,659.25],[293.66,369.99,739.99]
+]}
+};
+
+function ensureAudio(){
+  try{
+    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    return true;
+  }catch(e){return false;}
+}
+
+function stopMusic(){
+  musicRunId++;
+  if(musicTimer){clearTimeout(musicTimer);musicTimer=null;}
+}
+
+function playMusicTone(freq,duration,type,volume,when){
+  if(!audioCtx)return;
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  const filter=audioCtx.createBiquadFilter();
+  osc.type=type;
+  osc.frequency.setValueAtTime(freq,when);
+  filter.type='lowpass';
+  filter.frequency.setValueAtTime(type==='sawtooth'?1700:2600,when);
+  gain.gain.setValueAtTime(0.0001,when);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.0001,volume),when+0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0001,when+duration*.92);
+  osc.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
+  osc.start(when);
+  osc.stop(when+duration);
+}
+
+function playKick(when){
+  if(!audioCtx)return;
+  const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+  osc.type='sine';
+  osc.frequency.setValueAtTime(120,when);
+  osc.frequency.exponentialRampToValueAtTime(48,when+.11);
+  gain.gain.setValueAtTime(.0001,when);
+  gain.gain.exponentialRampToValueAtTime(.16*musicVolume/0.18,when+.004);
+  gain.gain.exponentialRampToValueAtTime(.0001,when+.13);
+  osc.connect(gain);gain.connect(audioCtx.destination);osc.start(when);osc.stop(when+.14);
+}
+
+function scheduleMusicStep(runId){
+  if(runId!==musicRunId||!running||!musicEnabled||!soundEnabled||!levelData)return;
+  if(!ensureAudio())return;
+  const track=musicTracks[levelData.id]||musicTracks[1];
+  const beat=60/track.tempo;
+  const now=audioCtx.currentTime+.03;
+  const chord=track.notes[musicStep%track.notes.length];
+  const beatInBar=musicStep%4;
+  chord.forEach((freq,i)=>playMusicTone(freq,beat*.92,track.wave,musicVolume*(i===0?.07:.045),now));
+  const bassFreq=chord[0]/2;
+  playMusicTone(bassFreq,beat*.78,track.bass,musicVolume*.12,now);
+  if(beatInBar===0||beatInBar===2)playKick(now);
+  musicStep++;
+  musicTimer=setTimeout(()=>scheduleMusicStep(runId),Math.max(35,(beat*1000)-8));
+}
+
+function startMusic(){
+  stopMusic();
+  if(!musicEnabled||!soundEnabled||!running)return;
+  if(!ensureAudio())return;
+  musicStep=0;
+  const runId=musicRunId;
+  scheduleMusicStep(runId);
+}
+
 let animationFrame=0;
 let gameRunId=0;
 
@@ -433,6 +543,9 @@ showScreen(gameScreen);
 running=true;
 dead=false;
 won=false;
+
+ensureAudio();
+startMusic();
 
 cameraX=0;
 player.x=220;
@@ -580,6 +693,7 @@ function die(){
 if(dead||won)return;
 dead=true;
 running=false;
+stopMusic();
 createDeathParticles();
 screenShake=14;
 messageTitle.textContent="CRASH!";
@@ -592,6 +706,7 @@ function completeLevel(){
 if(won)return;
 won=true;
 running=false;
+stopMusic();
 createWinParticles();
 messageTitle.textContent="LEVEL COMPLETE!";
 messageText.textContent="PRESS SPACE OR TAP TO RETURN TO LEVELS";
@@ -964,6 +1079,7 @@ animationFrame=requestAnimationFrame(gameLoop);
 
 function quitGame(){
 running=false;
+stopMusic();
 dead=false;
 won=false;
 gameMessage.classList.remove("show");
@@ -1045,7 +1161,17 @@ closeSettings.addEventListener("click",()=>settingsModal.classList.remove("show"
 soundToggle.addEventListener("click",()=>{
 soundEnabled=!soundEnabled;
 soundToggle.classList.toggle("on",soundEnabled);
+if(soundEnabled){ensureAudio();startMusic();}else{stopMusic();}
+try{localStorage.setItem("neonDashSound",soundEnabled?"on":"off");}catch(e){}
 showToast(soundEnabled?"SOUND ON":"SOUND OFF");
+});
+
+musicToggle.addEventListener("click",()=>{
+musicEnabled=!musicEnabled;
+musicToggle.classList.toggle("on",musicEnabled);
+if(musicEnabled){ensureAudio();startMusic();}else{stopMusic();}
+try{localStorage.setItem("neonDashMusic",musicEnabled?"on":"off");}catch(e){}
+showToast(musicEnabled?"MUSIC ON":"MUSIC OFF");
 });
 
 motionToggle.addEventListener("click",()=>{
@@ -1060,6 +1186,8 @@ window.addEventListener("blur",()=>{
 jumpHeld=false;
 });
 
+soundToggle.classList.toggle("on",soundEnabled);
+musicToggle.classList.toggle("on",musicEnabled);
 buildLevelList();
 </script>
 </body>
