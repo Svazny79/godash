@@ -76,6 +76,67 @@ button{font:inherit}
 .toast{position:absolute;left:50%;top:88px;transform:translateX(-50%) translateY(-20px);opacity:0;z-index:200;padding:11px 18px;border:1px solid #63f5ff;border-radius:12px;background:rgba(5,7,18,.92);box-shadow:0 0 25px #63f5ff33;letter-spacing:2px;font-size:11px;pointer-events:none;transition:.25s}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hidden{display:none!important}
+
+/* ============================================================
+   NEON DASH VISUAL UPGRADE
+   ============================================================ */
+body{
+    background:radial-gradient(circle at 50% 25%,#111a4b 0%,#050510 55%,#010106 100%);
+}
+.level-card{
+    background:linear-gradient(145deg,rgba(35,40,82,.94),rgba(8,10,28,.98));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -25px 60px rgba(0,0,0,.25),0 12px 35px rgba(0,0,0,.35);
+}
+.level-card::before{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    border-radius:20px;
+    pointer-events:none;
+    background:linear-gradient(120deg,transparent 15%,rgba(99,245,255,.13) 35%,transparent 55%,rgba(255,56,216,.11) 75%,transparent 90%);
+}
+.neon-button{
+    position:relative;
+    overflow:hidden;
+}
+.neon-button::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-130%;
+    width:70%;
+    height:100%;
+    transform:skewX(-22deg);
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);
+    transition:left .55s ease;
+}
+.neon-button:hover::after{left:150%}
+.progress-wrap{
+    box-shadow:0 0 18px rgba(99,245,255,.1),inset 0 0 8px rgba(0,0,0,.5);
+}
+#progressBar{
+    background:linear-gradient(90deg,#00eaff,#714fff,#ff38d8,#ffd52f);
+}
+.game-message{
+    padding:30px 45px;
+    border:1px solid rgba(99,245,255,.2);
+    border-radius:24px;
+    background:rgba(3,5,17,.52);
+    box-shadow:inset 0 0 35px rgba(99,245,255,.04),0 20px 70px rgba(0,0,0,.45);
+    backdrop-filter:blur(7px);
+}
+.difficulty{text-shadow:0 0 12px currentColor}
+.ui-pill{
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 25px rgba(0,0,0,.22);
+}
+.mobile-control{
+    background:radial-gradient(circle at 50% 30%,rgba(255,255,255,.15),transparent 40%),
+    linear-gradient(135deg,rgba(0,234,255,.22),rgba(113,79,255,.3),rgba(255,56,216,.18));
+}
+/* ============================================================
+   END VISUAL UPGRADE
+   ============================================================ */
+
 @media(max-width:700px){
 .level-list{grid-template-columns:1fr;width:min(430px,90vw);max-height:75vh;overflow-y:auto;padding:10px}
 .level-card{min-height:145px}
@@ -285,7 +346,7 @@ createStars("levelStars",80);
 function buildLevelList(){
 levelList.innerHTML="";
 levelsData.forEach(level=>{
-const unlocked=level.id<=Math.max(1,save.level);
+const unlocked=true;
 const best=save.best[level.id]||0;
 const card=document.createElement("div");
 card.className="level-card"+(unlocked?"":" locked");
@@ -583,108 +644,189 @@ if(p.life<=0)particles.splice(i,1);
 function drawBackground(){
 const w=canvas.width;
 const h=canvas.height;
+const groundY=h*.78;
 
-ctx.fillStyle="#050510";
+ctx.fillStyle="#02030a";
 ctx.fillRect(0,0,w,h);
 
-const gradient=ctx.createLinearGradient(0,0,0,h);
-gradient.addColorStop(0,"#08082a");
-gradient.addColorStop(1,"#03030a");
-ctx.fillStyle=gradient;
+/* Deep multi-color sky */
+const sky=ctx.createLinearGradient(0,0,0,h);
+sky.addColorStop(0,"#090b2b");
+sky.addColorStop(.25,"#11144a");
+sky.addColorStop(.55,"#080b25");
+sky.addColorStop(1,"#02030b");
+ctx.fillStyle=sky;
 ctx.fillRect(0,0,w,h);
 
-const glow=ctx.createRadialGradient(w*.5,h*.3,20,w*.5,h*.3,h*.7);
-glow.addColorStop(0,levelData.color+"28");
-glow.addColorStop(1,"transparent");
-ctx.fillStyle=glow;
-ctx.fillRect(0,0,w,h);
+/* Colored atmospheric glows */
+const atmospheres=[
+{x:.18,y:.25,r:.55,c:levelData.color,a:.16},
+{x:.78,y:.18,r:.48,c:"#00eaff",a:.09},
+{x:.55,y:.48,r:.6,c:"#ff38d8",a:.055}
+];
 
-ctx.fillStyle="#fff";
-for(let i=0;i<90;i++){
-const sx=((i*137-cameraX*.12)%(w+100)+w+100)%(w+100)-50;
-const sy=(i*73)%(h*.65);
-const size=i%5===0?2:1;
-ctx.globalAlpha=.15+(i%7)/10;
-ctx.fillRect(sx,sy,size,size);
+for(const a of atmospheres){
+    const g=ctx.createRadialGradient(
+        w*a.x,h*a.y,10,w*a.x,h*a.y,h*a.r
+    );
+    const alpha=Math.floor(a.a*255).toString(16).padStart(2,"0");
+    g.addColorStop(0,a.c+alpha);
+    g.addColorStop(1,"transparent");
+    ctx.fillStyle=g;
+    ctx.fillRect(0,0,w,h);
+}
+
+/* Distant stars */
+for(let i=0;i<130;i++){
+    const sx=((i*137-cameraX*.08)%(w+120)+w+120)%(w+120)-60;
+    const sy=(i*73)%(h*.65);
+    const size=i%17===0?3:i%5===0?2:1;
+    ctx.globalAlpha=.18+(i%9)/12;
+    ctx.fillStyle=i%13===0?"#63f5ff":i%17===0?"#ff72ed":"#ffffff";
+    ctx.fillRect(sx,sy,size,size);
 }
 ctx.globalAlpha=1;
 
-const groundY=h*.78;
-ctx.fillStyle=levelData.color;
-ctx.globalAlpha=.12;
-ctx.fillRect(0,groundY-5,w,10);
-ctx.globalAlpha=1;
+/* Distant skyline for extra depth */
+const skylineOffset=-(cameraX*.16%180);
+for(let x=skylineOffset-180;x<w+180;x+=45){
+    const bh=25+((Math.abs(Math.floor(x))*13)%95);
+    ctx.fillStyle="#07091a";
+    ctx.fillRect(x,groundY-bh,36,bh);
+    ctx.fillStyle=levelData.color;
+    ctx.globalAlpha=.16;
+    for(let wy=groundY-bh+10;wy<groundY-8;wy+=14){
+        if(Math.floor((x+wy)/17)%3===0){
+            ctx.fillRect(x+8,wy,4,5);
+            ctx.fillRect(x+20,wy,4,5);
+        }
+    }
+    ctx.globalAlpha=1;
+}
 
-ctx.fillStyle="#080b18";
+/* Horizon haze */
+const horizon=ctx.createLinearGradient(0,groundY-130,0,groundY+30);
+horizon.addColorStop(0,"transparent");
+horizon.addColorStop(.7,levelData.color+"18");
+horizon.addColorStop(1,levelData.color+"08");
+ctx.fillStyle=horizon;
+ctx.fillRect(0,groundY-130,w,160);
+
+/* Ground */
+ctx.fillStyle="#050717";
 ctx.fillRect(0,groundY,w,h-groundY);
 
-ctx.shadowColor=levelData.color;
-ctx.shadowBlur=16;
+ctx.fillStyle="#0b1030";
+ctx.fillRect(0,groundY+4,w,7);
+
 ctx.fillStyle=levelData.color;
+ctx.globalAlpha=.85;
+ctx.shadowColor=levelData.color;
+ctx.shadowBlur=22;
 ctx.fillRect(0,groundY,w,3);
 ctx.shadowBlur=0;
+ctx.globalAlpha=1;
 
-ctx.strokeStyle="#202744";
-ctx.globalAlpha=.6;
+/* Perspective floor */
+ctx.strokeStyle="#26305b";
+ctx.lineWidth=1;
+ctx.globalAlpha=.65;
 
-const gridSize=50;
+const gridSize=52;
 const offset=-(cameraX%gridSize);
 
 for(let x=offset;x<w;x+=gridSize){
-ctx.beginPath();
-ctx.moveTo(x,groundY);
-ctx.lineTo(x,h);
-ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x,groundY);
+    ctx.lineTo(x-55,h);
+    ctx.stroke();
 }
-
-for(let y=groundY+gridSize;y<h;y+=gridSize){
-ctx.beginPath();
-ctx.moveTo(0,y);
-ctx.lineTo(w,y);
-ctx.stroke();
+for(let y=groundY+28;y<h;y+=28){
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(w,y);
+    ctx.stroke();
 }
+ctx.globalAlpha=1;
 
+/* Moving neon floor accents */
+for(let i=0;i<18;i++){
+    const ax=((i*145-cameraX*.65)%(w+180)+w+180)%(w+180)-90;
+    ctx.fillStyle=i%3===0?"#00eaff":i%3===1?levelData.color:"#ff38d8";
+    ctx.globalAlpha=.3;
+    ctx.fillRect(ax,groundY+12,55,2);
+}
+ctx.globalAlpha=1;
+
+/* Floating atmosphere particles */
+for(let i=0;i<26;i++){
+    const fx=((i*211-cameraX*.32)%(w+100)+w+100)%(w+100)-50;
+    const fy=80+(i*97)%(groundY-120);
+    ctx.fillStyle=i%2?"#63f5ff":"#ff38d8";
+    ctx.globalAlpha=.12;
+    ctx.beginPath();
+    ctx.arc(fx,fy,1.5,0,Math.PI*2);
+    ctx.fill();
+}
 ctx.globalAlpha=1;
 }
 
 function drawObstacles(){
 for(const obstacle of obstacles){
 const x=obstacle.x-cameraX;
-if(x<-150||x>canvas.width+150)continue;
+if(x<-180||x>canvas.width+180)continue;
 
 if(obstacle.type==="block"){
 ctx.save();
-ctx.shadowColor=levelData.color;
-ctx.shadowBlur=15;
 
-const gradient=ctx.createLinearGradient(x,obstacle.y,x,obstacle.y+obstacle.h);
-gradient.addColorStop(0,levelData.color);
-gradient.addColorStop(1,"#17142e");
-ctx.fillStyle=gradient;
+const outer=ctx.createLinearGradient(
+    x,obstacle.y,x+obstacle.w,obstacle.y+obstacle.h
+);
+outer.addColorStop(0,"#ffffff");
+outer.addColorStop(.04,levelData.color);
+outer.addColorStop(.48,"#20254d");
+outer.addColorStop(1,"#080a19");
+
+ctx.shadowColor=levelData.color;
+ctx.shadowBlur=18;
+ctx.fillStyle=outer;
 ctx.fillRect(x,obstacle.y,obstacle.w,obstacle.h);
 
 ctx.shadowBlur=0;
-ctx.strokeStyle="#ffffff55";
+ctx.strokeStyle="#ffffff88";
 ctx.lineWidth=2;
 ctx.strokeRect(x,obstacle.y,obstacle.w,obstacle.h);
 
-ctx.fillStyle="#ffffff18";
-ctx.fillRect(x+6,obstacle.y+6,obstacle.w-12,5);
+if(obstacle.w>35&&obstacle.h>35){
+    ctx.strokeStyle=levelData.color+"88";
+    ctx.lineWidth=2;
+    ctx.strokeRect(x+7,obstacle.y+7,obstacle.w-14,obstacle.h-14);
+    ctx.fillStyle="#ffffff12";
+    ctx.fillRect(x+8,obstacle.y+8,Math.max(2,obstacle.w-16),7);
+}
+
+ctx.fillStyle="#ffffff";
+ctx.globalAlpha=.75;
+ctx.fillRect(x+4,obstacle.y+4,4,4);
+ctx.fillRect(x+obstacle.w-8,obstacle.y+4,4,4);
+ctx.globalAlpha=1;
 ctx.restore();
 }
 
 if(obstacle.type==="spike"){
 ctx.save();
 ctx.translate(x,obstacle.y+obstacle.h);
+
 ctx.shadowColor=levelData.color;
-ctx.shadowBlur=15;
+ctx.shadowBlur=20;
 
-const gradient=ctx.createLinearGradient(0,-obstacle.h,0,0);
-gradient.addColorStop(0,"#fff");
-gradient.addColorStop(.2,levelData.color);
-gradient.addColorStop(1,"#19182d");
-ctx.fillStyle=gradient;
+const spike=ctx.createLinearGradient(0,-obstacle.h,obstacle.w,0);
+spike.addColorStop(0,"#ffffff");
+spike.addColorStop(.12,levelData.color);
+spike.addColorStop(.58,"#714fff");
+spike.addColorStop(1,"#0a0c20");
 
+ctx.fillStyle=spike;
 ctx.beginPath();
 ctx.moveTo(0,0);
 ctx.lineTo(obstacle.w/2,-obstacle.h);
@@ -692,10 +834,18 @@ ctx.lineTo(obstacle.w,0);
 ctx.closePath();
 ctx.fill();
 
-ctx.strokeStyle="#ffffff88";
+ctx.shadowBlur=0;
+ctx.strokeStyle="#ffffffaa";
+ctx.lineWidth=1.5;
 ctx.stroke();
+
+ctx.strokeStyle="#ffffff33";
+ctx.beginPath();
+ctx.moveTo(obstacle.w/2,-obstacle.h+6);
+ctx.lineTo(obstacle.w/2,0);
+ctx.stroke();
+
 ctx.restore();
-}
 }
 }
 
@@ -712,9 +862,11 @@ ctx.shadowColor="#63f5ff";
 ctx.shadowBlur=24;
 
 const gradient=ctx.createLinearGradient(-s/2,-s/2,s/2,s/2);
-gradient.addColorStop(0,"#fff");
-gradient.addColorStop(.25,"#63f5ff");
-gradient.addColorStop(1,"#714fff");
+gradient.addColorStop(0,"#ffffff");
+gradient.addColorStop(.18,"#63f5ff");
+gradient.addColorStop(.52,"#714fff");
+gradient.addColorStop(.82,"#ff38d8");
+gradient.addColorStop(1,"#ffd52f");
 ctx.fillStyle=gradient;
 ctx.fillRect(-s/2,-s/2,s,s);
 
