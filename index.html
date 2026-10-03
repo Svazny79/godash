@@ -270,12 +270,16 @@ const closeSettings=document.getElementById("closeSettings");
 const toast=document.getElementById("toast");
 
 const levelsData=[
-{id:1,name:"CYBER START",difficulty:"EASY",color:"#714fff",speed:6,length:5200},
-{id:2,name:"ELECTRIC SKY",difficulty:"NORMAL",color:"#00eaff",speed:7,length:6000},
-{id:3,name:"VOID REACTOR",difficulty:"HARD",color:"#ff38d8",speed:7.5,length:6600},
-{id:4,name:"HYPER DRIVE",difficulty:"VERY HARD",color:"#ff6b2d",speed:9,length:7300},
-{id:5,name:"GALAXY CORE",difficulty:"INSANE",color:"#55ff78",speed:9.5,length:7900},
-{id:6,name:"FINAL PULSE",difficulty:"EXTREME",color:"#ffd52f",speed:10,length:8800}
+{id:1,name:"CYBER START",difficulty:"EASY",color:"#714fff",speed:6,length:5400},
+{id:2,name:"ELECTRIC SKY",difficulty:"NORMAL",color:"#00eaff",speed:6.5,length:6100},
+{id:3,name:"VOID REACTOR",difficulty:"HARD",color:"#ff38d8",speed:7,length:6800},
+{id:4,name:"HYPER DRIVE",difficulty:"VERY HARD",color:"#ff6b2d",speed:7.5,length:7500},
+{id:5,name:"GALAXY CORE",difficulty:"INSANE",color:"#55ff78",speed:8,length:8200},
+{id:6,name:"FINAL PULSE",difficulty:"EXTREME",color:"#ffd52f",speed:8.5,length:9000},
+{id:7,name:"NEON STORM",difficulty:"EXTREME",color:"#00ffb7",speed:8.5,length:9600},
+{id:8,name:"PHANTOM CIRCUIT",difficulty:"INSANE",color:"#9b5cff",speed:8,length:10200},
+{id:9,name:"OVERDRIVE",difficulty:"EXTREME",color:"#ff315c",speed:9,length:11000},
+{id:10,name:"NEON APOCALYPSE",difficulty:"MASTER",color:"#ffffff",speed:9,length:12000}
 ];
 
 let currentLevel=1;
@@ -529,37 +533,86 @@ function generateLevel(level){
 obstacles=[];
 const groundY=canvas.height*.78;
 
+/*
+============================================================
+VARIED GEOMETRY-DASH-STYLE LEVEL PATTERNS
+============================================================
+Each level now uses different obstacle combinations instead of
+simply relying on a faster speed.  The basic controls and physics
+stay the same, but the layouts introduce short jumps, double and
+triple spikes, raised blocks, tall blocks, and mixed sequences.
+============================================================
+*/
 const patterns={
 1:[
-["spike",700],["spike",980],["block",1250],["spike",1550],
-["spike",1800],["block",2100],["spike",2450],["spike",2740],
-["block",3050],["spike",3400],["spike",3680]
+["spike",650],["block",980],["spike2",1320],["spike",1700],
+["tallblock",2010],["spike",2390],["block",2720],["spike2",3060],
+["spike",3500],["block",3820],["spike3",4180],["spike",4680],["block",5010]
 ],
 2:[
-["spike",650],["spike2",920],["block",1250],["spike",1570],
-["block",1840],["spike2",2160],["block",2520],["spike",2860],
-["spike",3100],["block",3380],["spike2",3700],["spike",4100]
+["spike2",620],["spike",900],["lowblock",1190],["spike2",1510],
+["tallblock",1900],["spike",2290],["spike3",2590],["block",3060],
+["spike2",3430],["lowblock",3810],["spike",4240],["spike3",4580],
+["block",5080],["spike2",5480]
 ],
 3:[
-["spike2",600],["block",900],["spike",1230],["spike2",1470],
-["block",1800],["spike3",2140],["block",2530],["spike2",2860],
-["block",3200],["spike3",3520],["spike",3980],["spike2",4260]
+["spike",600],["spike2",890],["block",1280],["tallblock",1600],
+["spike3",2030],["block",2490],["spike2",2830],["lowblock",3230],
+["spike",3650],["spike3",3940],["tallblock",4430],["spike2",4890],
+["block",5360],["spike3",5710],["spike",6230]
 ],
 4:[
-["spike2",570],["block",850],["spike2",1160],["block",1480],
-["spike3",1810],["block",2200],["spike2",2500],["block",2840],
-["spike3",3160],["block",3600],["spike2",3910],["spike3",4250]
+["block",570],["spike2",900],["tallblock",1260],["spike3",1690],
+["lowblock",2170],["spike",2500],["spike2",2790],["tallblock",3260],
+["spike3",3700],["block",4230],["spike2",4580],["lowblock",5010],
+["spike3",5420],["tallblock",5940],["spike2",6460],["block",7000]
 ],
 5:[
-["spike2",550],["block",820],["spike3",1120],["block",1510],
-["spike2",1810],["block",2140],["spike3",2450],["block",2870],
-["spike2",3200],["spike3",3500],["block",3930],["spike3",4260]
+["spike2",560],["tallblock",910],["spike3",1320],["lowblock",1810],
+["spike2",2140],["tallblock",2580],["spike",3070],["spike3",3390],
+["block",3920],["spike2",4260],["tallblock",4690],["spike3",5140],
+["lowblock",5630],["spike2",6020],["block",6510],["spike3",6870],
+["tallblock",7420],["spike2",7810]
 ],
 6:[
-["spike2",540],["spike3",820],["block",1200],["spike3",1510],
-["block",1900],["spike3",2210],["spike2",2630],["block",2960],
-["spike3",3300],["block",3690],["spike3",4010],["spike3",4390],
-["block",4770],["spike3",5100]
+["spike3",540],["tallblock",960],["spike2",1410],["block",1810],
+["spike3",2150],["lowblock",2630],["spike2",2990],["tallblock",3430],
+["spike3",3900],["block",4430],["spike2",4780],["tallblock",5230],
+["spike3",5700],["lowblock",6200],["spike2",6570],["tallblock",7040],
+["spike3",7540],["block",8110],["spike2",8470]
+],
+7:[
+["spike",560],["lowblock",850],["spike2",1160],["tallblock",1580],
+["spike3",2040],["block",2550],["spike",2870],["spike2",3160],
+["tallblock",3620],["spike3",4090],["lowblock",4620],["spike2",4990],
+["block",5480],["spike3",5840],["tallblock",6380],["spike2",6870],
+["lowblock",7310],["spike3",7680],["tallblock",8240],["spike2",8750],
+["block",9290]
+],
+8:[
+["tallblock",550],["spike2",990],["spike3",1350],["lowblock",1860],
+["spike",2210],["tallblock",2530],["spike2",3000],["block",3480],
+["spike3",3850],["tallblock",4380],["spike2",4870],["lowblock",5360],
+["spike3",5730],["block",6260],["tallblock",6700],["spike2",7210],
+["spike3",7600],["lowblock",8120],["tallblock",8540],["spike2",9060],
+["spike3",9470],["block",9950]
+],
+9:[
+["spike2",540],["spike3",870],["tallblock",1330],["spike",1820],
+["spike2",2100],["lowblock",2520],["spike3",2890],["tallblock",3390],
+["spike2",3870],["block",4310],["spike3",4660],["tallblock",5160],
+["spike2",5660],["lowblock",6120],["spike3",6480],["tallblock",6980],
+["spike2",7480],["block",7920],["spike3",8280],["tallblock",8780],
+["spike2",9290],["lowblock",9750],["spike3",10120],["tallblock",10620]
+],
+10:[
+["spike3",520],["tallblock",930],["spike2",1390],["lowblock",1840],
+["spike3",2220],["tallblock",2730],["spike2",3220],["block",3690],
+["spike3",4080],["tallblock",4600],["spike2",5120],["lowblock",5600],
+["spike3",5980],["tallblock",6500],["spike2",7010],["block",7480],
+["spike3",7860],["tallblock",8380],["spike2",8900],["lowblock",9360],
+["spike3",9750],["tallblock",10280],["spike2",10820],["spike3",11180],
+["tallblock",11600]
 ]
 };
 
@@ -570,58 +623,20 @@ const type=item[0];
 const x=item[1];
 
 if(type==="spike"){
-obstacles.push({
-type:"spike",
-x:x,
-y:groundY-34,
-w:34,
-h:34
-});
+obstacles.push({type:"spike",x:x,y:groundY-34,w:34,h:34});
 }else if(type==="spike2"){
-obstacles.push({
-type:"spike",
-x:x,
-y:groundY-34,
-w:34,
-h:34
-});
-obstacles.push({
-type:"spike",
-x:x+42,
-y:groundY-34,
-w:34,
-h:34
-});
+obstacles.push({type:"spike",x:x,y:groundY-34,w:34,h:34});
+obstacles.push({type:"spike",x:x+42,y:groundY-34,w:34,h:34});
 }else if(type==="spike3"){
-obstacles.push({
-type:"spike",
-x:x,
-y:groundY-34,
-w:34,
-h:34
-});
-obstacles.push({
-type:"spike",
-x:x+42,
-y:groundY-34,
-w:34,
-h:34
-});
-obstacles.push({
-type:"spike",
-x:x+84,
-y:groundY-34,
-w:34,
-h:34
-});
+obstacles.push({type:"spike",x:x,y:groundY-34,w:34,h:34});
+obstacles.push({type:"spike",x:x+42,y:groundY-34,w:34,h:34});
+obstacles.push({type:"spike",x:x+84,y:groundY-34,w:34,h:34});
 }else if(type==="block"){
-obstacles.push({
-type:"block",
-x:x,
-y:groundY-55,
-w:55,
-h:55
-});
+obstacles.push({type:"block",x:x,y:groundY-55,w:55,h:55});
+}else if(type==="lowblock"){
+obstacles.push({type:"block",x:x,y:groundY-38,w:75,h:38});
+}else if(type==="tallblock"){
+obstacles.push({type:"block",x:x,y:groundY-82,w:55,h:82});
 }
 }
 }
