@@ -57,6 +57,10 @@ button{font:inherit}
 .game-message.show{display:block}
 .game-message h1{font-size:clamp(42px,8vw,90px);font-weight:1000;font-style:italic;letter-spacing:-3px;text-shadow:0 0 15px #fff,0 0 35px #63f5ff}
 .game-message p{margin-top:10px;font-size:12px;color:#a7aecb;letter-spacing:3px}
+.win-close{margin-top:20px;width:52px;height:52px;border-radius:50%;border:1px solid #63f5ff88;background:rgba(5,7,18,.9);color:#fff;font-size:25px;font-weight:900;cursor:pointer;box-shadow:0 0 25px #63f5ff55, inset 0 0 15px #63f5ff18;transition:.2s}
+.win-close:hover{transform:scale(1.08);box-shadow:0 0 35px #63f5ff88}
+.win-close.ready{border-color:#63f5ff;background:#101735;box-shadow:0 0 35px #63f5ff99}
+.win-close.locked{opacity:.25;cursor:not-allowed;pointer-events:none}
 .game-controls{position:absolute;bottom:22px;left:22px;right:22px;display:flex;justify-content:space-between;align-items:center;pointer-events:auto}
 .game-control-button{border:1px solid #303753;border-radius:11px;background:rgba(5,7,18,.75);color:#ccd2ef;padding:10px 14px;cursor:pointer;font-size:11px;letter-spacing:2px;font-weight:900}
 .modal{position:absolute;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
@@ -179,7 +183,7 @@ body{
 <div class="ui-pill">ATTEMPT: <strong id="attemptDisplay">1</strong></div>
 </div>
 <div class="progress-wrap"><div id="progressBar"></div></div>
-<div class="game-message" id="gameMessage"><h1 id="messageTitle">CRASH!</h1><p id="messageText">PRESS SPACE OR TAP TO TRY AGAIN</p></div>
+<div class="game-message" id="gameMessage"><h1 id="messageTitle">CRASH!</h1><p id="messageText">PRESS SPACE OR TAP TO TRY AGAIN</p><button class="win-close hidden" id="winCloseButton" aria-label="Close level complete">✕</button></div>
 <div class="game-controls">
 <button class="game-control-button" id="restartButton">RESTART</button>
 <button class="game-control-button" id="quitButton">QUIT</button>
@@ -254,6 +258,7 @@ const attemptDisplay=document.getElementById("attemptDisplay");
 const gameMessage=document.getElementById("gameMessage");
 const messageTitle=document.getElementById("messageTitle");
 const messageText=document.getElementById("messageText");
+const winCloseButton=document.getElementById("winCloseButton");
 
 const settingsModal=document.getElementById("settingsModal");
 const soundToggle=document.getElementById("soundToggle");
@@ -310,6 +315,8 @@ let bossProjectiles=[];
 let bossMoveTime=0;
 let bossMoveX=0;
 let bossMoveY=0;
+let winCloseReady=false;
+let winCloseTimer=null;
 let winEmojis=[];
 const bossStartX=2050;
 
@@ -721,6 +728,10 @@ attemptDisplay.textContent=save.attempts;
 
 progressBar.style.width="0%";
 gameMessage.classList.remove("show");
+winCloseReady=false;
+if(winCloseTimer){clearTimeout(winCloseTimer);winCloseTimer=null;}
+winCloseButton.classList.add("hidden","locked");
+winCloseButton.classList.remove("ready");
 
 gameRunId++;
 lastTime=performance.now();
@@ -897,9 +908,19 @@ running=false;
 stopMusic();
 createWinParticles();
 createEmojiVictoryRain();
+winCloseReady=false;
+winCloseButton.classList.remove("hidden","ready");
+winCloseButton.classList.add("locked");
 messageTitle.textContent="LEVEL COMPLETE!";
-messageText.textContent="PRESS SPACE OR TAP TO RETURN TO LEVELS";
+messageText.textContent="ENJOY THE EMOJI CELEBRATION...";
 gameMessage.classList.add("show");
+if(winCloseTimer)clearTimeout(winCloseTimer);
+winCloseTimer=setTimeout(()=>{
+  winCloseReady=true;
+  winCloseButton.classList.remove("locked");
+  winCloseButton.classList.add("ready");
+  messageText.textContent="CELEBRATION COMPLETE • CLICK ✕ TO RETURN TO LEVELS";
+},4000);
 save.best[currentLevel]=100;
 if(currentLevel===save.level&&save.level<levelsData.length)save.level++;
 save.stars++;
@@ -1582,13 +1603,23 @@ canvas.addEventListener("pointercancel",()=>jumpHeld=false);
 restartButton.addEventListener("click",()=>startLevel(currentLevel));
 quitButton.addEventListener("click",quitGame);
 
-gameMessage.addEventListener("pointerdown",()=>{
+gameMessage.addEventListener("pointerdown",event=>{
+if(event.target===winCloseButton)return;
 if(dead){
 startLevel(currentLevel);
-}else if(won){
-buildLevelList();
-showScreen(levelsScreen);
 }
+});
+
+winCloseButton.addEventListener("click",event=>{
+  event.stopPropagation();
+  if(!won||!winCloseReady)return;
+  if(winCloseTimer){clearTimeout(winCloseTimer);winCloseTimer=null;}
+  winCloseReady=false;
+  winCloseButton.classList.add("hidden","locked");
+  winCloseButton.classList.remove("ready");
+  gameMessage.classList.remove("show");
+  buildLevelList();
+  showScreen(levelsScreen);
 });
 
 playButton.addEventListener("click",()=>{
