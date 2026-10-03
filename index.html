@@ -273,7 +273,8 @@ const levelsData=[
 {id:7,name:"NEON STORM",difficulty:"EXTREME",color:"#00ffb7",speed:8.5,length:9600},
 {id:8,name:"PHANTOM CIRCUIT",difficulty:"INSANE",color:"#9b5cff",speed:8,length:10200},
 {id:9,name:"OVERDRIVE",difficulty:"EXTREME",color:"#ff315c",speed:9,length:11000},
-{id:10,name:"NEON APOCALYPSE",difficulty:"MASTER",color:"#ffffff",speed:9,length:12000}
+{id:10,name:"NEON APOCALYPSE",difficulty:"MASTER",color:"#ffffff",speed:9,length:12000},
+{id:11,name:"EMOJI MADNESS",difficulty:"MASTER",color:"#ffcf33",speed:8.5,length:9800}
 ];
 
 let currentLevel=1;
@@ -315,7 +316,8 @@ const musicTracks={
 7:{name:"NEON STORM",tempo:150,wave:"triangle",bassWave:"sawtooth",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[220.00,277.18,329.63],[196.00,246.94,293.66],[220.00,293.66,349.23],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,110.00,98.00,110.00,123.47],lead:[440.00,493.88,523.25,587.33,659.25,587.33,523.25,493.88]},
 8:{name:"PHANTOM CIRCUIT",tempo:136,wave:"sawtooth",bassWave:"triangle",leadWave:"square",chords:[[293.66,369.99,440.00],[261.63,329.63,392.00],[246.94,329.63,493.88],[220.00,293.66,440.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[293.66,392.00,493.88],[261.63,329.63,392.00]],bass:[146.83,130.81,123.47,110.00,146.83,164.81,146.83,130.81],lead:[587.33,523.25,493.88,440.00,587.33,659.25,587.33,523.25]},
 9:{name:"OVERDRIVE",tempo:162,wave:"square",bassWave:"sawtooth",leadWave:"sawtooth",chords:[[261.63,329.63,392.00],[311.13,392.00,466.16],[329.63,415.30,493.88],[369.99,466.16,554.37],[392.00,493.88,587.33],[369.99,466.16,554.37],[329.63,415.30,493.88],[311.13,392.00,466.16]],bass:[130.81,155.56,164.81,184.99,196.00,184.99,164.81,155.56],lead:[523.25,622.25,659.25,739.99,783.99,739.99,659.25,622.25]},
-10:{name:"NEON APOCALYPSE",tempo:178,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[293.66,369.99,440.00],[261.63,329.63,392.00],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,164.81,146.83,130.81,123.47],lead:[440.00,493.88,523.25,587.33,659.25,587.33,523.25,493.88]}
+10:{name:"NEON APOCALYPSE",tempo:178,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[293.66,369.99,440.00],[261.63,329.63,392.00],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,164.81,146.83,130.81,123.47],lead:[440.00,493.88,523.25,587.33,659.25,587.33,523.25,493.88]},
+11:{name:"EMOJI BEAT",tempo:144,wave:"triangle",bassWave:"sawtooth",leadWave:"square",chords:[[261.63,329.63,392.00],[329.63,392.00,493.88],[293.66,369.99,440.00],[349.23,440.00,523.25],[261.63,329.63,392.00],[392.00,493.88,587.33],[329.63,415.30,493.88],[293.66,369.99,440.00]],bass:[130.81,164.81,146.83,174.61,130.81,196.00,164.81,146.83],lead:[523.25,659.25,587.33,698.46,523.25,783.99,659.25,587.33]}
 };
 
 function ensureAudio(){
@@ -606,6 +608,13 @@ const patterns={
 ["spike3",7860],["tallblock",8380],["spike2",8900],["lowblock",9360],
 ["spike3",9750],["tallblock",10280],["spike2",10820],["spike3",11180],
 ["tallblock",11600]
+],
+11:[
+["emoji",620,"🔥"],["emoji",1040,"😈"],["emoji2",1450,"💀"],["emoji",1940,"⚡"],
+["emoji3",2350,"👾"],["emoji",2920,"💣"],["emoji2",3440,"🤖"],["emoji",3980,"😎"],
+["emoji3",4460,"🔥"],["emoji",5050,"💀"],["emoji2",5540,"⚡"],["emoji",6080,"👾"],
+["emoji3",6620,"💣"],["emoji",7230,"🤖"],["emoji2",7750,"😈"],["emoji3",8260,"🔥"],
+["emoji",8850,"💀"],["emoji2",9250,"⚡"]
 ]
 };
 
@@ -630,6 +639,15 @@ obstacles.push({type:"block",x:x,y:groundY-55,w:55,h:55});
 obstacles.push({type:"block",x:x,y:groundY-38,w:75,h:38});
 }else if(type==="tallblock"){
 obstacles.push({type:"block",x:x,y:groundY-82,w:55,h:82});
+}else if(type==="emoji"){
+obstacles.push({type:"emoji",emoji:item[2]||"🔥",x:x,y:groundY-58,w:58,h:58});
+}else if(type==="emoji2"){
+obstacles.push({type:"emoji",emoji:item[2]||"💀",x:x,y:groundY-58,w:58,h:58});
+obstacles.push({type:"emoji",emoji:item[2]||"💀",x:x+66,y:groundY-58,w:58,h:58});
+}else if(type==="emoji3"){
+obstacles.push({type:"emoji",emoji:item[2]||"👾",x:x,y:groundY-58,w:58,h:58});
+obstacles.push({type:"emoji",emoji:item[2]||"👾",x:x+66,y:groundY-58,w:58,h:58});
+obstacles.push({type:"emoji",emoji:item[2]||"👾",x:x+132,y:groundY-58,w:58,h:58});
 }
 }
 }
@@ -787,6 +805,12 @@ coyoteTime=5;
 die();
 return;
 }
+}
+
+if(obstacle.type==="emoji"){
+/* Emoji obstacles are solid, grounded hazards. */
+die();
+return;
 }
 }
 }
@@ -987,6 +1011,21 @@ for(let i=0;i<26;i++){
     ctx.fill();
 }
 ctx.globalAlpha=1;
+
+/* Emoji Madness background: distant translucent emoji silhouettes. */
+if(currentLevel===11){
+const emojiSet=["✨","💫","😈","🔥","💀","⚡","👾","💜"];
+for(let i=0;i<12;i++){
+const ex=((i*287-cameraX*.18)%(w+160)+w+160)%(w+160)-80;
+const ey=90+(i*113)%(groundY-170);
+ctx.save();
+ctx.globalAlpha=.07;
+ctx.font="30px Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif";
+ctx.textAlign="center";
+ctx.fillText(emojiSet[i%emojiSet.length],ex,ey);
+ctx.restore();
+}
+}
 }
 
 function drawObstacles(){
@@ -1028,6 +1067,41 @@ ctx.globalAlpha=.75;
 ctx.fillRect(x+4,obstacle.y+4,4,4);
 ctx.fillRect(x+obstacle.w-8,obstacle.y+4,4,4);
 ctx.globalAlpha=1;
+ctx.restore();
+}
+
+if(obstacle.type==="emoji"){
+ctx.save();
+const cx=x+obstacle.w/2;
+const cy=obstacle.y+obstacle.h/2;
+
+/* Dark glassy backing makes the native emoji feel like a real game object. */
+ctx.shadowColor=levelData.color;
+ctx.shadowBlur=24;
+const orb=ctx.createRadialGradient(cx-12,cy-14,4,cx,cy,obstacle.w*.62);
+orb.addColorStop(0,"#ffffff55");
+orb.addColorStop(.28,"#ffffff18");
+orb.addColorStop(.7,"#070914cc");
+orb.addColorStop(1,"#000000ee");
+ctx.fillStyle=orb;
+ctx.beginPath();
+ctx.roundRect(x-5,obstacle.y-5,obstacle.w+10,obstacle.h+10,16);
+ctx.fill();
+ctx.shadowBlur=0;
+ctx.strokeStyle=levelData.color+"aa";
+ctx.lineWidth=2;
+ctx.stroke();
+
+ctx.font="48px Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif";
+ctx.textAlign="center";
+ctx.textBaseline="middle";
+ctx.shadowColor="#000";
+ctx.shadowBlur=8;
+ctx.fillText(obstacle.emoji,cx,cy+1);
+ctx.shadowBlur=0;
+ctx.font="bold 11px Arial";
+ctx.fillStyle="#ffffff99";
+ctx.fillText("MADNESS",cx,obstacle.y+obstacle.h+14);
 ctx.restore();
 }
 
