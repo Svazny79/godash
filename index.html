@@ -12,6 +12,8 @@ body{user-select:none;-webkit-user-select:none}
 button{font:inherit}
 .screen{position:absolute;inset:0;display:none;overflow:hidden}
 .screen.active{display:flex}
+#gameScreen{touch-action:none}
+#gameCanvas{touch-action:none}
 .background{position:absolute;inset:0;overflow:hidden;background:radial-gradient(circle at 50% 20%,#17144b 0%,#080817 38%,#030308 100%)}
 .grid{position:absolute;width:200%;height:200%;left:-50%;top:-25%;opacity:.4;background-image:linear-gradient(rgba(91,86,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(91,86,255,.18) 1px,transparent 1px);background-size:55px 55px;transform:perspective(450px) rotateX(62deg);animation:gridMove 7s linear infinite}
 @keyframes gridMove{from{transform:perspective(450px) rotateX(62deg) translateY(0)}to{transform:perspective(450px) rotateX(62deg) translateY(55px)}}
@@ -318,6 +320,9 @@ let bossMoveY=0;
 let winCloseReady=false;
 let winCloseTimer=null;
 let winEmojis=[];
+let orbTapCount=0;
+let orbTapTimer=null;
+let orbGlowTime=0;
 const bossStartX=2050;
 
 /* ============================================================
@@ -533,7 +538,7 @@ card.innerHTML=`
 <div class="level-number">${level.id}</div>
 <h2>${level.name}</h2>
 <div class="difficulty" style="color:${level.color}">${level.difficulty}</div>
-<div class="level-description">${unlocked?"Jump through obstacles and reach the finish.":"Complete previous levels to unlock."}</div>
+<div class="level-description">${unlocked?"Jump, use slopes, glide over platforms, and master yellow 2X orbs.":"Complete previous levels to unlock."}</div>
 <div class="level-music">♫ ${track.name}</div>
 <div class="level-progress"><div style="width:${best}%;background:${level.color};box-shadow:0 0 10px ${level.color}"></div></div>
 `;
@@ -560,74 +565,34 @@ triple spikes, raised blocks, tall blocks, and mixed sequences.
 */
 const patterns={
 1:[
-["spike",650],["block",980],["spike2",1320],["spike",1700],
-["tallblock",2010],["spike",2390],["block",2720],["spike2",3060],
-["spike",3500],["block",3820],["spike3",4180],["spike",4680],["block",5010]
+["spike",650],["slope",950,"up"],["glide",1240,360,78],["spike2",1530],["orb",1810],["block",2080],["slope",2400,"down"],["spike",2740],["glide",3010,330,72],["spike2",3330],["orb",3650],["tallblock",3940],["slope",4260,"up"],["spike3",4610],["glide",5000,300,68] 
 ],
 2:[
-["spike2",620],["spike",900],["lowblock",1190],["spike2",1510],
-["tallblock",1900],["spike",2290],["spike3",2590],["block",3060],
-["spike2",3430],["lowblock",3810],["spike",4240],["spike3",4580],
-["block",5080],["spike2",5480]
+["spike2",620],["slope",930,"up"],["glide",1210,350,80],["spike",1510],["orb",1760],["lowblock",2030],["slope",2350,"down"],["spike3",2690],["glide",3050,340,70],["tallblock",3420],["orb",3740],["spike2",4050],["slope",4380,"up"],["glide",4720,310,74],["spike",5100] 
 ],
 3:[
-["spike",600],["spike2",890],["block",1280],["tallblock",1600],
-["spike3",2030],["block",2490],["spike2",2830],["lowblock",3230],
-["spike",3650],["spike3",3940],["tallblock",4430],["spike2",4890],
-["block",5360],["spike3",5710],["spike",6230]
+["slope",600,"up"],["spike2",900],["glide",1230,370,82],["orb",1560],["tallblock",1850],["slope",2180,"down"],["spike3",2530],["glide",2940,320,70],["spike",3300],["orb",3590],["block",3890],["slope",4210,"up"],["spike2",4580],["glide",4920,360,76],["tallblock",5340],["orb",5680],["spike3",6000] 
 ],
 4:[
-["block",570],["spike2",900],["tallblock",1260],["spike3",1690],
-["lowblock",2170],["spike",2500],["spike2",2790],["tallblock",3260],
-["spike3",3700],["block",4230],["spike2",4580],["lowblock",5010],
-["spike3",5420],["tallblock",5940],["spike2",6460],["block",7000]
+["glide",570,360,82],["spike2",980],["slope",1310,"down"],["orb",1650],["tallblock",1950],["spike3",2310],["glide",2750,330,68],["slope",3110,"up"],["spike",3470],["orb",3760],["block",4070],["spike2",4440],["glide",4820,390,78],["slope",5260,"down"],["spike3",5630],["orb",6120],["tallblock",6490],["glide",6860,330,72] 
 ],
 5:[
-["spike2",560],["tallblock",910],["spike3",1320],["lowblock",1810],
-["spike2",2140],["tallblock",2580],["spike",3070],["spike3",3390],
-["block",3920],["spike2",4260],["tallblock",4690],["spike3",5140],
-["lowblock",5630],["spike2",6020],["block",6510],["spike3",6870],
-["tallblock",7420],["spike2",7810]
+["slope",560,"up"],["glide",930,390,86],["spike2",1390],["orb",1740],["tallblock",2050],["slope",2430,"down"],["spike3",2800],["glide",3250,360,76],["spike",3660],["orb",3950],["block",4260],["slope",4610,"up"],["spike2",5000],["glide",5420,420,84],["tallblock",5900],["orb",6240],["spike3",6600],["slope",7040,"down"],["glide",7410,350,72],["spike2",7850] 
 ],
 6:[
-["spike3",540],["tallblock",960],["spike2",1410],["block",1810],
-["spike3",2150],["lowblock",2630],["spike2",2990],["tallblock",3430],
-["spike3",3900],["block",4430],["spike2",4780],["tallblock",5230],
-["spike3",5700],["lowblock",6200],["spike2",6570],["tallblock",7040],
-["spike3",7540],["block",8110],["spike2",8470]
+["glide",540,400,90],["spike3",1010],["slope",1430,"up"],["orb",1780],["tallblock",2140],["spike2",2580],["glide",3020,360,74],["slope",3450,"down"],["spike3",3850],["orb",4290],["block",4650],["glide",5050,430,82],["spike2",5550],["slope",5950,"up"],["tallblock",6400],["orb",6830],["spike3",7250],["glide",7740,390,78],["slope",8180,"down"],["spike2",8580] 
 ],
 7:[
-["spike",560],["lowblock",850],["spike2",1160],["tallblock",1580],
-["spike3",2040],["block",2550],["spike",2870],["spike2",3160],
-["tallblock",3620],["spike3",4090],["lowblock",4620],["spike2",4990],
-["block",5480],["spike3",5840],["tallblock",6380],["spike2",6870],
-["lowblock",7310],["spike3",7680],["tallblock",8240],["spike2",8750],
-["block",9290]
+["spike",560],["slope",900,"up"],["glide",1250,420,88],["orb",1700],["spike2",2020],["tallblock",2390],["slope",2780,"down"],["glide",3160,360,72],["spike3",3600],["orb",4070],["block",4450],["slope",4810,"up"],["glide",5190,440,86],["spike2",5680],["tallblock",6120],["orb",6580],["spike3",7010],["slope",7460,"down"],["glide",7830,380,76],["spike2",8320],["orb",8720],["tallblock",9090],["glide",9440,350,70] 
 ],
 8:[
-["tallblock",550],["spike2",990],["spike3",1350],["lowblock",1860],
-["spike",2210],["tallblock",2530],["spike2",3000],["block",3480],
-["spike3",3850],["tallblock",4380],["spike2",4870],["lowblock",5360],
-["spike3",5730],["block",6260],["tallblock",6700],["spike2",7210],
-["spike3",7600],["lowblock",8120],["tallblock",8540],["spike2",9060],
-["spike3",9470],["block",9950]
+["tallblock",550],["slope",1000,"up"],["glide",1350,380,82],["spike2",1800],["orb",2170],["slope",2500,"down"],["spike3",2870],["glide",3330,430,88],["tallblock",3820],["orb",4200],["spike2",4590],["slope",4970,"up"],["glide",5350,360,74],["spike3",5800],["block",6270],["orb",6640],["slope",7000,"down"],["glide",7380,410,80],["spike2",7860],["tallblock",8320],["orb",8740],["spike3",9160],["glide",9580,390,76],["slope",10030,"up"] 
 ],
 9:[
-["spike2",540],["spike3",870],["tallblock",1330],["spike",1820],
-["spike2",2100],["lowblock",2520],["spike3",2890],["tallblock",3390],
-["spike2",3870],["block",4310],["spike3",4660],["tallblock",5160],
-["spike2",5660],["lowblock",6120],["spike3",6480],["tallblock",6980],
-["spike2",7480],["block",7920],["spike3",8280],["tallblock",8780],
-["spike2",9290],["lowblock",9750],["spike3",10120],["tallblock",10620]
+["slope",540,"up"],["spike2",940],["glide",1320,400,86],["orb",1760],["spike3",2110],["tallblock",2530],["slope",2970,"down"],["glide",3370,360,72],["spike2",3800],["orb",4220],["block",4610],["slope",4990,"up"],["glide",5380,440,88],["spike3",5890],["tallblock",6350],["orb",6820],["spike2",7230],["slope",7620,"down"],["glide",8010,380,76],["spike3",8490],["orb",9000],["tallblock",9420],["glide",9840,420,82],["spike2",10330] 
 ],
 10:[
-["spike3",520],["tallblock",930],["spike2",1390],["lowblock",1840],
-["spike3",2220],["tallblock",2730],["spike2",3220],["block",3690],
-["spike3",4080],["tallblock",4600],["spike2",5120],["lowblock",5600],
-["spike3",5980],["tallblock",6500],["spike2",7010],["block",7480],
-["spike3",7860],["tallblock",8380],["spike2",8900],["lowblock",9360],
-["spike3",9750],["tallblock",10280],["spike2",10820],["spike3",11180],
-["tallblock",11600]
+["spike3",520],["slope",930,"up"],["glide",1320,440,92],["orb",1800],["tallblock",2200],["spike2",2660],["slope",3100,"down"],["glide",3490,400,80],["spike3",3950],["orb",4450],["block",4860],["slope",5280,"up"],["glide",5690,460,90],["spike2",6220],["tallblock",6680],["orb",7190],["spike3",7650],["slope",8110,"down"],["glide",8500,420,84],["spike2",9000],["orb",9470],["tallblock",9900],["glide",10330,440,88],["slope",10820,"up"],["spike3",11280],["glide",11700,400,80]
 ],
 11:[
 ["emoji",620,"🔥"],["emoji",1040,"😈"],["emoji2",1450,"💀"],["emoji",1940,"⚡"],
@@ -644,7 +609,8 @@ const patterns={
 
 const selected=patterns[level.id]||patterns[1];
 
-for(const item of selected){
+for(let itemIndex=0;itemIndex<selected.length;itemIndex++){
+const item=selected[itemIndex];
 const type=item[0];
 const x=item[1];
 
@@ -663,6 +629,22 @@ obstacles.push({type:"block",x:x,y:groundY-55,w:55,h:55});
 obstacles.push({type:"block",x:x,y:groundY-38,w:75,h:38});
 }else if(type==="tallblock"){
 obstacles.push({type:"block",x:x,y:groundY-82,w:55,h:82});
+}else if(type==="glide"){
+const gw=item[2]||340;
+const gy=groundY-(item[3]||72);
+obstacles.push({type:"glide",x:x,y:gy,w:gw,h:22,top:gy});
+}else if(type==="orb"){
+/* Yellow 2X orbs are placed directly over the next spike section so
+   the boost has a clear purpose: use it to fly safely over the spikes. */
+let orbX=x;
+for(let look=itemIndex+1;look<selected.length;look++){
+  const next=selected[look];
+  if(next[0]==="spike"||next[0]==="spike2"||next[0]==="spike3"){
+    orbX=next[1]+(next[0]==="spike"?17:42)-16;
+    break;
+  }
+}
+obstacles.push({type:"orb",x:orbX,y:groundY-108,w:32,h:32,active:false,pulse:Math.random()*Math.PI*2});
 }else if(type==="slope"){
 obstacles.push({type:"slope",x:x,y:groundY-30,w:78,h:30,direction:item[2]||"up"});
 }else if(type==="emoji"){
@@ -715,6 +697,9 @@ bossMoveTime=0;
 bossMoveX=0;
 bossMoveY=0;
 winEmojis=[];
+orbTapCount=0;
+if(orbTapTimer)clearTimeout(orbTapTimer);
+orbGlowTime=0;
 
 generateLevel(levelData);
 
@@ -740,6 +725,46 @@ cancelAnimationFrame(animationFrame);
 animationFrame=requestAnimationFrame(gameLoop);
 }
 
+function findNearbyOrb(){
+  if(!running||currentLevel===12)return null;
+  const px=player.x+player.size/2, py=player.y+player.size/2;
+  let best=null,bestScore=999999;
+  for(const o of obstacles){
+    if(o.type!=="orb"||o.active)continue;
+    const ox=o.x+o.w/2, oy=o.y+o.h/2;
+    const dx=Math.abs(ox-px), dy=Math.abs(oy-py);
+    /* The yellow orb is intentionally easy to reach: it is a jump helper,
+       so you can double-tap it while approaching a spike instead of needing
+       pixel-perfect timing. */
+    if(dx<150&&dy<180){
+      const score=dx+dy*.55;
+      if(score<bestScore){best=o;bestScore=score;}
+    }
+  }
+  return best;
+}
+
+function activateYellowOrb(){
+  const orb=findNearbyOrb();
+  if(!orb)return false;
+  orbTapCount++;
+  if(orbTapTimer)clearTimeout(orbTapTimer);
+  orbTapTimer=setTimeout(()=>{orbTapCount=0;},360);
+  if(orbTapCount<2)return true;
+  orbTapCount=0;
+  orb.active=true;
+  orbGlowTime=28;
+  /* A yellow orb is a true mid-air jump helper.  It can be triggered while
+     falling or even while already airborne, launching the player high enough
+     to clear the spike sequence ahead. */
+  player.vy=-19.5;
+  player.grounded=false;
+  coyoteTime=0;
+  jumpBuffer=0;
+  for(let i=0;i<28;i++)addParticle(orb.x+orb.w/2,orb.y+orb.h/2,(Math.random()-.5)*10,-Math.random()*8-2,30+Math.random()*24,3+Math.random()*5,"#ffd52f");
+  return true;
+}
+
 function requestJump(){
 if(dead){
 startLevel(currentLevel);
@@ -761,6 +786,7 @@ const groundY=canvas.height*.78;
 
 if(jumpBuffer>0)jumpBuffer--;
 if(coyoteTime>0)coyoteTime--;
+if(orbGlowTime>0)orbGlowTime--;
 
 if(currentLevel===12&&bossActive){
   player.x=bossStartX;
@@ -854,6 +880,23 @@ if(px<obstacle.x+obstacle.w&&px+ps>obstacle.x&&py<obstacle.y+obstacle.h&&py+ps>o
 if(obstacle.type==="spike"){
 die();
 return;
+}
+
+if(obstacle.type==="glide"){
+  const previousBottom=py+ps-player.vy;
+  if(previousBottom<=obstacle.y+6&&player.vy>=0){
+    player.y=obstacle.y-ps;
+    player.vy=0;
+    player.grounded=true;
+    coyoteTime=5;
+  }else if(py+ps>obstacle.y+5){
+    die();
+    return;
+  }
+}
+
+if(obstacle.type==="orb"){
+  /* Orbs are triggered by the input handler, not by body collision. */
 }
 
 if(obstacle.type==="slope"){
@@ -1150,6 +1193,33 @@ ctx.globalAlpha=.75;
 ctx.fillRect(x+4,obstacle.y+4,4,4);
 ctx.fillRect(x+obstacle.w-8,obstacle.y+4,4,4);
 ctx.globalAlpha=1;
+ctx.restore();
+}
+
+if(obstacle.type==="glide"){
+ctx.save();
+const gy=obstacle.y;
+const gg=ctx.createLinearGradient(x,gy,x,gy+obstacle.h);
+gg.addColorStop(0,"#ffffff");gg.addColorStop(.12,levelData.color);gg.addColorStop(.5,"#1b2450");gg.addColorStop(1,"#060816");
+ctx.shadowColor=levelData.color;ctx.shadowBlur=24;ctx.fillStyle=gg;
+ctx.fillRect(x,gy,obstacle.w,obstacle.h);
+ctx.shadowBlur=0;ctx.strokeStyle="#ffffff99";ctx.lineWidth=2;ctx.strokeRect(x,gy,obstacle.w,obstacle.h);
+ctx.fillStyle="#63f5ff55";ctx.fillRect(x+8,gy+5,Math.max(2,obstacle.w-16),3);
+for(let gx=x+18;gx<x+obstacle.w-8;gx+=28){ctx.fillStyle="#ffffff22";ctx.fillRect(gx,gy+11,12,4);}
+ctx.restore();
+}
+
+if(obstacle.type==="orb"){
+ctx.save();
+const cx=x+obstacle.w/2,cy=obstacle.y+obstacle.h/2;
+const pulse=1+Math.sin(performance.now()*.009+obstacle.pulse)*.12;
+ctx.translate(cx,cy);ctx.scale(pulse,pulse);
+ctx.shadowColor="#ffd52f";ctx.shadowBlur=30;
+const og=ctx.createRadialGradient(-5,-6,1,0,0,17);
+og.addColorStop(0,"#fff");og.addColorStop(.2,"#fff7a6");og.addColorStop(.55,"#ffd52f");og.addColorStop(1,"#ff9d00");
+ctx.fillStyle=og;ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fill();
+ctx.shadowBlur=0;ctx.strokeStyle="#fff8b0";ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,18,0,Math.PI*2);ctx.stroke();
+ctx.fillStyle="#fff";ctx.font="900 7px Arial";ctx.textAlign="center";ctx.fillText("2X",0,2);
 ctx.restore();
 }
 
@@ -1571,7 +1641,7 @@ event.preventDefault();
 if(!jumpHeld){
 jumpHeld=true;
 if(currentLevel===12&&bossActive)fireBossLaser();
-else requestJump();
+else if(!activateYellowOrb())requestJump();
 }
 }
 if(event.code==="KeyR"&&gameScreen.classList.contains("active")){
@@ -1593,7 +1663,7 @@ if(!gameScreen.classList.contains("active"))return;
 if(!jumpHeld){
 jumpHeld=true;
 if(currentLevel===12&&bossActive)fireBossLaser();
-else requestJump();
+else if(!activateYellowOrb())requestJump();
 }
 });
 
