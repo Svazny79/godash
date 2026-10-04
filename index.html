@@ -31,10 +31,15 @@ button{font:inherit}
 .neon-button:hover{transform:translateY(-3px) scale(1.02);background:linear-gradient(135deg,rgba(99,245,255,.2),rgba(113,79,255,.3));box-shadow:0 0 28px rgba(99,245,255,.45),inset 0 0 20px rgba(99,245,255,.1)}
 .neon-button:active{transform:scale(.97)}
 .small-version{position:absolute;bottom:15px;font-size:10px;letter-spacing:3px;color:#62677d}
-.level-screen{flex-direction:column;align-items:center;justify-content:flex-start;z-index:10;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:112px 0 45px}
+.level-screen{flex-direction:column;align-items:center;justify-content:flex-start;z-index:10;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:185px 0 45px}
 .level-header{position:absolute;top:24px;width:100%;text-align:center;z-index:3;pointer-events:none}.level-brand{font-size:11px;letter-spacing:6px;font-weight:1000;color:#63f5ff;text-shadow:0 0 14px #63f5ff;margin-bottom:5px}
 .level-header h1{font-size:36px;font-weight:1000;letter-spacing:4px;text-shadow:0 0 20px #714fff}
 .level-header p{margin-top:5px;color:#777c9c;font-size:12px;letter-spacing:3px}
+.level-search-wrap{width:min(520px,88vw);margin:14px auto 0;pointer-events:auto}
+.level-search{width:100%;height:46px;border:1px solid #3a4262;border-radius:14px;background:rgba(5,7,18,.88);color:#fff;padding:0 18px;font-size:14px;letter-spacing:1px;outline:none;box-shadow:0 0 18px rgba(99,245,255,.08),inset 0 0 14px rgba(99,245,255,.03);transition:.18s}
+.level-search::placeholder{color:#6f7695}
+.level-search:focus{border-color:#63f5ff;box-shadow:0 0 24px rgba(99,245,255,.2),inset 0 0 16px rgba(99,245,255,.04)}
+.search-results{margin-top:6px;color:#747b9a;font-size:10px;letter-spacing:1.5px;min-height:12px}
 .level-list{width:min(850px,92vw);display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 auto;flex:none;padding-bottom:20px}
 .level-card{position:relative;min-height:190px;padding:22px;border:1px solid #303653;border-radius:20px;overflow:hidden;background:linear-gradient(145deg,rgba(22,25,53,.95),rgba(7,8,20,.95));cursor:pointer;transition:.2s}
 .level-card:hover{transform:translateY(-5px);border-color:#63f5ff;box-shadow:0 0 25px #63f5ff22}
@@ -138,7 +143,7 @@ body{
    ============================================================ */
 
 @media(max-width:700px){
-.level-screen{padding-top:105px;padding-bottom:30px}
+.level-screen{padding-top:180px;padding-bottom:30px}
 .level-list{grid-template-columns:1fr;width:min(430px,90vw);max-height:none;overflow:visible;padding:10px}
 .level-card{min-height:145px}
 .level-header{top:20px}
@@ -172,7 +177,7 @@ body{
 <section id="levels" class="screen level-screen">
 <div class="background"><div class="grid"></div><div class="glow"></div><div class="stars" id="levelStars"></div></div>
 <button class="back-button" id="levelsBack">← BACK</button>
-<div class="level-header"><div class="level-brand">NEON DASH</div><h1>SELECT LEVEL</h1><p>BEAT THE NEON • SWIPE TO EXPLORE</p></div>
+<div class="level-header"><div class="level-brand">NEON DASH</div><h1>SELECT LEVEL</h1><p>BEAT THE NEON • SWIPE TO EXPLORE</p><div class="level-search-wrap"><input id="levelSearch" class="level-search" type="search" autocomplete="off" spellcheck="false" placeholder="Search levels by name, difficulty, number, or music..." aria-label="Search levels"><div class="search-results" id="searchResults" aria-live="polite"></div></div></div>
 <div class="level-list" id="levelList"></div>
 </section>
 
@@ -249,6 +254,8 @@ const settingsButton=document.getElementById("settingsButton");
 const levelsBack=document.getElementById("levelsBack");
 
 const levelList=document.getElementById("levelList");
+const levelSearch=document.getElementById("levelSearch");
+const searchResults=document.getElementById("searchResults");
 
 const restartButton=document.getElementById("restartButton");
 const quitButton=document.getElementById("quitButton");
@@ -284,7 +291,11 @@ const levelsData=[
 {id:11,name:"EMOJI MADNESS",difficulty:"MASTER",color:"#ffcf33",speed:8.5,length:9800},
 {id:12,name:"EMOJI BOSS",difficulty:"BOSS",color:"#ff3b5f",speed:8,length:6500},
 {id:13,name:"WAVE FLOW",difficulty:"HARD",color:"#00ff9d",speed:6.8,length:14500},
-{id:14,name:"WAVE RUN",difficulty:"INSANE",color:"#ff4fd8",speed:8.7,length:16000}
+{id:14,name:"WAVE RUN",difficulty:"INSANE",color:"#ff4fd8",speed:8.7,length:16000},
+{id:15,name:"STAIRWAY SURGE",difficulty:"HARD",color:"#4dffea",speed:6.9,length:13200},
+{id:16,name:"SKY STEPS",difficulty:"VERY HARD",color:"#6aa8ff",speed:7.4,length:14500},
+{id:17,name:"RAMPAGE RISE",difficulty:"INSANE",color:"#ff7a3d",speed:7.9,length:15800},
+{id:18,name:"NEON DETOUR",difficulty:"EXTREME",color:"#ff9d3d",speed:8.3,length:12500},
 ];
 
 let currentLevel=1;
@@ -350,7 +361,11 @@ const musicTracks={
 11:{name:"EMOJI PARTY",tempo:140,wave:"triangle",bassWave:"sawtooth",leadWave:"square",chords:[[261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[349.23,440.00,523.25],[392.00,493.88,587.33],[349.23,440.00,523.25],[329.63,415.30,493.88],[293.66,369.99,440.00]],bass:[130.81,146.83,164.81,174.61,196.00,174.61,164.81,146.83],lead:[523.25,659.25,783.99,659.25,587.33,739.99,880.00,739.99]},
 12:{name:"BOSS BATTLE",tempo:150,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[130.81,164.81,196.00],[146.83,174.61,220.00],[164.81,196.00,246.94],[146.83,184.99,220.00],[123.47,155.56,185.00],[110.00,146.83,174.61],[123.47,164.81,196.00],[146.83,184.99,220.00]],bass:[65.41,73.42,82.41,73.42,61.74,55.00,61.74,73.42],lead:[261.63,293.66,329.63,246.94,220.00,246.94,293.66,369.99]},
 13:{name:"WAVE FLOW",tempo:118,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[246.94,311.13,369.99],[220.00,277.18,329.63],[196.00,246.94,293.66],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,123.47,110.00,98.00,123.47],lead:[440.00,493.88,587.33,659.25,587.33,523.25,440.00,493.88]},
-14:{name:"WAVE RUN",tempo:164,wave:"square",bassWave:"sawtooth",leadWave:"triangle",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[293.66,369.99,440.00],[329.63,415.30,493.88],[392.00,493.88,587.33],[329.63,415.30,493.88],[293.66,369.99,440.00],[246.94,311.13,369.99]],bass:[110.00,123.47,146.83,164.81,196.00,164.81,146.83,123.47],lead:[440.00,523.25,659.25,783.99,987.77,783.99,659.25,523.25]}
+14:{name:"WAVE RUN",tempo:164,wave:"square",bassWave:"sawtooth",leadWave:"triangle",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[293.66,369.99,440.00],[329.63,415.30,493.88],[392.00,493.88,587.33],[329.63,415.30,493.88],[293.66,369.99,440.00],[246.94,311.13,369.99]],bass:[110.00,123.47,146.83,164.81,196.00,164.81,146.83,123.47],lead:[440.00,523.25,659.25,783.99,987.77,783.99,659.25,523.25]},
+15:{name:"STAIRLIGHT",tempo:132,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[220,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392],[293.66,369.99,440],[220,277.18,329.63],[196,246.94,293.66],[246.94,311.13,369.99],[261.63,329.63,392]],bass:[110,123.47,130.81,146.83,110,98,123.47,130.81],lead:[440,523.25,659.25,587.33,493.88,523.25,659.25,739.99]},
+16:{name:"SKY STEPS",tempo:145,wave:"square",bassWave:"sawtooth",leadWave:"triangle",chords:[[261.63,329.63,392],[293.66,369.99,440],[329.63,415.3,493.88],[349.23,440,523.25],[392,493.88,587.33],[349.23,440,523.25],[329.63,415.3,493.88],[293.66,369.99,440]],bass:[130.81,146.83,164.81,174.61,196,174.61,164.81,146.83],lead:[523.25,659.25,783.99,698.46,880,783.99,659.25,587.33]},
+17:{name:"RAMPAGE RISE",tempo:156,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[196,246.94,293.66],[220,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392],[293.66,369.99,440],[261.63,329.63,392],[246.94,311.13,369.99],[220,277.18,329.63]],bass:[98,110,123.47,130.81,146.83,130.81,123.47,110],lead:[392,493.88,587.33,659.25,739.99,659.25,587.33,493.88]},
+18:{name:"PLATFORM PANIC",tempo:164,wave:"square",bassWave:"sawtooth",leadWave:"square",chords:[[220,277.18,329.63],[246.94,311.13,369.99],[277.18,349.23,415.3],[293.66,369.99,440],[329.63,415.3,493.88],[293.66,369.99,440],[277.18,349.23,415.3],[246.94,311.13,369.99]],bass:[110,123.47,138.59,146.83,164.81,146.83,138.59,123.47],lead:[440,554.37,659.25,739.99,880,739.99,659.25,554.37]},
 };
 
 function ensureAudio(){
@@ -555,6 +570,22 @@ function scheduleMusicStep(runId){
       if(sixteen%2===1) playMusicHat(now,intensity*.62,false);
       break;
     }
+    case 15:
+    case 16:
+    case 17:
+    case 18:
+    case 19:
+    case 20: { // Staircase-era levels: energetic original synth groove
+      const stairLead=track.lead[(step*2+id)%track.lead.length];
+      const chordNote=chord[(Math.floor(step/2)+id)%chord.length];
+      playMusicTone(stairLead,beat*.24,track.leadWave,musicVolume*.065,now);
+      if(sixteen%2===0)playMusicBass(now,bass,intensity*(id>=19?.38:.32));
+      if(sixteen%4===0)playMusicTone(chordNote,beat*.34,track.wave,musicVolume*.038,now);
+      if(sixteen%4===0)playMusicKick(now,intensity*(id>=19?1.0:.85));
+      if(sixteen===4||sixteen===12)playMusicSnare(now,intensity*.58);
+      if(sixteen%2===1)playMusicHat(now,intensity*.62,false);
+      break;
+    }
 const musicTracks={
 1:{name:"NEON ASCENT",tempo:128,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[261.63,329.63,392.00],[293.66,349.23,440.00],[329.63,392.00,493.88],[349.23,440.00,523.25],[261.63,329.63,392.00],[246.94,329.63,392.00],[293.66,369.99,440.00],[329.63,392.00,493.88]],bass:[130.81,146.83,164.81,174.61,130.81,123.47,146.83,164.81],lead:[523.25,659.25,587.33,698.46,783.99,698.46,587.33,659.25]},
 2:{name:"PIXEL VELOCITY",tempo:142,wave:"square",bassWave:"sawtooth",leadWave:"triangle",chords:[[329.63,415.30,493.88],[369.99,440.00,554.37],[392.00,493.88,587.33],[440.00,554.37,659.25],[329.63,415.30,493.88],[293.66,369.99,440.00],[329.63,392.00,493.88],[392.00,493.88,587.33]],bass:[164.81,184.99,196.00,220.00,164.81,146.83,164.81,196.00],lead:[659.25,739.99,880.00,783.99,739.99,659.25,587.33,739.99]},
@@ -687,9 +718,33 @@ container.appendChild(star);
 createStars("homeStars",100);
 createStars("levelStars",80);
 
-function buildLevelList(){
+function buildLevelList(query=""){
 levelList.innerHTML="";
-levelsData.forEach(level=>{
+const rawQuery=String(query||"").trim();
+const q=rawQuery.toLowerCase();
+const numericQuery=/^\d+$/.test(rawQuery)?Number(rawQuery):null;
+const filtered=levelsData.filter(level=>{
+if(!q)return true;
+if(numericQuery!==null)return level.id===numericQuery;
+const track=musicTracks[level.id]||musicTracks[1];
+const searchable=[String(level.id),level.name,level.difficulty,track.name||""] .join(" ").toLowerCase();
+return searchable.includes(q);
+});
+if(searchResults){
+searchResults.textContent=q?`${filtered.length} LEVEL${filtered.length===1?"":"S"} FOUND` : `SHOWING ALL ${levelsData.length} LEVELS`;
+}
+if(!filtered.length){
+const empty=document.createElement("div");
+empty.style.gridColumn="1 / -1";
+empty.style.textAlign="center";
+empty.style.padding="55px 20px";
+empty.style.color="#737b9b";
+empty.style.letterSpacing="2px";
+empty.textContent="NO MATCHING LEVELS";
+levelList.appendChild(empty);
+return;
+}
+filtered.forEach(level=>{
 const unlocked=true;
 const best=save.best[level.id]||0;
 const track=musicTracks[level.id]||musicTracks[1];
@@ -699,7 +754,7 @@ card.innerHTML=`
 <div class="level-number">${level.id}</div>
 <h2>${level.name}</h2>
 <div class="difficulty" style="color:${level.color}">${level.difficulty}</div>
-<div class="level-description">${unlocked?"Jump, use slopes, glide over platforms, and master yellow 2X orbs.":"Complete previous levels to unlock."}</div>
+<div class="level-description">${unlocked?(level.id>=15?"Climb neon staircases, chain platform jumps, dodge slopes, and master yellow 2X orbs.":"Jump, use slopes, glide over platforms, and master yellow 2X orbs."):"Complete previous levels to unlock."}</div>
 <div class="level-music">♫ ${track.name}</div>
 <div class="level-progress"><div style="width:${best}%;background:${level.color};box-shadow:0 0 10px ${level.color}"></div></div>
 `;
@@ -791,6 +846,39 @@ const patterns={
 ["waveCourse",10100,3000],
 ["slope",13250,"up"],
 ["waveCourse",13500,2850]
+],
+15:[
+["slope",560,"up"],["staircase",880,5,"up"],["spike2",1540],["glide",1900,380,82],
+["slope",2360,"down"],["staircase",2660,6,"down"],["orb",3600],["spike3",3950],
+["slope",4380,"up"],["staircase",4680,5,"up"],["glide",5480,420,105],["spike2",6020],
+["slope",6480,"down"],["staircase",6780,7,"down"],["orb",7820],["spike3",8180],
+["slope",8620,"up"],["staircase",8920,6,"up"],["glide",9900,450,120],["spike2",10480],
+["slope",10920,"down"],["staircase",11220,6,"down"],["spike3",12100]
+],
+16:[
+["spike",540],["slope",820,"up"],["staircase",1120,6,"up"],["glide",1880,400,115],
+["spike2",2400],["slope",2780,"down"],["staircase",3080,7,"down"],["orb",4080],
+["spike3",4420],["slope",4860,"up"],["staircase",5160,6,"up"],["glide",6100,440,135],
+["spike2",6700],["slope",7120,"down"],["staircase",7420,8,"down"],["orb",8500],
+["spike3",8880],["slope",9320,"up"],["staircase",9620,7,"up"],["glide",10700,460,145],
+["spike2",11320],["slope",11720,"down"],["staircase",12020,8,"down"],["spike3",13200]
+],
+17:[
+["slope",520,"up"],["staircase",820,7,"up"],["spike2",1540],["glide",1910,430,130],
+["slope",2420,"down"],["staircase",2720,8,"down"],["spike3",3680],["orb",4140],
+["slope",4520,"up"],["staircase",4820,7,"up"],["glide",5840,470,150],["spike2",6480],
+["slope",6920,"down"],["staircase",7220,9,"down"],["spike3",8320],["orb",8840],
+["slope",9260,"up"],["staircase",9560,8,"up"],["glide",10720,490,160],["spike2",11380],
+["slope",11820,"down"],["staircase",12120,9,"down"],["spike3",13320],["slope",13720,"up"],
+["staircase",14020,7,"up"],["spike2",14900]
+],
+18:[
+["spike2",520],["slope",820,"up"],["staircase",1120,6,"up"],["glide",1880,400,110],
+["spike3",2380],["slope",2820,"down"],["staircase",3120,7,"down"],["orb",4180],
+["spike2",4540],["slope",4920,"up"],["staircase",5220,6,"up"],["glide",6200,430,125],
+["spike3",6760],["slope",7200,"down"],["staircase",7500,7,"down"],["forwardPortal",7800,9300],
+["spike2",9750],["glide",10120,430,120],["slope",10700,"up"],["staircase",11000,5,"up"],
+["spike3",11800],["slope",12200,"down"],["staircase",12500,5,"down"],["spike2",13300]
 ]
 };
 
@@ -840,6 +928,8 @@ obstacles.push({type:"portal",target:"spike",x:x,y:groundY-190,w:64,h:190,used:f
 obstacles.push({type:"portal",target:"spike",x:x,y:groundY-190,w:64,h:190,used:true,decorative:true});
 }else if(type==="exitPortal"){
 obstacles.push({type:"portal",target:"cube",x:x,y:groundY-190,w:64,h:190,used:false});
+}else if(type==="forwardPortal"){
+obstacles.push({type:"forwardPortal",targetX:item[2]||x+1800,x:x,y:groundY-190,w:64,h:190,used:false});
 }else if(type==="zigzag" || type==="waveRun" || type==="waveCourse"){
 const zw=item[2]||1000;
 const step=type==="waveCourse"?230:(type==="waveRun"?200:135);
@@ -859,6 +949,22 @@ for(let z=0;z<count;z++){
     flip:topBlock
   });
 }
+}else if(type==="staircase"){
+  /* A staircase is a chain of solid glide platforms. Each step is
+     slightly higher/lower than the previous one, creating a real
+     platform staircase the player can jump across. */
+  const count=item[2]||6;
+  const direction=item[3]||"up";
+  const stepW=92;
+  const gap=18;
+  const stepH=22;
+  const heightStep=32;
+  for(let st=0;st<count;st++){
+    const sy=direction==="up"
+      ? groundY-78-(st*heightStep)
+      : groundY-78-((count-1-st)*heightStep);
+    obstacles.push({type:"glide",x:x+st*(stepW+gap),y:sy,w:stepW,h:stepH,top:sy,stair:true});
+  }
 }else if(type==="emoji"){
 obstacles.push({type:"emoji",emoji:item[2]||"🔥",x:x,y:groundY-58,w:58,h:58});
 }else if(type==="emoji2"){
@@ -1154,6 +1260,21 @@ if(obstacle.type==="portal"){
     }
     player.rotation=0;
     for(let i=0;i<30;i++)addParticle(player.x+player.size/2,player.y+player.size/2,(Math.random()-.5)*9,(Math.random()-.5)*9,24+Math.random()*22,2+Math.random()*4,levelData.color);
+  }
+}
+
+if(obstacle.type==="forwardPortal"){
+  if(!obstacle.used){
+    obstacle.used=true;
+    const target=Math.max(obstacle.targetX,obstacle.x+1200);
+    player.x=target;
+    player.y=groundY-player.size;
+    player.vy=0;
+    player.grounded=true;
+    playerMode="cube";
+    waveActive=false;
+    cameraX=Math.max(0,target-canvas.width*.25);
+    for(let i=0;i<55;i++)addParticle(player.x+player.size/2,player.y+player.size/2,(Math.random()-.5)*12,(Math.random()-.5)*12,30+Math.random()*35,3+Math.random()*5,i%2?levelData.color:"#fff");
   }
 }
 
@@ -1565,6 +1686,21 @@ ctx.shadowColor="#fff";ctx.shadowBlur=10;
 ctx.fillText(obstacle.target==="spike"?"WAVE MODE":"CUBE MODE",px,obstacle.y-14);
 ctx.font="700 8px Arial";
 ctx.fillText(obstacle.target==="spike"?"HOLD / RELEASE":"RETURN",px,obstacle.y+obstacle.h+15);
+ctx.restore();
+}
+
+if(obstacle.type==="forwardPortal"){
+ctx.save();
+const cx=x+obstacle.w/2, cy=obstacle.y+obstacle.h/2;
+ctx.shadowColor=levelData.color;ctx.shadowBlur=34;
+ctx.strokeStyle=levelData.color;ctx.lineWidth=8;
+ctx.beginPath();ctx.ellipse(cx,cy,26,82,0,0,Math.PI*2);ctx.stroke();
+ctx.strokeStyle="#ffffffaa";ctx.lineWidth=2;
+ctx.beginPath();ctx.ellipse(cx,cy,18,70,0,0,Math.PI*2);ctx.stroke();
+ctx.fillStyle="#fff";ctx.font="900 11px Arial";ctx.textAlign="center";ctx.shadowColor="#fff";ctx.shadowBlur=12;
+ctx.fillText("FORWARD",cx,obstacle.y-15);
+ctx.font="900 22px Arial";ctx.fillText("→",cx,cy+8);
+ctx.font="700 8px Arial";ctx.fillText("NEW FINISH",cx,obstacle.y+obstacle.h+15);
 ctx.restore();
 }
 
@@ -2036,11 +2172,16 @@ winCloseButton.addEventListener("click",event=>{
 });
 
 playButton.addEventListener("click",()=>{
+levelSearch.value="";
 buildLevelList();
 showScreen(levelsScreen);
 });
 
-levelsBack.addEventListener("click",()=>showScreen(home));
+levelsBack.addEventListener("click",()=>{
+levelSearch.value="";
+buildLevelList();
+showScreen(home);
+});
 
 settingsButton.addEventListener("click",()=>settingsModal.classList.add("show"));
 closeSettings.addEventListener("click",()=>settingsModal.classList.remove("show"));
@@ -2076,6 +2217,7 @@ jumpHeld=false;
 soundToggle.classList.toggle("on",soundEnabled);
 musicToggle.classList.toggle("on",musicEnabled);
 buildLevelList();
+levelSearch.addEventListener("input",()=>buildLevelList(levelSearch.value));
 </script>
 <div id="beatBoostNote" style="display:none">Beat Boost enabled</div>
 
