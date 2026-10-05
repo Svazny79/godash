@@ -305,8 +305,6 @@ let running=false;
 let dead=false;
 let won=false;
 let cameraX=0;
-cameraY=0;
-let cameraY=0;
 let lastTime=0;
 let jumpBuffer=0;
 let coyoteTime=0;
@@ -1235,18 +1233,6 @@ const targetCamera=player.x-canvas.width*.25;
 cameraX+=(targetCamera-cameraX)*.1;
 if(cameraX<0)cameraX=0;
 
-/* Moon Mountain vertical camera: follow the climb so the next stairs/slopes
-   stay visible instead of disappearing above the screen. Other levels remain
-   locked to the normal ground view. */
-if(currentLevel===19){
-  const targetCameraY=player.y-canvas.height*.42;
-  cameraY+=(targetCameraY-cameraY)*.12;
-  if(cameraY>0)cameraY=0;
-}else{
-  cameraY+=(0-cameraY)*.15;
-  if(Math.abs(cameraY)<.1)cameraY=0;
-}
-
 checkCollisions();
 
 if(currentLevel!==12&&player.x>=levelData.length){
@@ -1514,10 +1500,10 @@ const skylineOffset=-(cameraX*.16%180);
 for(let x=skylineOffset-180;x<w+180;x+=45){
     const bh=25+((Math.abs(Math.floor(x))*13)%95);
     ctx.fillStyle="#07091a";
-    ctx.fillRect(x,viewGroundY-bh,36,bh);
+    ctx.fillRect(x,groundY-bh,36,bh);
     ctx.fillStyle=levelData.color;
     ctx.globalAlpha=.16;
-    for(let wy=viewGroundY-bh+10;wy<viewGroundY-8;wy+=14){
+    for(let wy=groundY-bh+10;wy<groundY-8;wy+=14){
         if(Math.floor((x+wy)/17)%3===0){
             ctx.fillRect(x+8,wy,4,5);
             ctx.fillRect(x+20,wy,4,5);
@@ -1527,25 +1513,25 @@ for(let x=skylineOffset-180;x<w+180;x+=45){
 }
 
 /* Horizon haze */
-const horizon=ctx.createLinearGradient(0,viewGroundY-130,0,viewGroundY+30);
+const horizon=ctx.createLinearGradient(0,groundY-130,0,groundY+30);
 horizon.addColorStop(0,"transparent");
 horizon.addColorStop(.7,levelData.color+"18");
 horizon.addColorStop(1,levelData.color+"08");
 ctx.fillStyle=horizon;
-ctx.fillRect(0,viewGroundY-130,w,160);
+ctx.fillRect(0,groundY-130,w,160);
 
 /* Ground */
 ctx.fillStyle="#050717";
-ctx.fillRect(0,viewGroundY,w,h-viewGroundY);
+ctx.fillRect(0,groundY,w,h-groundY);
 
 ctx.fillStyle="#0b1030";
-ctx.fillRect(0,viewGroundY+4,w,7);
+ctx.fillRect(0,groundY+4,w,7);
 
 ctx.fillStyle=levelData.color;
 ctx.globalAlpha=.85;
 ctx.shadowColor=levelData.color;
 ctx.shadowBlur=22;
-ctx.fillRect(0,viewGroundY,w,3);
+ctx.fillRect(0,groundY,w,3);
 ctx.shadowBlur=0;
 ctx.globalAlpha=1;
 
@@ -1559,11 +1545,11 @@ const offset=-(cameraX%gridSize);
 
 for(let x=offset;x<w;x+=gridSize){
     ctx.beginPath();
-    ctx.moveTo(x,viewGroundY);
+    ctx.moveTo(x,groundY);
     ctx.lineTo(x-55,h);
     ctx.stroke();
 }
-for(let y=viewGroundY+28;y<h;y+=28){
+for(let y=groundY+28;y<h;y+=28){
     ctx.beginPath();
     ctx.moveTo(0,y);
     ctx.lineTo(w,y);
@@ -1576,7 +1562,7 @@ for(let i=0;i<18;i++){
     const ax=((i*145-cameraX*.65)%(w+180)+w+180)%(w+180)-90;
     ctx.fillStyle=i%3===0?"#00eaff":i%3===1?levelData.color:"#ff38d8";
     ctx.globalAlpha=.3;
-    ctx.fillRect(ax,viewGroundY+12,55,2);
+    ctx.fillRect(ax,groundY+12,55,2);
 }
 ctx.globalAlpha=1;
 
@@ -1609,8 +1595,6 @@ ctx.restore();
 }
 
 function drawObstacles(){
-ctx.save();
-ctx.translate(0,-cameraY);
 for(const obstacle of obstacles){
 const x=obstacle.x-cameraX;
 if(x<-180||x>canvas.width+180)continue;
@@ -1982,8 +1966,6 @@ ctx.fillText("EMOJI BOSS",0,112);
 ctx.restore();
 
 if(bossActive){
-ctx.restore();
-
 const barW=Math.min(420,canvas.width*.52),barH=16;
 const bx=canvas.width/2-barW/2,by=92;
 ctx.save();
@@ -2040,7 +2022,6 @@ if(waveActive){
 function drawPlayerTrail(){
 if((currentLevel!==13&&currentLevel!==14)||playerTrail.length<2)return;
 ctx.save();
-ctx.translate(0,-cameraY);
 ctx.lineCap="round";
 ctx.lineJoin="round";
 for(let i=1;i<playerTrail.length;i++){
@@ -2052,8 +2033,8 @@ for(let i=1;i<playerTrail.length;i++){
   ctx.shadowBlur=18;
   ctx.lineWidth=2+5*(i/playerTrail.length);
   ctx.beginPath();
-  ctx.moveTo(a.x-cameraX,a.y-cameraY);
-  ctx.lineTo(b.x-cameraX,b.y-cameraY);
+  ctx.moveTo(a.x-cameraX,a.y);
+  ctx.lineTo(b.x-cameraX,b.y);
   ctx.stroke();
 }
 ctx.globalAlpha=1;
@@ -2063,7 +2044,7 @@ ctx.restore();
 
 function drawPlayer(){
 const x=player.x-cameraX;
-const y=player.y-cameraY;
+const y=player.y;
 const s=player.size;
 
 ctx.save();
@@ -2119,7 +2100,7 @@ ctx.globalAlpha=Math.max(0,p.life/p.maxLife);
 ctx.fillStyle=p.color;
 ctx.shadowColor=p.color;
 ctx.shadowBlur=10;
-ctx.fillRect(p.x-cameraX,p.y-cameraY,p.size,p.size);
+ctx.fillRect(p.x-cameraX,p.y,p.size,p.size);
 }
 ctx.globalAlpha=1;
 ctx.shadowBlur=0;
@@ -2129,7 +2110,7 @@ function drawFinish(){
 if(!levelData)return;
 
 const x=levelData.length-cameraX;
-const groundY=canvas.height*.78-cameraY;
+const groundY=canvas.height*.78;
 
 if(x<-100||x>canvas.width+100)return;
 
