@@ -296,6 +296,7 @@ const levelsData=[
 {id:16,name:"SKY STEPS",difficulty:"VERY HARD",color:"#6aa8ff",speed:7.4,length:14500},
 {id:17,name:"RAMPAGE RISE",difficulty:"INSANE",color:"#ff7a3d",speed:7.9,length:15800},
 {id:18,name:"NEON DETOUR",difficulty:"EXTREME",color:"#ff9d3d",speed:8.3,length:12500},
+{id:19,name:"MOON MOUNTAIN",difficulty:"EXTREME",color:"#b88cff",speed:7.7,length:18400},
 ];
 
 let currentLevel=1;
@@ -304,6 +305,8 @@ let running=false;
 let dead=false;
 let won=false;
 let cameraX=0;
+cameraY=0;
+let cameraY=0;
 let lastTime=0;
 let jumpBuffer=0;
 let coyoteTime=0;
@@ -366,6 +369,7 @@ const musicTracks={
 16:{name:"SKY STEPS",tempo:145,wave:"square",bassWave:"sawtooth",leadWave:"triangle",chords:[[261.63,329.63,392],[293.66,369.99,440],[329.63,415.3,493.88],[349.23,440,523.25],[392,493.88,587.33],[349.23,440,523.25],[329.63,415.3,493.88],[293.66,369.99,440]],bass:[130.81,146.83,164.81,174.61,196,174.61,164.81,146.83],lead:[523.25,659.25,783.99,698.46,880,783.99,659.25,587.33]},
 17:{name:"RAMPAGE RISE",tempo:156,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[196,246.94,293.66],[220,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392],[293.66,369.99,440],[261.63,329.63,392],[246.94,311.13,369.99],[220,277.18,329.63]],bass:[98,110,123.47,130.81,146.83,130.81,123.47,110],lead:[392,493.88,587.33,659.25,739.99,659.25,587.33,493.88]},
 18:{name:"PLATFORM PANIC",tempo:164,wave:"square",bassWave:"sawtooth",leadWave:"square",chords:[[220,277.18,329.63],[246.94,311.13,369.99],[277.18,349.23,415.3],[293.66,369.99,440],[329.63,415.3,493.88],[293.66,369.99,440],[277.18,349.23,415.3],[246.94,311.13,369.99]],bass:[110,123.47,138.59,146.83,164.81,146.83,138.59,123.47],lead:[440,554.37,659.25,739.99,880,739.99,659.25,554.37]},
+19:{name:"MOONRISE CLIMB",tempo:126,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[220,261.63,329.63],[246.94,293.66,369.99],[261.63,329.63,392],[293.66,349.23,440],[329.63,392,493.88],[293.66,349.23,440],[261.63,329.63,392],[246.94,293.66,369.99]],bass:[110,123.47,130.81,146.83,164.81,146.83,130.81,123.47],lead:[440,523.25,659.25,587.33,739.99,659.25,587.33,523.25]},
 };
 
 function ensureAudio(){
@@ -879,6 +883,25 @@ const patterns={
 ["spike3",6760],["slope",7200,"down"],["staircase",7500,7,"down"],["forwardPortal",7800,9300],
 ["spike2",9750],["glide",10120,430,120],["slope",10700,"up"],["staircase",11000,5,"up"],
 ["spike3",11800],["slope",12200,"down"],["staircase",12500,5,"down"],["spike2",13300]
+],
+19:[
+/* MOON MOUNTAIN: tightly connected stairs and short platformed slopes. */
+["mountainStair",560,5,0],["mountainSlope",1060,"down",0,40],
+["mountainStair",1210,5,120],["mountainSlope",1710,"down",120,40],
+["mountainStair",1860,5,240],["mountainSlope",2360,"down",240,40],
+["mountainStair",2510,5,360],["mountainSlope",3010,"down",360,40],
+["mountainStair",3160,5,480],["mountainSlope",3660,"down",480,40],
+["mountainStair",3810,5,600],["mountainSlope",4310,"down",600,40],
+["mountainStair",4460,5,720],["mountainSlope",4960,"down",720,40],
+["mountainStair",5110,5,840],["mountainSlope",5610,"down",840,40],
+["mountainStair",5760,5,960],["mountainSlope",6260,"down",960,40],
+["mountainStair",6410,5,1080],["mountainSlope",6910,"down",1080,40],
+["mountainStair",7060,5,1200],["mountainSlope",7560,"down",1200,40],
+["mountainStair",7710,5,1320],["mountainSlope",8210,"down",1320,40],
+["mountainStair",8360,5,1440],["mountainSlope",8860,"down",1440,40],
+["mountainStair",9010,5,1560],["mountainSlope",9510,"down",1560,40],
+["mountainStair",9660,5,1680],["mountainSlope",10160,"down",1680,40],
+["mountainStair",10310,5,1800],["mountainSlope",10810,"down",1800,40]
 ]
 };
 
@@ -949,6 +972,23 @@ for(let z=0;z<count;z++){
     flip:topBlock
   });
 }
+}else if(type==="mountainStair"){
+  const count=item[2]||6;
+  const offset=item[3]||0;
+  const stepW=100, gap=0, stepH=24, heightStep=20;
+  for(let st=0;st<count;st++){
+    const sy=groundY-78-offset-(st*heightStep);
+    obstacles.push({type:"glide",x:x+st*(stepW+gap),y:sy,w:stepW+2,h:stepH,top:sy,stair:true,mountain:true});
+  }
+}else if(type==="mountainSlope"){
+  const offset=item[3]||0;
+  const sh=item[4]||40;
+  /* Start exactly at the top of the final stair step, then rise only
+     by the short slope height. The next stair begins at the slope top. */
+  const platformY=groundY-158-offset;
+  const slopeY=platformY-sh;
+  obstacles.push({type:"glide",x:x,y:platformY,w:150,h:24,top:platformY,stair:true,mountain:true});
+  obstacles.push({type:"mountainSlope",x:x,y:slopeY,w:150,h:sh,direction:item[2]||"down",platformed:true});
 }else if(type==="staircase"){
   /* A staircase is a chain of solid glide platforms. Each step is
      slightly higher/lower than the previous one, creating a real
@@ -1195,6 +1235,18 @@ const targetCamera=player.x-canvas.width*.25;
 cameraX+=(targetCamera-cameraX)*.1;
 if(cameraX<0)cameraX=0;
 
+/* Moon Mountain vertical camera: follow the climb so the next stairs/slopes
+   stay visible instead of disappearing above the screen. Other levels remain
+   locked to the normal ground view. */
+if(currentLevel===19){
+  const targetCameraY=player.y-canvas.height*.42;
+  cameraY+=(targetCameraY-cameraY)*.12;
+  if(cameraY>0)cameraY=0;
+}else{
+  cameraY+=(0-cameraY)*.15;
+  if(Math.abs(cameraY)<.1)cameraY=0;
+}
+
 checkCollisions();
 
 if(currentLevel!==12&&player.x>=levelData.length){
@@ -1275,6 +1327,23 @@ if(obstacle.type==="forwardPortal"){
     waveActive=false;
     cameraX=Math.max(0,target-canvas.width*.25);
     for(let i=0;i<55;i++)addParticle(player.x+player.size/2,player.y+player.size/2,(Math.random()-.5)*12,(Math.random()-.5)*12,30+Math.random()*35,3+Math.random()*5,i%2?levelData.color:"#fff");
+  }
+}
+
+if(obstacle.type==="mountainSlope"){
+  const t=Math.max(0,Math.min(1,(px+ps/2-obstacle.x)/obstacle.w));
+  const surface=obstacle.direction==="down"
+    ? obstacle.y+obstacle.h*(1-t)
+    : obstacle.y+obstacle.h*t;
+  const previousBottom=py+ps-player.vy;
+  if(previousBottom<=surface+8&&player.vy>=0){
+    player.y=surface-ps;
+    player.vy=0;
+    player.grounded=true;
+    coyoteTime=5;
+  }else if(py+ps>obstacle.y+5&&py<obstacle.y+obstacle.h){
+    die();
+    return;
   }
 }
 
@@ -1445,10 +1514,10 @@ const skylineOffset=-(cameraX*.16%180);
 for(let x=skylineOffset-180;x<w+180;x+=45){
     const bh=25+((Math.abs(Math.floor(x))*13)%95);
     ctx.fillStyle="#07091a";
-    ctx.fillRect(x,groundY-bh,36,bh);
+    ctx.fillRect(x,viewGroundY-bh,36,bh);
     ctx.fillStyle=levelData.color;
     ctx.globalAlpha=.16;
-    for(let wy=groundY-bh+10;wy<groundY-8;wy+=14){
+    for(let wy=viewGroundY-bh+10;wy<viewGroundY-8;wy+=14){
         if(Math.floor((x+wy)/17)%3===0){
             ctx.fillRect(x+8,wy,4,5);
             ctx.fillRect(x+20,wy,4,5);
@@ -1458,25 +1527,25 @@ for(let x=skylineOffset-180;x<w+180;x+=45){
 }
 
 /* Horizon haze */
-const horizon=ctx.createLinearGradient(0,groundY-130,0,groundY+30);
+const horizon=ctx.createLinearGradient(0,viewGroundY-130,0,viewGroundY+30);
 horizon.addColorStop(0,"transparent");
 horizon.addColorStop(.7,levelData.color+"18");
 horizon.addColorStop(1,levelData.color+"08");
 ctx.fillStyle=horizon;
-ctx.fillRect(0,groundY-130,w,160);
+ctx.fillRect(0,viewGroundY-130,w,160);
 
 /* Ground */
 ctx.fillStyle="#050717";
-ctx.fillRect(0,groundY,w,h-groundY);
+ctx.fillRect(0,viewGroundY,w,h-viewGroundY);
 
 ctx.fillStyle="#0b1030";
-ctx.fillRect(0,groundY+4,w,7);
+ctx.fillRect(0,viewGroundY+4,w,7);
 
 ctx.fillStyle=levelData.color;
 ctx.globalAlpha=.85;
 ctx.shadowColor=levelData.color;
 ctx.shadowBlur=22;
-ctx.fillRect(0,groundY,w,3);
+ctx.fillRect(0,viewGroundY,w,3);
 ctx.shadowBlur=0;
 ctx.globalAlpha=1;
 
@@ -1490,11 +1559,11 @@ const offset=-(cameraX%gridSize);
 
 for(let x=offset;x<w;x+=gridSize){
     ctx.beginPath();
-    ctx.moveTo(x,groundY);
+    ctx.moveTo(x,viewGroundY);
     ctx.lineTo(x-55,h);
     ctx.stroke();
 }
-for(let y=groundY+28;y<h;y+=28){
+for(let y=viewGroundY+28;y<h;y+=28){
     ctx.beginPath();
     ctx.moveTo(0,y);
     ctx.lineTo(w,y);
@@ -1507,7 +1576,7 @@ for(let i=0;i<18;i++){
     const ax=((i*145-cameraX*.65)%(w+180)+w+180)%(w+180)-90;
     ctx.fillStyle=i%3===0?"#00eaff":i%3===1?levelData.color:"#ff38d8";
     ctx.globalAlpha=.3;
-    ctx.fillRect(ax,groundY+12,55,2);
+    ctx.fillRect(ax,viewGroundY+12,55,2);
 }
 ctx.globalAlpha=1;
 
@@ -1540,6 +1609,8 @@ ctx.restore();
 }
 
 function drawObstacles(){
+ctx.save();
+ctx.translate(0,-cameraY);
 for(const obstacle of obstacles){
 const x=obstacle.x-cameraX;
 if(x<-180||x>canvas.width+180)continue;
@@ -1605,6 +1676,22 @@ og.addColorStop(0,"#fff");og.addColorStop(.2,"#fff7a6");og.addColorStop(.55,"#ff
 ctx.fillStyle=og;ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fill();
 ctx.shadowBlur=0;ctx.strokeStyle="#fff8b0";ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,18,0,Math.PI*2);ctx.stroke();
 ctx.fillStyle="#fff";ctx.font="900 7px Arial";ctx.textAlign="center";ctx.fillText("2X",0,2);
+ctx.restore();
+}
+
+if(obstacle.type==="mountainSlope"){
+ctx.save();
+const baseY=obstacle.y+obstacle.h;
+const topY=obstacle.y;
+const left=x,right=x+obstacle.w;
+ctx.shadowColor=levelData.color;ctx.shadowBlur=24;
+const ramp=ctx.createLinearGradient(left,topY,right,baseY);
+ramp.addColorStop(0,"#ffffff");ramp.addColorStop(.16,levelData.color);ramp.addColorStop(.55,"#714fff");ramp.addColorStop(1,"#080a19");
+ctx.fillStyle=ramp;ctx.beginPath();
+if(obstacle.direction==="down"){ctx.moveTo(left,baseY);ctx.lineTo(right,topY);ctx.lineTo(right,baseY);}
+else{ctx.moveTo(left,topY);ctx.lineTo(right,baseY);ctx.lineTo(left,baseY);}
+ctx.closePath();ctx.fill();
+ctx.shadowBlur=0;ctx.strokeStyle="#ffffff99";ctx.lineWidth=2;ctx.stroke();
 ctx.restore();
 }
 
@@ -1895,6 +1982,8 @@ ctx.fillText("EMOJI BOSS",0,112);
 ctx.restore();
 
 if(bossActive){
+ctx.restore();
+
 const barW=Math.min(420,canvas.width*.52),barH=16;
 const bx=canvas.width/2-barW/2,by=92;
 ctx.save();
@@ -1951,6 +2040,7 @@ if(waveActive){
 function drawPlayerTrail(){
 if((currentLevel!==13&&currentLevel!==14)||playerTrail.length<2)return;
 ctx.save();
+ctx.translate(0,-cameraY);
 ctx.lineCap="round";
 ctx.lineJoin="round";
 for(let i=1;i<playerTrail.length;i++){
@@ -1962,8 +2052,8 @@ for(let i=1;i<playerTrail.length;i++){
   ctx.shadowBlur=18;
   ctx.lineWidth=2+5*(i/playerTrail.length);
   ctx.beginPath();
-  ctx.moveTo(a.x-cameraX,a.y);
-  ctx.lineTo(b.x-cameraX,b.y);
+  ctx.moveTo(a.x-cameraX,a.y-cameraY);
+  ctx.lineTo(b.x-cameraX,b.y-cameraY);
   ctx.stroke();
 }
 ctx.globalAlpha=1;
@@ -1973,7 +2063,7 @@ ctx.restore();
 
 function drawPlayer(){
 const x=player.x-cameraX;
-const y=player.y;
+const y=player.y-cameraY;
 const s=player.size;
 
 ctx.save();
@@ -2029,7 +2119,7 @@ ctx.globalAlpha=Math.max(0,p.life/p.maxLife);
 ctx.fillStyle=p.color;
 ctx.shadowColor=p.color;
 ctx.shadowBlur=10;
-ctx.fillRect(p.x-cameraX,p.y,p.size,p.size);
+ctx.fillRect(p.x-cameraX,p.y-cameraY,p.size,p.size);
 }
 ctx.globalAlpha=1;
 ctx.shadowBlur=0;
@@ -2039,11 +2129,25 @@ function drawFinish(){
 if(!levelData)return;
 
 const x=levelData.length-cameraX;
-const groundY=canvas.height*.78;
+const groundY=canvas.height*.78-cameraY;
 
 if(x<-100||x>canvas.width+100)return;
 
 ctx.save();
+
+if(currentLevel===19){
+  const moonX=x;
+  const moonY=groundY-275;
+  ctx.shadowColor="#d9c8ff";
+  ctx.shadowBlur=35;
+  ctx.fillStyle="#f1eaff";
+  ctx.beginPath();ctx.arc(moonX,moonY,58,0,Math.PI*2);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.fillStyle="#c9b9e8";
+  [[-22,-16,10],[18,-28,7],[-8,16,13],[25,12,9]].forEach(([cx,cy,r])=>{ctx.beginPath();ctx.arc(moonX+cx,moonY+cy,r,0,Math.PI*2);ctx.fill();});
+  ctx.fillStyle="#ffffff";ctx.font="900 12px Arial";ctx.textAlign="center";
+  ctx.fillText("MOON SUMMIT",moonX,moonY-78);
+}
 
 ctx.shadowColor=levelData.color;
 ctx.shadowBlur=25;
