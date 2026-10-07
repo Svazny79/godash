@@ -299,6 +299,10 @@ const levelsData=[
 {id:17,name:"RAMPAGE RISE",difficulty:"INSANE",color:"#ff7a3d",speed:7.9,length:15800},
 {id:18,name:"NEON DETOUR",difficulty:"EXTREME",color:"#ff9d3d",speed:8.3,length:12500},
 {id:19,name:"MOON MOUNTAIN",difficulty:"EXTREME",color:"#b88cff",speed:7.7,length:18400},
+{id:20,name:"BOOST BLITZ",difficulty:"INSANE",color:"#ff4fd8",speed:8.2,length:13800},
+{id:21,name:"SLOW MOTION",difficulty:"HARD",color:"#4dffea",speed:7.2,length:13200},
+{id:22,name:"TEMPO BREAKER",difficulty:"EXTREME",color:"#ffd52f",speed:8.8,length:15100},
+{id:23,name:"NEON TURBO",difficulty:"MASTER",color:"#63f5ff",speed:9.5,length:16800},
 ];
 
 let currentLevel=1;
@@ -312,6 +316,7 @@ let jumpBuffer=0;
 let coyoteTime=0;
 let jumpHeld=false;
 let boostTimer=0;
+let zoneSpeedFactor=1;
 let playerMode="cube";
 let waveActive=false;
 let waveTimer=0;
@@ -358,22 +363,26 @@ const musicTracks={
 1:{name:"NEON ASCENT",tempo:128,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[261.63,329.63,392.00],[293.66,349.23,440.00],[329.63,392.00,493.88],[349.23,440.00,523.25],[261.63,329.63,392.00],[246.94,329.63,392.00],[293.66,369.99,440.00],[329.63,392.00,493.88]],bass:[130.81,146.83,164.81,174.61,130.81,123.47,146.83,164.81],lead:[523.25,659.25,587.33,698.46,783.99,698.46,587.33,659.25]},
 2:{name:"PIXEL VELOCITY",tempo:142,wave:"square",bassWave:"sawtooth",leadWave:"triangle",chords:[[329.63,415.30,493.88],[369.99,440.00,554.37],[392.00,493.88,587.33],[440.00,554.37,659.25],[329.63,415.30,493.88],[293.66,369.99,440.00],[329.63,392.00,493.88],[392.00,493.88,587.33]],bass:[164.81,184.99,196.00,220.00,164.81,146.83,164.81,196.00],lead:[659.25,739.99,880.00,783.99,739.99,659.25,587.33,739.99]},
 3:{name:"SHADOW CIRCUIT",tempo:118,wave:"sawtooth",bassWave:"square",leadWave:"triangle",chords:[[164.81,207.65,246.94],[146.83,184.99,220.00],[174.61,220.00,261.63],[130.81,164.81,196.00],[164.81,196.00,246.94],[146.83,184.99,220.00],[196.00,246.94,293.66],[164.81,207.65,246.94]],bass:[82.41,73.42,87.31,65.41,82.41,73.42,98.00,82.41],lead:[329.63,293.66,369.99,329.63,246.94,293.66,349.23,329.63]},
-4:{name:"RUSH HOUR",tempo:154,wave:"square",bassWave:"sawtooth",leadWave:"square",chords:[[392.00,493.88,587.33],[440.00,554.37,659.25],[493.88,622.25,739.99],[523.25,659.25,783.99],[392.00,493.88,587.33],[369.99,466.16,554.37],[440.00,554.37,659.25],[493.88,622.25,739.99]],bass:[196.00,220.00,246.94,261.63,196.00,184.99,220.00,246.94],lead:[783.99,987.77,880.00,1046.50,987.77,880.00,739.99,987.77]},
+4:{name:"RUSH HOUR // REWIRED",tempo:158,wave:"square",bassWave:"sawtooth",leadWave:"square",chords:[[392.00,493.88,587.33],[440.00,554.37,659.25],[493.88,622.25,739.99],[523.25,659.25,783.99],[392.00,493.88,587.33],[369.99,466.16,554.37],[440.00,554.37,659.25],[493.88,622.25,739.99]],bass:[196.00,220.00,246.94,261.63,196.00,184.99,220.00,246.94],lead:[783.99,987.77,880.00,1046.50,987.77,880.00,739.99,987.77]},
 5:{name:"STARLIGHT DRIVE",tempo:134,wave:"triangle",bassWave:"sine",leadWave:"triangle",chords:[[261.63,392.00,523.25],[293.66,440.00,587.33],[329.63,493.88,659.25],[349.23,523.25,698.46],[261.63,392.00,523.25],[246.94,369.99,493.88],[293.66,440.00,587.33],[329.63,493.88,659.25]],bass:[130.81,146.83,164.81,174.61,130.81,123.47,146.83,164.81],lead:[523.25,587.33,783.99,698.46,659.25,783.99,880.00,783.99]},
 6:{name:"THUNDER MODE",tempo:168,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[329.63,415.30,493.88],[369.99,466.16,554.37],[392.00,493.88,587.33],[440.00,554.37,659.25],[493.88,622.25,739.99],[440.00,554.37,659.25],[392.00,493.88,587.33],[369.99,466.16,554.37]],bass:[164.81,184.99,196.00,220.00,246.94,220.00,196.00,184.99],lead:[659.25,783.99,880.00,987.77,1174.66,987.77,880.00,783.99]},
 7:{name:"NEON TEMPEST",tempo:148,wave:"triangle",bassWave:"sawtooth",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[293.66,369.99,440.00],[261.63,329.63,392.00],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,164.81,146.83,130.81,123.47],lead:[440.00,523.25,659.25,587.33,739.99,659.25,523.25,493.88]},
-8:{name:"PHANTOM PULSE",tempo:130,wave:"sawtooth",bassWave:"triangle",leadWave:"square",chords:[[293.66,369.99,440.00],[261.63,329.63,392.00],[246.94,329.63,493.88],[220.00,293.66,440.00],[246.94,329.63,493.88],[293.66,369.99,440.00],[329.63,415.30,493.88],[261.63,329.63,392.00]],bass:[146.83,130.81,123.47,110.00,123.47,146.83,164.81,130.81],lead:[587.33,659.25,523.25,493.88,440.00,523.25,783.99,659.25]},
+8:{name:"PHANTOM PULSE // AFTERDARK",tempo:136,wave:"sawtooth",bassWave:"triangle",leadWave:"square",chords:[[293.66,369.99,440.00],[261.63,329.63,392.00],[246.94,329.63,493.88],[220.00,293.66,440.00],[246.94,329.63,493.88],[293.66,369.99,440.00],[329.63,415.30,493.88],[261.63,329.63,392.00]],bass:[146.83,130.81,123.47,110.00,123.47,146.83,164.81,130.81],lead:[587.33,659.25,523.25,493.88,440.00,523.25,783.99,659.25]},
 9:{name:"HYPER OVERDRIVE",tempo:160,wave:"square",bassWave:"sawtooth",leadWave:"sawtooth",chords:[[261.63,329.63,392.00],[293.66,369.99,440.00],[311.13,392.00,466.16],[329.63,415.30,493.88],[369.99,466.16,554.37],[392.00,493.88,587.33],[369.99,466.16,554.37],[329.63,415.30,493.88]],bass:[130.81,146.83,155.56,164.81,184.99,196.00,184.99,164.81],lead:[523.25,622.25,739.99,659.25,783.99,880.00,783.99,698.46]},
 10:{name:"LAST LIGHT",tempo:174,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[349.23,440.00,523.25],[293.66,369.99,440.00],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,164.81,174.61,146.83,123.47],lead:[440.00,493.88,587.33,659.25,783.99,880.00,783.99,659.25]},
 11:{name:"EMOJI PARTY",tempo:140,wave:"triangle",bassWave:"sawtooth",leadWave:"square",chords:[[261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[349.23,440.00,523.25],[392.00,493.88,587.33],[349.23,440.00,523.25],[329.63,415.30,493.88],[293.66,369.99,440.00]],bass:[130.81,146.83,164.81,174.61,196.00,174.61,164.81,146.83],lead:[523.25,659.25,783.99,659.25,587.33,739.99,880.00,739.99]},
 12:{name:"BOSS BATTLE",tempo:150,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[130.81,164.81,196.00],[146.83,174.61,220.00],[164.81,196.00,246.94],[146.83,184.99,220.00],[123.47,155.56,185.00],[110.00,146.83,174.61],[123.47,164.81,196.00],[146.83,184.99,220.00]],bass:[65.41,73.42,82.41,73.42,61.74,55.00,61.74,73.42],lead:[261.63,293.66,329.63,246.94,220.00,246.94,293.66,369.99]},
 13:{name:"WAVE FLOW",tempo:118,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[246.94,311.13,369.99],[220.00,277.18,329.63],[196.00,246.94,293.66],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,123.47,110.00,98.00,123.47],lead:[440.00,493.88,587.33,659.25,587.33,523.25,440.00,493.88]},
 14:{name:"WAVE RUN",tempo:164,wave:"square",bassWave:"sawtooth",leadWave:"triangle",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[293.66,369.99,440.00],[329.63,415.30,493.88],[392.00,493.88,587.33],[329.63,415.30,493.88],[293.66,369.99,440.00],[246.94,311.13,369.99]],bass:[110.00,123.47,146.83,164.81,196.00,164.81,146.83,123.47],lead:[440.00,523.25,659.25,783.99,987.77,783.99,659.25,523.25]},
-15:{name:"STAIRLIGHT",tempo:132,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[220,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392],[293.66,369.99,440],[220,277.18,329.63],[196,246.94,293.66],[246.94,311.13,369.99],[261.63,329.63,392]],bass:[110,123.47,130.81,146.83,110,98,123.47,130.81],lead:[440,523.25,659.25,587.33,493.88,523.25,659.25,739.99]},
+15:{name:"STAIRLIGHT // RECHARGED",tempo:138,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[220,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392],[293.66,369.99,440],[220,277.18,329.63],[196,246.94,293.66],[246.94,311.13,369.99],[261.63,329.63,392]],bass:[110,123.47,130.81,146.83,110,98,123.47,130.81],lead:[440,523.25,659.25,587.33,493.88,523.25,659.25,739.99]},
 16:{name:"SKY STEPS",tempo:145,wave:"square",bassWave:"sawtooth",leadWave:"triangle",chords:[[261.63,329.63,392],[293.66,369.99,440],[329.63,415.3,493.88],[349.23,440,523.25],[392,493.88,587.33],[349.23,440,523.25],[329.63,415.3,493.88],[293.66,369.99,440]],bass:[130.81,146.83,164.81,174.61,196,174.61,164.81,146.83],lead:[523.25,659.25,783.99,698.46,880,783.99,659.25,587.33]},
 17:{name:"RAMPAGE RISE",tempo:156,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[196,246.94,293.66],[220,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392],[293.66,369.99,440],[261.63,329.63,392],[246.94,311.13,369.99],[220,277.18,329.63]],bass:[98,110,123.47,130.81,146.83,130.81,123.47,110],lead:[392,493.88,587.33,659.25,739.99,659.25,587.33,493.88]},
 18:{name:"PLATFORM PANIC",tempo:164,wave:"square",bassWave:"sawtooth",leadWave:"square",chords:[[220,277.18,329.63],[246.94,311.13,369.99],[277.18,349.23,415.3],[293.66,369.99,440],[329.63,415.3,493.88],[293.66,369.99,440],[277.18,349.23,415.3],[246.94,311.13,369.99]],bass:[110,123.47,138.59,146.83,164.81,146.83,138.59,123.47],lead:[440,554.37,659.25,739.99,880,739.99,659.25,554.37]},
 19:{name:"MOONRISE CLIMB",tempo:126,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[220,261.63,329.63],[246.94,293.66,369.99],[261.63,329.63,392],[293.66,349.23,440],[329.63,392,493.88],[293.66,349.23,440],[261.63,329.63,392],[246.94,293.66,369.99]],bass:[110,123.47,130.81,146.83,164.81,146.83,130.81,123.47],lead:[440,523.25,659.25,587.33,739.99,659.25,587.33,523.25]},
+20:{name:"BOOST BLITZ",tempo:176,wave:"square",bassWave:"sawtooth",leadWave:"square",chords:[[261.63,329.63,392],[329.63,415.30,493.88],[392,493.88,587.33],[329.63,415.30,493.88],[293.66,369.99,440],[349.23,440,523.25],[440,554.37,659.25],[392,493.88,587.33]],bass:[130.81,164.81,196,164.81,146.83,174.61,220,196],lead:[783.99,987.77,1174.66,987.77,880,1046.50,1318.51,1174.66]},
+21:{name:"SLOW MOTION",tempo:104,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[196,246.94,293.66],[220,277.18,329.63],[246.94,311.13,369.99],[220,277.18,329.63],[174.61,220,261.63],[196,246.94,293.66],[220,277.18,329.63],[261.63,329.63,392]],bass:[98,110,123.47,110,87.31,98,110,130.81],lead:[392,493.88,587.33,659.25,587.33,493.88,440,523.25]},
+22:{name:"TEMPO BREAKER",tempo:150,wave:"sawtooth",bassWave:"square",leadWave:"triangle",chords:[[220,277.18,329.63],[246.94,311.13,369.99],[293.66,369.99,440],[329.63,415.30,493.88],[261.63,329.63,392],[293.66,369.99,440],[349.23,440,523.25],[392,493.88,587.33]],bass:[110,123.47,146.83,164.81,130.81,146.83,174.61,196],lead:[659.25,783.99,880,1046.50,987.77,880,1174.66,1318.51]},
+23:{name:"NEON TURBO",tempo:184,wave:"square",bassWave:"sawtooth",leadWave:"sawtooth",chords:[[329.63,415.30,493.88],[392,493.88,587.33],[440,554.37,659.25],[493.88,622.25,739.99],[392,493.88,587.33],[440,554.37,659.25],[523.25,659.25,783.99],[493.88,622.25,739.99]],bass:[164.81,196,220,246.94,196,220,261.63,246.94],lead:[987.77,1174.66,1318.51,1567.98,1318.51,1174.66,1479.98,1318.51]},
 };
 
 function ensureAudio(){
@@ -582,8 +591,7 @@ function scheduleMusicStep(runId){
     case 16:
     case 17:
     case 18:
-    case 19:
-    case 20: { // Staircase-era levels: energetic original synth groove
+    case 19: { // Staircase-era levels: energetic original synth groove
       const stairLead=track.lead[(step*2+id)%track.lead.length];
       const chordNote=chord[(Math.floor(step/2)+id)%chord.length];
       playMusicTone(stairLead,beat*.24,track.leadWave,musicVolume*.065,now);
@@ -594,22 +602,45 @@ function scheduleMusicStep(runId){
       if(sixteen%2===1)playMusicHat(now,intensity*.62,false);
       break;
     }
-const musicTracks={
-1:{name:"NEON ASCENT",tempo:128,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[261.63,329.63,392.00],[293.66,349.23,440.00],[329.63,392.00,493.88],[349.23,440.00,523.25],[261.63,329.63,392.00],[246.94,329.63,392.00],[293.66,369.99,440.00],[329.63,392.00,493.88]],bass:[130.81,146.83,164.81,174.61,130.81,123.47,146.83,164.81],lead:[523.25,659.25,587.33,698.46,783.99,698.46,587.33,659.25]},
-2:{name:"PIXEL VELOCITY",tempo:142,wave:"square",bassWave:"sawtooth",leadWave:"triangle",chords:[[329.63,415.30,493.88],[369.99,440.00,554.37],[392.00,493.88,587.33],[440.00,554.37,659.25],[329.63,415.30,493.88],[293.66,369.99,440.00],[329.63,392.00,493.88],[392.00,493.88,587.33]],bass:[164.81,184.99,196.00,220.00,164.81,146.83,164.81,196.00],lead:[659.25,739.99,880.00,783.99,739.99,659.25,587.33,739.99]},
-3:{name:"SHADOW CIRCUIT",tempo:118,wave:"sawtooth",bassWave:"square",leadWave:"triangle",chords:[[164.81,207.65,246.94],[146.83,184.99,220.00],[174.61,220.00,261.63],[130.81,164.81,196.00],[164.81,196.00,246.94],[146.83,184.99,220.00],[196.00,246.94,293.66],[164.81,207.65,246.94]],bass:[82.41,73.42,87.31,65.41,82.41,73.42,98.00,82.41],lead:[329.63,293.66,369.99,329.63,246.94,293.66,349.23,329.63]},
-4:{name:"RUSH HOUR",tempo:154,wave:"square",bassWave:"sawtooth",leadWave:"square",chords:[[392.00,493.88,587.33],[440.00,554.37,659.25],[493.88,622.25,739.99],[523.25,659.25,783.99],[392.00,493.88,587.33],[369.99,466.16,554.37],[440.00,554.37,659.25],[493.88,622.25,739.99]],bass:[196.00,220.00,246.94,261.63,196.00,184.99,220.00,246.94],lead:[783.99,987.77,880.00,1046.50,987.77,880.00,739.99,987.77]},
-5:{name:"STARLIGHT DRIVE",tempo:134,wave:"triangle",bassWave:"sine",leadWave:"triangle",chords:[[261.63,392.00,523.25],[293.66,440.00,587.33],[329.63,493.88,659.25],[349.23,523.25,698.46],[261.63,392.00,523.25],[246.94,369.99,493.88],[293.66,440.00,587.33],[329.63,493.88,659.25]],bass:[130.81,146.83,164.81,174.61,130.81,123.47,146.83,164.81],lead:[523.25,587.33,783.99,698.46,659.25,783.99,880.00,783.99]},
-6:{name:"THUNDER MODE",tempo:168,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[329.63,415.30,493.88],[369.99,466.16,554.37],[392.00,493.88,587.33],[440.00,554.37,659.25],[493.88,622.25,739.99],[440.00,554.37,659.25],[392.00,493.88,587.33],[369.99,466.16,554.37]],bass:[164.81,184.99,196.00,220.00,246.94,220.00,196.00,184.99],lead:[659.25,783.99,880.00,987.77,1174.66,987.77,880.00,783.99]},
-7:{name:"NEON TEMPEST",tempo:148,wave:"triangle",bassWave:"sawtooth",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[293.66,369.99,440.00],[261.63,329.63,392.00],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,164.81,146.83,130.81,123.47],lead:[440.00,523.25,659.25,587.33,739.99,659.25,523.25,493.88]},
-8:{name:"PHANTOM PULSE",tempo:130,wave:"sawtooth",bassWave:"triangle",leadWave:"square",chords:[[293.66,369.99,440.00],[261.63,329.63,392.00],[246.94,329.63,493.88],[220.00,293.66,440.00],[246.94,329.63,493.88],[293.66,369.99,440.00],[329.63,415.30,493.88],[261.63,329.63,392.00]],bass:[146.83,130.81,123.47,110.00,123.47,146.83,164.81,130.81],lead:[587.33,659.25,523.25,493.88,440.00,523.25,783.99,659.25]},
-9:{name:"HYPER OVERDRIVE",tempo:160,wave:"square",bassWave:"sawtooth",leadWave:"sawtooth",chords:[[261.63,329.63,392.00],[293.66,369.99,440.00],[311.13,392.00,466.16],[329.63,415.30,493.88],[369.99,466.16,554.37],[392.00,493.88,587.33],[369.99,466.16,554.37],[329.63,415.30,493.88]],bass:[130.81,146.83,155.56,164.81,184.99,196.00,184.99,164.81],lead:[523.25,622.25,739.99,659.25,783.99,880.00,783.99,698.46]},
-10:{name:"LAST LIGHT",tempo:174,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[349.23,440.00,523.25],[293.66,369.99,440.00],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,164.81,174.61,146.83,123.47],lead:[440.00,493.88,587.33,659.25,783.99,880.00,783.99,659.25]},
-11:{name:"EMOJI PARTY",tempo:140,wave:"triangle",bassWave:"sawtooth",leadWave:"square",chords:[[261.63,329.63,392.00],[293.66,369.99,440.00],[329.63,415.30,493.88],[349.23,440.00,523.25],[392.00,493.88,587.33],[349.23,440.00,523.25],[329.63,415.30,493.88],[293.66,369.99,440.00]],bass:[130.81,146.83,164.81,174.61,196.00,174.61,164.81,146.83],lead:[523.25,659.25,783.99,659.25,587.33,739.99,880.00,739.99]},
-12:{name:"BOSS BATTLE",tempo:150,wave:"sawtooth",bassWave:"square",leadWave:"square",chords:[[130.81,164.81,196.00],[146.83,174.61,220.00],[164.81,196.00,246.94],[146.83,184.99,220.00],[123.47,155.56,185.00],[110.00,146.83,174.61],[123.47,164.81,196.00],[146.83,184.99,220.00]],bass:[65.41,73.42,82.41,73.42,61.74,55.00,61.74,73.42],lead:[261.63,293.66,329.63,246.94,220.00,246.94,293.66,369.99]},
-13:{name:"WAVE FLOW",tempo:118,wave:"triangle",bassWave:"sine",leadWave:"square",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[261.63,329.63,392.00],[293.66,369.99,440.00],[246.94,311.13,369.99],[220.00,277.18,329.63],[196.00,246.94,293.66],[246.94,311.13,369.99]],bass:[110.00,123.47,130.81,146.83,123.47,110.00,98.00,123.47],lead:[440.00,493.88,587.33,659.25,587.33,523.25,440.00,493.88]},
-14:{name:"WAVE RUN",tempo:164,wave:"square",bassWave:"sawtooth",leadWave:"triangle",chords:[[220.00,277.18,329.63],[246.94,311.13,369.99],[293.66,369.99,440.00],[329.63,415.30,493.88],[392.00,493.88,587.33],[329.63,415.30,493.88],[293.66,369.99,440.00],[246.94,311.13,369.99]],bass:[110.00,123.47,146.83,164.81,196.00,164.81,146.83,123.47],lead:[440.00,523.25,659.25,783.99,987.77,783.99,659.25,523.25]}
-};  }
+    case 20: { // BOOST BLITZ — turbo arps and aggressive drums
+      const n=track.lead[(step*3)%track.lead.length];
+      playMusicTone(n,beat*.18,track.leadWave,musicVolume*.078,now);
+      if(sixteen%2===0)playMusicBass(now,bass,intensity*.42);
+      if(sixteen%4===0)playMusicKick(now,intensity*1.15);
+      if(sixteen===3||sixteen===7||sixteen===11||sixteen===15)playMusicSnare(now,intensity*.82);
+      playMusicHat(now,intensity*.72,sixteen===15);
+      break;
+    }
+    case 21: { // SLOW MOTION — spacious, dreamy half-time groove
+      const n=track.lead[(step+3)%track.lead.length];
+      if(sixteen===0||sixteen===8)playMusicTone(chord[0]/2,beat*1.5,track.wave,musicVolume*.06,now);
+      playMusicTone(n,beat*.58,track.leadWave,musicVolume*.052,now);
+      if(sixteen===0||sixteen===8)playMusicBass(now,bass,intensity*.28);
+      if(sixteen===0)playMusicKick(now,intensity*.7);
+      if(sixteen===8)playMusicSnare(now,intensity*.4);
+      if(sixteen===6||sixteen===14)playMusicHat(now,intensity*.25,true);
+      break;
+    }
+    case 22: { // TEMPO BREAKER — switch between punchy sections
+      const n=track.lead[(step*2+2)%track.lead.length];
+      playMusicTone(n,beat*.20,track.leadWave,musicVolume*.07,now);
+      if(sixteen%2===0)playMusicBass(now,bass,intensity*.34);
+      if(sixteen%4===0)playMusicKick(now,intensity*1.0);
+      if(sixteen===2||sixteen===6||sixteen===10||sixteen===14)playMusicSnare(now,intensity*.72);
+      if(sixteen%2===1)playMusicHat(now,intensity*.65,false);
+      break;
+    }
+    case 23: { // NEON TURBO — final-level rave sprint
+      const n=track.lead[(step*3+1)%track.lead.length];
+      playMusicTone(n,beat*.14,track.leadWave,musicVolume*.085,now);
+      if(sixteen%2===0)playMusicBass(now,bass,intensity*.48);
+      if(sixteen%4===0)playMusicTone(chord[sixteen%3],beat*.16,track.wave,musicVolume*.055,now);
+      if(sixteen%4===0)playMusicKick(now,intensity*1.25);
+      if(sixteen===2||sixteen===6||sixteen===10||sixteen===14)playMusicSnare(now,intensity*.92);
+      playMusicHat(now,intensity*.8,sixteen===7||sixteen===15);
+      break;
+    }
+  }
 
   musicStep++;
   musicTimer=setTimeout(()=>scheduleMusicStep(runId),Math.max(25,(styleStep*1000)-5));
@@ -763,7 +794,7 @@ card.innerHTML=`
 <div class="level-number">${level.id}</div>
 <h2>${level.name}</h2>
 <div class="difficulty" style="color:${level.color}">${level.difficulty}</div>
-<div class="level-description">${unlocked?(level.id>=15?"Climb neon staircases, chain platform jumps, dodge slopes, and master yellow 2X orbs.":"Jump, use slopes, glide over platforms, and master yellow 2X orbs."):"🔒 Complete the previous level to unlock."}</div>
+<div class="level-description">${unlocked?(level.id>=23?"Race through TURBO and SLOW zones with a unique original synth track, chain boosts, and survive the fastest Neon Dash sections.":level.id>=20?"Hit boost slopes, control your speed through SLOW zones, and explode through TURBO sections with punchy original music.":level.id>=15?"Climb neon staircases, chain platform jumps, dodge slopes, and master yellow 2X orbs.":"Jump, use slopes, glide over platforms, and master yellow 2X orbs."):"🔒 Complete the previous level to unlock."}</div>
 <div class="level-music">♫ ${track.name}</div>
 <div style="margin-top:8px;letter-spacing:3px;color:#ffd52f;font-size:14px">${"★".repeat(earned)}${"☆".repeat(3-earned)} <span style="color:#737b9b;letter-spacing:1px">${earned===3?"MASTERED":""}</span></div>
 <div class="level-progress"><div style="width:${best}%;background:${level.color};box-shadow:0 0 10px ${level.color}"></div></div>
@@ -831,7 +862,15 @@ const patterns={
 16:[["spike",540],["slope",820,"up"],["staircase",1120,6,"up"],["glide",1880,400,115],["spike2",2400],["slope",2780,"down"],["staircase",3080,7,"down"],["orb",4080],["spike3",4420],["slope",4860,"up"],["staircase",5160,6,"up"],["glide",6100,440,135],["spike2",6700],["slope",7120,"down"],["staircase",7420,8,"down"],["orb",8500],["spike3",8880],["slope",9320,"up"],["staircase",9620,7,"up"],["glide",10700,460,145],["spike2",11320],["slope",11720,"down"],["staircase",12020,8,"down"],["spike3",13200]],
 17:[["slope",520,"up"],["staircase",820,7,"up"],["spike2",1540],["glide",1910,430,130],["slope",2420,"down"],["boostSlope",3520,"down"],["staircase",3720,8,"down"],["orb",4140],["spike3",4520],["slope",4820,"up"],["staircase",5120,7,"up"],["glide",5840,470,150],["spike2",6480],["slope",6920,"down"],["boostSlope",8120,"down"],["staircase",8320,9,"down"],["orb",8840],["spike3",9260],["slope",9560,"up"],["staircase",9860,8,"up"],["glide",10720,490,160],["spike2",11380],["slope",11820,"down"],["staircase",12120,9,"down"],["spike3",13320],["slope",13720,"up"],["staircase",14020,7,"up"],["spike2",14900]],
 18:[["spike2",520],["slope",820,"up"],["staircase",1120,6,"up"],["glide",1880,400,110],["spike3",2380],["slope",2820,"down"],["boostSlope",3820,"down"],["staircase",4020,7,"down"],["orb",4180],["spike2",4540],["slope",4920,"up"],["staircase",5220,6,"up"],["glide",6200,430,125],["spike3",6760],["slope",7200,"down"],["boostSlope",8200,"down"],["staircase",8400,7,"down"],["orb",9000],["spike2",9460],["glide",10120,430,120],["slope",10700,"up"],["staircase",11000,5,"up"],["spike3",11800],["slope",12200,"down"],["staircase",12500,5,"down"],["spike2",13300]],
-19:[["mountainStair",560,5,0],["mountainSlope",1060,"down",0,40],["mountainStair",1210,5,120],["mountainSlope",1710,"down",120,40],["mountainStair",1860,5,240],["mountainSlope",2360,"down",240,40],["mountainStair",2510,5,360],["mountainSlope",3010,"down",360,40],["mountainStair",3160,5,480],["mountainSlope",3660,"down",480,40],["mountainStair",3810,5,600],["mountainSlope",4310,"down",600,40],["mountainStair",4460,5,720],["mountainSlope",4960,"down",720,40],["mountainStair",5110,5,840],["mountainSlope",5610,"down",840,40],["mountainStair",5760,5,960],["mountainSlope",6260,"down",960,40],["mountainStair",6410,5,1080],["mountainSlope",6910,"down",1080,40],["mountainStair",7060,5,1200],["mountainSlope",7560,"down",1200,40],["mountainStair",7710,5,1320],["mountainSlope",8210,"down",1320,40],["mountainStair",8360,5,1440],["mountainSlope",8860,"down",1440,40],["mountainStair",9010,5,1560],["mountainSlope",9510,"down",1560,40],["mountainStair",9660,5,1680],["mountainSlope",10160,"down",1680,40],["mountainStair",10310,5,1800],["mountainSlope",10810,"down",1800,40],["mountainStair",10960,5,1920],["mountainSlope",11460,"down",1920,40],["mountainStair",11610,5,2040],["mountainSlope",12110,"down",2040,40]]
+19:[["mountainStair",560,5,0],["mountainSlope",1060,"down",0,40],["mountainStair",1210,5,120],["mountainSlope",1710,"down",120,40],["mountainStair",1860,5,240],["mountainSlope",2360,"down",240,40],["mountainStair",2510,5,360],["mountainSlope",3010,"down",360,40],["mountainStair",3160,5,480],["mountainSlope",3660,"down",480,40],["mountainStair",3810,5,600],["mountainSlope",4310,"down",600,40],["mountainStair",4460,5,720],["mountainSlope",4960,"down",720,40],["mountainStair",5110,5,840],["mountainSlope",5610,"down",840,40],["mountainStair",5760,5,960],["mountainSlope",6260,"down",960,40],["mountainStair",6410,5,1080],["mountainSlope",6910,"down",1080,40],["mountainStair",7060,5,1200],["mountainSlope",7560,"down",1200,40],["mountainStair",7710,5,1320],["mountainSlope",8210,"down",1320,40],["mountainStair",8360,5,1440],["mountainSlope",8860,"down",1440,40],["mountainStair",9010,5,1560],["mountainSlope",9510,"down",1560,40],["mountainStair",9660,5,1680],["mountainSlope",10160,"down",1680,40],["mountainStair",10310,5,1800],["mountainSlope",10810,"down",1800,40],["mountainStair",10960,5,1920],["mountainSlope",11460,"down",1920,40],["mountainStair",11610,5,2040],["mountainSlope",12110,"down",2040,40]],
+20:[
+["spike2",520],["pad",790],["boostSlope",1080,"down"],["spike3",1290],["orb",1530],["speedZone",1800,700,1.35],["staircase",2620,6,"up"],["boostSlope",3360,"down"],["spike2",3570],["slowZone",3890,650,0.58],["glide",4680,420,105],["spike3",5200],["orb",5480],["boostSlope",5850,"down"],["speedZone",6100,850,1.4],["staircase",7160,7,"down"],["spike3",7860],["slope",8200,"up"],["orb",8460],["boostSlope",8820,"down"],["slowZone",9140,700,0.62],["glide",10020,460,125],["spike2",10600],["speedZone",10900,800,1.45],["spike3",11900],["exitPortal",12800]],
+21:[
+["spike",500],["slowZone",760,850,0.55],["spike2",1710],["slope",2010,"up"],["orb",2260],["glide",2550,430,92],["slowZone",3150,1000,0.48],["staircase",4380,5,"up"],["spike3",5000],["boostSlope",5320,"down"],["speedZone",5580,500,1.3],["spike2",6250],["slowZone",6550,800,0.5],["slope",7480,"down"],["orb",7730],["glide",8040,450,105],["speedZone",8660,650,1.35],["staircase",9520,6,"down"],["spike3",10220],["slowZone",10500,950,0.52],["boostSlope",11700,"down"],["spike2",11920],["exitPortal",12500]],
+22:[
+["speedZone",480,900,1.4],["spike2",620],["pad",920],["boostSlope",1190,"down"],["spike3",1410],["slowZone",1660,520,0.58],["orb",1870],["staircase",2180,6,"up"],["speedZone",2860,1100,1.45],["slope",3020,"down"],["boostSlope",3400,"down"],["spike2",3620],["slowZone",3880,700,0.5],["glide",4720,440,110],["spike3",5290],["speedZone",5600,1000,1.5],["orb",5790],["staircase",6120,7,"down"],["boostSlope",6900,"down"],["spike3",7130],["slowZone",7440,600,0.55],["slope",8260,"up"],["orb",8520],["speedZone",8810,1050,1.45],["staircase",10020,7,"up"],["spike3",10800],["boostSlope",11100,"down"],["slowZone",11400,850,0.5],["glide",12400,480,125],["speedZone",13050,900,1.5],["spike3",14150],["exitPortal",14700]],
+23:[
+["speedZone",480,1000,1.5],["spike3",620],["boostSlope",920,"down"],["orb",1170],["speedZone",1390,900,1.55],["staircase",2440,7,"up"],["slowZone",3260,550,0.48],["spike3",3890],["boostSlope",4200,"down"],["speedZone",4480,1200,1.5],["glide",4860,470,115],["orb",5460],["slowZone",5900,700,0.5],["staircase",6800,8,"down"],["boostSlope",7700,"down"],["speedZone",7980,1250,1.55],["spike3",8200],["slope",8700,"up"],["orb",8970],["slowZone",9300,650,0.48],["glide",10100,500,130],["boostSlope",10800,"down"],["speedZone",11100,1300,1.6],["staircase",12450,8,"up"],["spike3",13300],["slowZone",13600,700,0.5],["boostSlope",14500,"down"],["speedZone",14800,1000,1.6],["spike3",15800],["exitPortal",16200]],
 };
 
 const selected=patterns[level.id]||patterns[1];
@@ -913,6 +952,10 @@ for(let z=0;z<count;z++){
     flip:topBlock
   });
 }
+}else if(type==="slowZone"||type==="speedZone"){
+  const zw=item[2]||700;
+  const factor=item[3]||(type==="slowZone"?.55:1.4);
+  obstacles.push({type:type,x:x,y:groundY-150,w:zw,h:150,factor:factor});
 }else if(type==="mountainStair"){
   const count=item[2]||6;
   const offset=item[3]||0;
@@ -1118,7 +1161,14 @@ if(currentLevel===12&&bossActive){
   player.grounded=true;
   updateBoss();
 }else{
-  player.x+=levelData.speed+(boostTimer>0?2.8:0);
+  zoneSpeedFactor=1;
+  for(const z of obstacles){
+    if((z.type==="slowZone"||z.type==="speedZone")&&player.x+player.size>z.x&&player.x<z.x+z.w){
+      zoneSpeedFactor=z.factor;
+      break;
+    }
+  }
+  player.x+=levelData.speed*zoneSpeedFactor+(boostTimer>0?2.8:0);
   if(boostTimer>0)boostTimer--;
 
   if(waveActive){
@@ -1688,6 +1738,19 @@ og.addColorStop(0,"#fff");og.addColorStop(.2,"#fff7a6");og.addColorStop(.55,"#ff
 ctx.fillStyle=og;ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fill();
 ctx.shadowBlur=0;ctx.strokeStyle="#fff8b0";ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,18,0,Math.PI*2);ctx.stroke();
 ctx.fillStyle="#fff";ctx.font="900 7px Arial";ctx.textAlign="center";ctx.fillText("2X",0,2);
+ctx.restore();
+}
+
+if(obstacle.type==="slowZone"||obstacle.type==="speedZone"){
+ctx.save();
+const zoneColor=obstacle.type==="slowZone"?"#4dffea":"#ff3dce";
+const label=obstacle.type==="slowZone"?"SLOW":"TURBO";
+const alpha=.16+Math.sin(performance.now()*.008+obstacle.x)*.04;
+ctx.fillStyle=zoneColor;ctx.globalAlpha=alpha;ctx.fillRect(x,obstacle.y,obstacle.w,obstacle.h);ctx.globalAlpha=1;
+ctx.strokeStyle=zoneColor;ctx.shadowColor=zoneColor;ctx.shadowBlur=22;ctx.lineWidth=3;ctx.strokeRect(x,obstacle.y+4,obstacle.w,obstacle.h-4);ctx.shadowBlur=0;
+ctx.fillStyle="#fff";ctx.font="900 12px Arial";ctx.textAlign="center";ctx.fillText(label,x+obstacle.w/2,obstacle.y+25);
+ctx.font="700 9px Arial";ctx.fillText(Math.round(obstacle.factor*100)+"% SPEED",x+obstacle.w/2,obstacle.y+41);
+for(let zx=x+25;zx<x+obstacle.w;zx+=55){ctx.globalAlpha=.45;ctx.fillStyle=zoneColor;ctx.fillRect(zx,obstacle.y+55,22,3);ctx.fillRect(zx+10,obstacle.y+62,12,3);}ctx.globalAlpha=1;
 ctx.restore();
 }
 
