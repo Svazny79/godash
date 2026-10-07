@@ -223,7 +223,9 @@ const defaultSave={
 level:1,
 stars:0,
 attempts:0,
-best:{}
+best:{},
+levelAttempts:{},
+levelStars:{}
 };
 
 let save={...defaultSave,best:{}};
@@ -232,7 +234,7 @@ try{
 const stored=localStorage.getItem(SAVE_KEY);
 if(stored){
 const parsed=JSON.parse(stored);
-save={...defaultSave,...parsed,best:{...(parsed.best||{})}};
+save={...defaultSave,...parsed,best:{...(parsed.best||{})},levelAttempts:{...(parsed.levelAttempts||{})},levelStars:{...(parsed.levelStars||{})}};
 }
 }catch(error){}
 
@@ -280,14 +282,14 @@ const toast=document.getElementById("toast");
 const levelsData=[
 {id:1,name:"CYBER START",difficulty:"EASY",color:"#714fff",speed:6,length:6200},
 {id:2,name:"ELECTRIC SKY",difficulty:"NORMAL",color:"#00eaff",speed:6.5,length:7000},
-{id:3,name:"VOID REACTOR",difficulty:"HARD",color:"#ff38d8",speed:7,length:9200},
-{id:4,name:"HYPER DRIVE",difficulty:"VERY HARD",color:"#ff6b2d",speed:7.5,length:10400},
-{id:5,name:"GALAXY CORE",difficulty:"INSANE",color:"#55ff78",speed:8,length:11600},
-{id:6,name:"FINAL PULSE",difficulty:"EXTREME",color:"#ffd52f",speed:8.5,length:12500},
-{id:7,name:"NEON STORM",difficulty:"EXTREME",color:"#00ffb7",speed:8.5,length:13500},
-{id:8,name:"PHANTOM CIRCUIT",difficulty:"INSANE",color:"#9b5cff",speed:8,length:14400},
-{id:9,name:"OVERDRIVE",difficulty:"EXTREME",color:"#ff315c",speed:9,length:15100},
-{id:10,name:"NEON APOCALYPSE",difficulty:"MASTER",color:"#ffffff",speed:9,length:16300},
+{id:3,name:"VOID REACTOR",difficulty:"HARD",color:"#ff38d8",speed:7.25,length:9200},
+{id:4,name:"HYPER DRIVE",difficulty:"VERY HARD",color:"#ff6b2d",speed:7.8,length:10400},
+{id:5,name:"GALAXY CORE",difficulty:"INSANE",color:"#55ff78",speed:8.25,length:11600},
+{id:6,name:"FINAL PULSE",difficulty:"EXTREME",color:"#ffd52f",speed:8.7,length:12500},
+{id:7,name:"NEON STORM",difficulty:"EXTREME",color:"#00ffb7",speed:8.9,length:13500},
+{id:8,name:"PHANTOM CIRCUIT",difficulty:"INSANE",color:"#9b5cff",speed:8.7,length:14400},
+{id:9,name:"OVERDRIVE",difficulty:"EXTREME",color:"#ff315c",speed:9.3,length:15100},
+{id:10,name:"NEON APOCALYPSE",difficulty:"MASTER",color:"#ffffff",speed:9.7,length:16300},
 {id:11,name:"EMOJI MADNESS",difficulty:"MASTER",color:"#ffcf33",speed:8.5,length:9800},
 {id:12,name:"EMOJI BOSS",difficulty:"BOSS",color:"#ff3b5f",speed:8,length:6500},
 {id:13,name:"WAVE FLOW",difficulty:"HARD",color:"#00ff9d",speed:6.8,length:14500},
@@ -309,6 +311,7 @@ let lastTime=0;
 let jumpBuffer=0;
 let coyoteTime=0;
 let jumpHeld=false;
+let boostTimer=0;
 let playerMode="cube";
 let waveActive=false;
 let waveTimer=0;
@@ -337,10 +340,13 @@ let bossMoveX=0;
 let bossMoveY=0;
 let winCloseReady=false;
 let winCloseTimer=null;
+let currentLevelDeaths=0;
+let retryingAfterDeath=false;
 let winEmojis=[];
 let orbTapCount=0;
 let orbTapTimer=null;
 let orbGlowTime=0;
+let yellowSlopeAssist=0;
 const bossStartX=2050;
 
 /* ============================================================
@@ -749,15 +755,17 @@ return;
 filtered.forEach(level=>{
 const unlocked=true;
 const best=save.best[level.id]||0;
+const earned=save.levelStars[level.id]||0;
 const track=musicTracks[level.id]||musicTracks[1];
 const card=document.createElement("div");
-card.className="level-card"+(unlocked?"":" locked");
+card.className="level-card";
 card.innerHTML=`
 <div class="level-number">${level.id}</div>
 <h2>${level.name}</h2>
 <div class="difficulty" style="color:${level.color}">${level.difficulty}</div>
-<div class="level-description">${unlocked?(level.id>=15?"Climb neon staircases, chain platform jumps, dodge slopes, and master yellow 2X orbs.":"Jump, use slopes, glide over platforms, and master yellow 2X orbs."):"Complete previous levels to unlock."}</div>
+<div class="level-description">${unlocked?(level.id>=15?"Climb neon staircases, chain platform jumps, dodge slopes, and master yellow 2X orbs.":"Jump, use slopes, glide over platforms, and master yellow 2X orbs."):"🔒 Complete the previous level to unlock."}</div>
 <div class="level-music">♫ ${track.name}</div>
+<div style="margin-top:8px;letter-spacing:3px;color:#ffd52f;font-size:14px">${"★".repeat(earned)}${"☆".repeat(3-earned)} <span style="color:#737b9b;letter-spacing:1px">${earned===3?"MASTERED":""}</span></div>
 <div class="level-progress"><div style="width:${best}%;background:${level.color};box-shadow:0 0 10px ${level.color}"></div></div>
 `;
 if(unlocked){
@@ -783,124 +791,47 @@ triple spikes, raised blocks, tall blocks, and mixed sequences.
 */
 const patterns={
 1:[
-["spike",650],["slope",930,"up"],["glide",1180,360,78],["spike2",1530],["orb",1810],["block",2080],["slope",2390,"down"],["spike",2720],["glide",2980,330,72],["spike2",3330],["orb",3630],["tallblock",3920],["slope",4210,"up"],["glide",4490,320,70],["portal",4780],["zigzag",4960,620],["exitPortal",5700]
+["spike",560],["spike2",820],["pad",1110],["spike",1280],["spike2",1480],["slope",1800,"up"],["spike",2070],["orb",2260],["spike3",2440],["glide",2820,360,84],["spike",3300],["pad",3540],["spike2",3730],["staircase",4140,4,"up"],["spike2",4650],["portal",5050],["waveCourse",5230,1250],
+["exitPortal",6600]
 ],
 2:[
-["spike2",620],["slope",900,"up"],["glide",1190,350,80],["spike",1510],["orb",1760],["lowblock",2030],["slope",2330,"down"],["spike3",2670],["glide",3020,340,70],["tallblock",3400],["orb",3720],["spike2",4050],["slope",4360,"up"],["glide",4690,330,74],["slope",5070,"down"],["portal",5350],["zigzag",5530,780],["exitPortal",6500]
+["spike2",520],["pad",790],["spike",970],["spike3",1190],["slope",1510,"up"],["orb",1740],["spike2",1900],["glide",2250,330,88],["spike3",2680],["slope",3010,"down"],["pad",3290],["spike2",3480],["staircase",3850,5,"up"],["tallblock",4440],["spike2",4660],["orb",4940],["spike3",5120],["portal",5480],["waveCourse",5660,1500],["exitPortal",7350]
 ],
 3:[
-["slope",600,"up"],["spike2",900],["glide",1230,370,82],["orb",1560],["tallblock",1850],["slope",2180,"down"],["spike3",2530],["glide",2940,320,70],["spike",3300],["orb",3590],["block",3890],["slope",4210,"up"],["spike2",4580],["glide",4920,360,76],["tallblock",5340],["orb",5680],["spike3",6000],["slope",6280,"down"],["glide",6520,400,84],["slope",6940,"up"],["portal",7240],["zigzag",7420,900],["exitPortal",8400] 
+["spike",500],["spike2",720],["pad",980],["spike3",1160],["slope",1480,"up"],["spike",1770],["orb",1960],["spike2",2140],["glide",2490,360,92],["spike3",2940],["boostSlope",3260,"down"],["spike2",3470],["staircase",3830,5,"down"],["spike3",4420],["slope",4740,"up"],["pad",5030],["spike2",5220],["orb",5500],["spike3",5680],["portal",6030],["waveCourse",6210,1800],["exitPortal",8200]
 ],
 4:[
-["glide",570,360,82],["spike2",980],["slope",1310,"down"],["orb",1650],["tallblock",1950],["spike3",2310],["glide",2750,330,68],["slope",3110,"up"],["spike",3470],["orb",3760],["block",4070],["spike2",4440],["glide",4820,390,78],["slope",5260,"down"],["spike3",5630],["orb",6120],["tallblock",6490],["glide",6860,330,72],["slope",7240,"up"],["glide",7480,420,82],["slope",7940,"down"],["portal",8240],["zigzag",8420,1100],["exitPortal",9700] 
+["spike2",500],["slope",760,"up"],["spike3",1010],["pad",1310],["spike",1490],["spike2",1690],["orb",1940],["glide",2260,380,96],["spike3",2730],["slope",3060,"down"],["boostSlope",3340,"down"],["spike2",3540],["staircase",3910,5,"up"],["tallblock",4500],["spike3",4760],["pad",5050],["orb",5290],["spike2",5480],["slope",5790,"up"],["spike3",6030],["portal",6350],["waveCourse",6530,2100],["exitPortal",8900]
 ],
 5:[
-["slope",560,"up"],["glide",930,390,86],["spike2",1390],["orb",1740],["tallblock",2050],["slope",2430,"down"],["spike3",2800],["glide",3250,360,76],["spike",3660],["orb",3950],["block",4260],["slope",4610,"up"],["spike2",5000],["glide",5420,420,84],["tallblock",5900],["orb",6240],["spike3",6600],["slope",7040,"down"],["glide",7410,350,72],["spike2",7850],["slope",8160,"up"],["glide",8420,430,84],["slope",8900,"down"],["portal",9220],["zigzag",9400,1300],["exitPortal",10880] 
+["spike3",480],["pad",760],["spike",930],["spike2",1130],["slope",1410,"up"],["orb",1650],["spike3",1840],["glide",2190,390,100],["spike2",2670],["slope",3000,"down"],["pad",3280],["spike3",3470],["boostSlope",3770,"down"],["staircase",3980,6,"down"],["spike2",4530],["orb",4780],["spike3",4970],["slope",5300,"up"],["pad",5570],["spike2",5760],["spike3",6000],["portal",6330],["waveCourse",6510,2450],["exitPortal",9300]
 ],
 6:[
-["glide",540,400,90],["spike3",1010],["slope",1430,"up"],["orb",1780],["tallblock",2140],["spike2",2580],["glide",3020,360,74],["slope",3450,"down"],["spike3",3850],["orb",4290],["block",4650],["glide",5050,430,82],["spike2",5550],["slope",5950,"up"],["tallblock",6400],["orb",6830],["spike3",7250],["glide",7740,390,78],["slope",8180,"down"],["spike2",8580],["slope",8890,"up"],["glide",9160,440,86],["slope",9660,"down"],["portal",9980],["zigzag",10160,1450],["exitPortal",11740] 
+["spike3",470],["slope",740,"up"],["pad",1010],["spike2",1190],["orb",1430],["spike3",1610],["glide",1980,410,104],["spike2",2480],["boostSlope",2780,"down"],["spike3",2990],["staircase",3320,6,"up"],["spike2",3910],["slope",4180,"down"],["pad",4460],["orb",4700],["spike3",4890],["tallblock",5240],["spike2",5500],["boostSlope",5790,"down"],["staircase",6000,7,"down"],["spike3",6650],["slope",6960,"up"],["orb",7200],["portal",7420],["waveCourse",7600,2700],["exitPortal",10600]
 ],
 7:[
-["spike",560],["slope",900,"up"],["glide",1250,420,88],["orb",1700],["spike2",2020],["tallblock",2390],["slope",2780,"down"],["glide",3160,360,72],["spike3",3600],["orb",4070],["block",4450],["slope",4810,"up"],["glide",5190,440,86],["spike2",5680],["tallblock",6120],["orb",6580],["spike3",7010],["slope",7460,"down"],["glide",7830,380,76],["spike2",8320],["orb",8720],["tallblock",9090],["glide",9440,350,70],["slope",9780,"up"],["glide",10040,450,88],["slope",10560,"down"],["portal",10880],["zigzag",11060,1500],["exitPortal",12680] 
+["spike3",460],["pad",720],["spike2",930],["slope",1190,"up"],["orb",1430],["spike3",1620],["glide",1990,420,108],["spike2",2500],["slope",2810,"down"],["boostSlope",3090,"down"],["spike3",3300],["staircase",3630,6,"up"],["spike2",4230],["pad",4500],["spike3",4690],["orb",4940],["tallblock",5220],["slope",5500,"up"],["spike2",5740],["boostSlope",6030,"down"],["staircase",6240,7,"down"],["spike3",6900],["orb",7160],["portal",7350],["waveCourse",7530,2950],["exitPortal",10700]
 ],
 8:[
-["tallblock",550],["slope",1000,"up"],["glide",1350,380,82],["spike2",1800],["orb",2170],["slope",2500,"down"],["spike3",2870],["glide",3330,430,88],["tallblock",3820],["orb",4200],["spike2",4590],["slope",4970,"up"],["glide",5350,360,74],["spike3",5800],["block",6270],["orb",6640],["slope",7000,"down"],["glide",7380,410,80],["spike2",7860],["tallblock",8320],["orb",8740],["spike3",9160],["glide",9580,390,76],["slope",10030,"up"],["slope",10480,"up"],["glide",10740,460,90],["slope",11260,"down"],["portal",11580],["zigzag",11760,1700],["exitPortal",13580] 
+["spike3",450],["slope",710,"up"],["pad",970],["spike2",1150],["orb",1390],["spike3",1580],["glide",1940,430,112],["spike2",2460],["boostSlope",2760,"down"],["staircase",2970,6,"up"],["spike3",3530],["slope",3830,"down"],["pad",4110],["orb",4350],["spike3",4540],["tallblock",4860],["spike2",5130],["boostSlope",5430,"down"],["staircase",5640,7,"down"],["spike3",6280],["slope",6590,"up"],["pad",6860],["spike2",7050],["portal",7320],["waveCourse",7500,3250],["exitPortal",10900]
 ],
 9:[
-["slope",540,"up"],["spike2",940],["glide",1320,400,86],["orb",1760],["spike3",2110],["tallblock",2530],["slope",2970,"down"],["glide",3370,360,72],["spike2",3800],["orb",4220],["block",4610],["slope",4990,"up"],["glide",5380,440,88],["spike3",5890],["tallblock",6350],["orb",6820],["spike2",7230],["slope",7620,"down"],["glide",8010,380,76],["spike3",8490],["orb",9000],["tallblock",9420],["glide",9840,420,82],["spike2",10330],["slope",10970,"up"],["glide",11240,470,92],["slope",11780,"down"],["portal",12100],["zigzag",12280,1900],["exitPortal",14300] 
+["spike3",440],["pad",690],["spike2",900],["slope",1160,"up"],["orb",1390],["spike3",1580],["glide",1940,440,116],["spike2",2480],["slope",2790,"down"],["boostSlope",3070,"down"],["spike3",3290],["staircase",3620,7,"up"],["tallblock",4280],["orb",4530],["spike3",4720],["pad",5010],["spike2",5200],["slope",5500,"up"],["boostSlope",5790,"down"],["staircase",6000,8,"down"],["spike3",6720],["orb",6980],["spike2",7170],["portal",7420],["waveCourse",7600,3450],["exitPortal",11200]
 ],
 10:[
-["spike3",520],["slope",930,"up"],["glide",1320,440,92],["orb",1800],["tallblock",2200],["spike2",2660],["slope",3100,"down"],["glide",3490,400,80],["spike3",3950],["orb",4450],["block",4860],["slope",5280,"up"],["glide",5690,460,90],["spike2",6220],["tallblock",6680],["orb",7190],["spike3",7650],["slope",8110,"down"],["glide",8500,420,84],["spike2",9000],["orb",9470],["tallblock",9900],["glide",10330,440,88],["slope",10820,"up"],["spike3",11280],["glide",11700,400,80],["slope",11920,"up"],["glide",12200,480,94],["slope",12740,"down"],["portal",13060],["zigzag",13240,2100],["exitPortal",15460]
+["spike3",430],["pad",670],["spike2",860],["slope",1110,"up"],["orb",1340],["spike3",1520],["glide",1880,450,120],["spike2",2440],["boostSlope",2740,"down"],["staircase",2950,7,"up"],["spike3",3590],["slope",3890,"down"],["pad",4170],["orb",4410],["tallblock",4680],["spike3",4940],["boostSlope",5240,"down"],["staircase",5460,8,"down"],["spike2",6170],["slope",6460,"up"],["orb",6700],["spike3",6890],["tallblock",7190],["spike2",7480],["boostSlope",7770,"down"],["portal",8080],["waveCourse",8260,3850],["exitPortal",12400]
 ],
 11:[
-["emoji",620,"🔥"],["emoji",1040,"😈"],["emoji2",1450,"💀"],["emoji",1940,"⚡"],
-["emoji3",2350,"👾"],["emoji",2920,"💣"],["emoji2",3440,"🤖"],["emoji",3980,"😎"],
-["emoji3",4460,"🔥"],["emoji",5050,"💀"],["emoji2",5540,"⚡"],["emoji",6080,"👾"],
-["emoji3",6620,"💣"],["emoji",7230,"🤖"],["emoji2",7750,"😈"],["emoji3",8260,"🔥"],
-["emoji",8850,"💀"],["emoji2",9250,"⚡"]
+["emoji",620,"🔥"],["emoji",1040,"😈"],["emoji2",1450,"💀"],["emoji",1940,"⚡"],["emoji3",2350,"👾"],["emoji",2920,"💣"],["emoji2",3440,"🤖"],["emoji",3980,"😎"],["emoji3",4460,"🔥"],["emoji",5050,"💀"],["emoji2",5540,"⚡"],["emoji",6080,"👾"],["emoji3",6620,"💣"],["emoji",7230,"🤖"],["emoji2",7750,"😈"],["emoji3",8260,"🔥"],["emoji",8850,"💀"],["emoji2",9250,"⚡"]
 ],
-12:[
-["slope",650,"up"],["slope",1150,"down"],["slope",1650,"up"],
-["spike",1950]
-],
-13:[
-/* Easier Wave Flow: immediate portal, slower course, fewer slope sets. */
-["portal",205],
-["slope",900,"up"],
-["waveCourse",330,3000],
-["slope",3600,"down"],
-["waveCourse",3850,3300],
-["slope",7600,"up"],
-["waveCourse",7850,3000],
-["slope",11100,"down"],
-["waveCourse",11350,2800]
-],
-14:[
-/* Original WAVE RUN course preserved as Level 14, with extra visual slope sets. */
-["portal",205],
-["slope",850,"up"],
-["waveCourse",330,2600],
-["slope",3050,"down"],
-["waveCourse",3300,3000],
-["slope",6450,"up"],
-["waveCourse",6700,3000],
-["slope",9850,"down"],
-["waveCourse",10100,3000],
-["slope",13250,"up"],
-["waveCourse",13500,2850]
-],
-15:[
-["slope",560,"up"],["staircase",880,5,"up"],["spike2",1540],["glide",1900,380,82],
-["slope",2360,"down"],["staircase",2660,6,"down"],["orb",3600],["spike3",3950],
-["slope",4380,"up"],["staircase",4680,5,"up"],["glide",5480,420,105],["spike2",6020],
-["slope",6480,"down"],["staircase",6780,7,"down"],["orb",7820],["spike3",8180],
-["slope",8620,"up"],["staircase",8920,6,"up"],["glide",9900,450,120],["spike2",10480],
-["slope",10920,"down"],["staircase",11220,6,"down"],["spike3",12100]
-],
-16:[
-["spike",540],["slope",820,"up"],["staircase",1120,6,"up"],["glide",1880,400,115],
-["spike2",2400],["slope",2780,"down"],["staircase",3080,7,"down"],["orb",4080],
-["spike3",4420],["slope",4860,"up"],["staircase",5160,6,"up"],["glide",6100,440,135],
-["spike2",6700],["slope",7120,"down"],["staircase",7420,8,"down"],["orb",8500],
-["spike3",8880],["slope",9320,"up"],["staircase",9620,7,"up"],["glide",10700,460,145],
-["spike2",11320],["slope",11720,"down"],["staircase",12020,8,"down"],["spike3",13200]
-],
-17:[
-["slope",520,"up"],["staircase",820,7,"up"],["spike2",1540],["glide",1910,430,130],
-["slope",2420,"down"],["staircase",2720,8,"down"],["spike3",3680],["orb",4140],
-["slope",4520,"up"],["staircase",4820,7,"up"],["glide",5840,470,150],["spike2",6480],
-["slope",6920,"down"],["staircase",7220,9,"down"],["spike3",8320],["orb",8840],
-["slope",9260,"up"],["staircase",9560,8,"up"],["glide",10720,490,160],["spike2",11380],
-["slope",11820,"down"],["staircase",12120,9,"down"],["spike3",13320],["slope",13720,"up"],
-["staircase",14020,7,"up"],["spike2",14900]
-],
-18:[
-["spike2",520],["slope",820,"up"],["staircase",1120,6,"up"],["glide",1880,400,110],
-["spike3",2380],["slope",2820,"down"],["staircase",3120,7,"down"],["orb",4180],
-["spike2",4540],["slope",4920,"up"],["staircase",5220,6,"up"],["glide",6200,430,125],
-["spike3",6760],["slope",7200,"down"],["staircase",7500,7,"down"],["forwardPortal",7800,9300],
-["spike2",9750],["glide",10120,430,120],["slope",10700,"up"],["staircase",11000,5,"up"],
-["spike3",11800],["slope",12200,"down"],["staircase",12500,5,"down"],["spike2",13300]
-],
-19:[
-/* MOON MOUNTAIN: tightly connected stairs and short platformed slopes. */
-["mountainStair",560,5,0],["mountainSlope",1060,"down",0,40],
-["mountainStair",1210,5,120],["mountainSlope",1710,"down",120,40],
-["mountainStair",1860,5,240],["mountainSlope",2360,"down",240,40],
-["mountainStair",2510,5,360],["mountainSlope",3010,"down",360,40],
-["mountainStair",3160,5,480],["mountainSlope",3660,"down",480,40],
-["mountainStair",3810,5,600],["mountainSlope",4310,"down",600,40],
-["mountainStair",4460,5,720],["mountainSlope",4960,"down",720,40],
-["mountainStair",5110,5,840],["mountainSlope",5610,"down",840,40],
-["mountainStair",5760,5,960],["mountainSlope",6260,"down",960,40],
-["mountainStair",6410,5,1080],["mountainSlope",6910,"down",1080,40],
-["mountainStair",7060,5,1200],["mountainSlope",7560,"down",1200,40],
-["mountainStair",7710,5,1320],["mountainSlope",8210,"down",1320,40],
-["mountainStair",8360,5,1440],["mountainSlope",8860,"down",1440,40],
-["mountainStair",9010,5,1560],["mountainSlope",9510,"down",1560,40],
-["mountainStair",9660,5,1680],["mountainSlope",10160,"down",1680,40],
-["mountainStair",10310,5,1800],["mountainSlope",10810,"down",1800,40]
-]
+12:[["slope",650,"up"],["slope",1150,"down"],["slope",1650,"up"],["spike",1950]],
+13:[["portal",205],["slope",900,"up"],["waveCourse",330,3000],["slope",3600,"down"],["waveCourse",3850,3300],["slope",7600,"up"],["waveCourse",7850,3000],["slope",11100,"down"],["waveCourse",11350,2800]],
+14:[["portal",205],["slope",850,"up"],["waveCourse",330,2600],["slope",3050,"down"],["waveCourse",3300,3000],["slope",6450,"up"],["waveCourse",6700,3000],["slope",9850,"down"],["waveCourse",10100,3000],["slope",13250,"up"],["waveCourse",13500,2850]],
+15:[["slope",560,"up"],["staircase",880,5,"up"],["spike2",1540],["glide",1900,380,82],["slope",2360,"down"],["boostSlope",3260,"down"],["staircase",3460,6,"down"],["orb",3600],["spike3",3950],["slope",4380,"up"],["staircase",4680,5,"up"],["glide",5480,420,105],["spike2",6020],["slope",6480,"down"],["boostSlope",7480,"down"],["staircase",7680,7,"down"],["orb",7820],["spike3",8180],["slope",8620,"up"],["staircase",8920,6,"up"],["glide",9900,450,120],["spike2",10480],["slope",10920,"down"],["staircase",11220,6,"down"],["spike3",12100]],
+16:[["spike",540],["slope",820,"up"],["staircase",1120,6,"up"],["glide",1880,400,115],["spike2",2400],["slope",2780,"down"],["staircase",3080,7,"down"],["orb",4080],["spike3",4420],["slope",4860,"up"],["staircase",5160,6,"up"],["glide",6100,440,135],["spike2",6700],["slope",7120,"down"],["staircase",7420,8,"down"],["orb",8500],["spike3",8880],["slope",9320,"up"],["staircase",9620,7,"up"],["glide",10700,460,145],["spike2",11320],["slope",11720,"down"],["staircase",12020,8,"down"],["spike3",13200]],
+17:[["slope",520,"up"],["staircase",820,7,"up"],["spike2",1540],["glide",1910,430,130],["slope",2420,"down"],["boostSlope",3520,"down"],["staircase",3720,8,"down"],["orb",4140],["spike3",4520],["slope",4820,"up"],["staircase",5120,7,"up"],["glide",5840,470,150],["spike2",6480],["slope",6920,"down"],["boostSlope",8120,"down"],["staircase",8320,9,"down"],["orb",8840],["spike3",9260],["slope",9560,"up"],["staircase",9860,8,"up"],["glide",10720,490,160],["spike2",11380],["slope",11820,"down"],["staircase",12120,9,"down"],["spike3",13320],["slope",13720,"up"],["staircase",14020,7,"up"],["spike2",14900]],
+18:[["spike2",520],["slope",820,"up"],["staircase",1120,6,"up"],["glide",1880,400,110],["spike3",2380],["slope",2820,"down"],["boostSlope",3820,"down"],["staircase",4020,7,"down"],["orb",4180],["spike2",4540],["slope",4920,"up"],["staircase",5220,6,"up"],["glide",6200,430,125],["spike3",6760],["slope",7200,"down"],["boostSlope",8200,"down"],["staircase",8400,7,"down"],["orb",9000],["spike2",9460],["glide",10120,430,120],["slope",10700,"up"],["staircase",11000,5,"up"],["spike3",11800],["slope",12200,"down"],["staircase",12500,5,"down"],["spike2",13300]],
+19:[["mountainStair",560,5,0],["mountainSlope",1060,"down",0,40],["mountainStair",1210,5,120],["mountainSlope",1710,"down",120,40],["mountainStair",1860,5,240],["mountainSlope",2360,"down",240,40],["mountainStair",2510,5,360],["mountainSlope",3010,"down",360,40],["mountainStair",3160,5,480],["mountainSlope",3660,"down",480,40],["mountainStair",3810,5,600],["mountainSlope",4310,"down",600,40],["mountainStair",4460,5,720],["mountainSlope",4960,"down",720,40],["mountainStair",5110,5,840],["mountainSlope",5610,"down",840,40],["mountainStair",5760,5,960],["mountainSlope",6260,"down",960,40],["mountainStair",6410,5,1080],["mountainSlope",6910,"down",1080,40],["mountainStair",7060,5,1200],["mountainSlope",7560,"down",1200,40],["mountainStair",7710,5,1320],["mountainSlope",8210,"down",1320,40],["mountainStair",8360,5,1440],["mountainSlope",8860,"down",1440,40],["mountainStair",9010,5,1560],["mountainSlope",9510,"down",1560,40],["mountainStair",9660,5,1680],["mountainSlope",10160,"down",1680,40],["mountainStair",10310,5,1800],["mountainSlope",10810,"down",1800,40],["mountainStair",10960,5,1920],["mountainSlope",11460,"down",1920,40],["mountainStair",11610,5,2040],["mountainSlope",12110,"down",2040,40]]
 };
 
 const selected=patterns[level.id]||patterns[1];
@@ -930,17 +861,29 @@ const gw=item[2]||340;
 const gy=groundY-(item[3]||72);
 obstacles.push({type:"glide",x:x,y:gy,w:gw,h:22,top:gy});
 }else if(type==="orb"){
-/* Yellow 2X orbs are placed directly over the next spike section so
-   the boost has a clear purpose: use it to fly safely over the spikes. */
+/* Yellow 2X orbs are launch points. They are placed before the next
+   slope/spike section so the player can tap once and get a strong boost
+   high enough to cross the slope instead of treating the orb like a
+   second ordinary jump. */
 let orbX=x;
 for(let look=itemIndex+1;look<selected.length;look++){
   const next=selected[look];
+  if(next[0]==="slope"||next[0]==="boostSlope"||next[0]==="mountainSlope"){
+    orbX=Math.max(x,next[1]-150);
+    break;
+  }
   if(next[0]==="spike"||next[0]==="spike2"||next[0]==="spike3"){
-    orbX=next[1]+(next[0]==="spike"?17:42)-16;
+    orbX=Math.max(x,next[1]-70);
     break;
   }
 }
 obstacles.push({type:"orb",x:orbX,y:groundY-108,w:32,h:32,active:false,pulse:Math.random()*Math.PI*2});
+}else if(type==="pad"){
+  obstacles.push({type:"pad",x:x,y:groundY-18,w:58,h:18,used:false,pulse:Math.random()*Math.PI*2});
+}else if(type==="boostSlope"){
+const bh=34;
+const by=groundY-bh;
+obstacles.push({type:"boostSlope",x:x,y:by,w:150,h:bh,direction:item[2]||"down",boosted:false,pulse:Math.random()*Math.PI*2});
 }else if(type==="slope"){
 obstacles.push({type:"slope",x:x,y:groundY-30,w:78,h:30,direction:item[2]||"up",waveSafe:currentLevel===13||currentLevel===14});
 }else if(type==="portal"){
@@ -1014,12 +957,17 @@ obstacles.push({type:"emoji",emoji:item[2]||"👾",x:x+66,y:groundY-58,w:58,h:58
 obstacles.push({type:"emoji",emoji:item[2]||"👾",x:x+132,y:groundY-58,w:58,h:58});
 }
 }
+
+
 }
 function startLevel(id){
 levelData=levelsData.find(l=>l.id===id);
 if(!levelData)return;
 
+
 currentLevel=id;
+if(!retryingAfterDeath)currentLevelDeaths=0;
+retryingAfterDeath=false;
 showScreen(gameScreen);
 
 running=true;
@@ -1040,6 +988,7 @@ player.rotation=0;
 playerMode="cube";
 waveActive=false;
 waveTimer=0;
+boostTimer=0;
 if(currentLevel===13||currentLevel===14){
   playerMode="spike";
   waveActive=true;
@@ -1075,7 +1024,9 @@ const musicTrackDisplay=document.getElementById("musicTrackDisplay");
 if(musicTrackDisplay)musicTrackDisplay.textContent=currentTrack.name;
 
 save.attempts++;
+save.levelAttempts[currentLevel]=(save.levelAttempts[currentLevel]||0)+1;
 attemptDisplay.textContent=save.attempts;
+saveGame();
 
 progressBar.style.width="0%";
 gameMessage.classList.remove("show");
@@ -1099,9 +1050,8 @@ function findNearbyOrb(){
     if(o.type!=="orb"||o.active)continue;
     const ox=o.x+o.w/2, oy=o.y+o.h/2;
     const dx=Math.abs(ox-px), dy=Math.abs(oy-py);
-    /* The yellow orb is intentionally easy to reach: it is a jump helper,
-       so you can double-tap it while approaching a spike instead of needing
-       pixel-perfect timing. */
+    /* The yellow orb is intentionally easy to reach: it is a launch helper
+     for crossing the next slope or obstacle section. */
     if(dx<150&&dy<180){
       const score=dx+dy*.55;
       if(score<bestScore){best=o;bestScore=score;}
@@ -1113,17 +1063,16 @@ function findNearbyOrb(){
 function activateYellowOrb(){
   const orb=findNearbyOrb();
   if(!orb)return false;
-  orbTapCount++;
-  if(orbTapTimer)clearTimeout(orbTapTimer);
-  orbTapTimer=setTimeout(()=>{orbTapCount=0;},360);
-  if(orbTapCount<2)return true;
+  /* One tap activates the orb. It is deliberately stronger than a normal
+     jump so it launches the cube over the upcoming slope. */
   orbTapCount=0;
+  if(orbTapTimer)clearTimeout(orbTapTimer);
   orb.active=true;
-  orbGlowTime=28;
-  /* A yellow orb is a true mid-air jump helper.  It can be triggered while
-     falling or even while already airborne, launching the player high enough
-     to clear the spike sequence ahead. */
-  player.vy=-19.5;
+  orbGlowTime=32;
+  player.vy=-18.5;
+  // Give the yellow orb a short slope-crossing assist so the boost carries
+  // the player safely over the upcoming ramp instead of into its side.
+  yellowSlopeAssist=46;
   player.grounded=false;
   coyoteTime=0;
   jumpBuffer=0;
@@ -1159,6 +1108,8 @@ if(currentLevel===13||currentLevel===14){
 if(jumpBuffer>0)jumpBuffer--;
 if(coyoteTime>0)coyoteTime--;
 if(orbGlowTime>0)orbGlowTime--;
+if(yellowSlopeAssist>0)yellowSlopeAssist--;
+if(boostTimer>0)boostTimer--;
 
 if(currentLevel===12&&bossActive){
   player.x=bossStartX;
@@ -1167,7 +1118,8 @@ if(currentLevel===12&&bossActive){
   player.grounded=true;
   updateBoss();
 }else{
-  player.x+=levelData.speed;
+  player.x+=levelData.speed+(boostTimer>0?2.8:0);
+  if(boostTimer>0)boostTimer--;
 
   if(waveActive){
     /* Zig-zag mode: holding jumps upward, releasing dives downward. */
@@ -1278,6 +1230,18 @@ if(obstacle.type==="glide"){
   }
 }
 
+if(obstacle.type==="pad"){
+  const previousBottom=py+ps-player.vy;
+  if(previousBottom<=obstacle.y+8&&player.vy>=0){
+    player.y=obstacle.y-ps;
+    player.vy=-19.5;
+    player.grounded=false;
+    coyoteTime=0;
+    obstacle.used=true;
+    createBoostParticles(obstacle.x+obstacle.w/2,obstacle.y);
+  }
+}
+
 if(obstacle.type==="orb"){
   /* Orbs are triggered by the input handler, not by body collision. */
 }
@@ -1316,6 +1280,31 @@ if(obstacle.type==="forwardPortal"){
   }
 }
 
+if(obstacle.type==="boostSlope"){
+  const left=obstacle.x, right=obstacle.x+obstacle.w;
+  if(px+ps>left&&px<right){
+    const t=Math.max(0,Math.min(1,(px+ps/2-left)/obstacle.w));
+    const surface=obstacle.direction==="down"
+      ? obstacle.y+obstacle.h*(1-t)
+      : obstacle.y+obstacle.h*t;
+    const previousBottom=py+ps-player.vy;
+    if(previousBottom<=surface+10&&py+ps>=surface-4&&player.vy>=0){
+      player.y=surface-ps;
+      player.grounded=true;
+      coyoteTime=5;
+      if(jumpHeld&&!obstacle.boosted){
+        obstacle.boosted=true;
+        player.vy=-20.5;
+        player.grounded=false;
+        boostTimer=38;
+        createBoostParticles(obstacle.x+obstacle.w*.62,surface);
+      }else if(!jumpHeld){
+        obstacle.boosted=false;
+      }
+    }
+  }
+}
+
 if(obstacle.type==="mountainSlope"){
   const t=Math.max(0,Math.min(1,(px+ps/2-obstacle.x)/obstacle.w));
   const surface=obstacle.direction==="down"
@@ -1336,6 +1325,9 @@ if(obstacle.type==="mountainSlope"){
 if(obstacle.type==="slope"){
   /* Wave levels use these slopes as visual terrain so the Wave path stays fair. */
   if(waveActive&&obstacle.waveSafe)continue;
+  /* A yellow orb is a helper for crossing the next slope. While its short
+     assist window is active, the player can pass over the ramp safely. */
+  if(yellowSlopeAssist>0)continue;
   /* Slopes are jump-over hazards for the boss approach. */
   const slopeLeft=obstacle.x;
   const slopeRight=obstacle.x+obstacle.w;
@@ -1371,6 +1363,7 @@ function die(){
 if(dead||won)return;
 dead=true;
 running=false;
+currentLevelDeaths++;
 stopMusic();
 createDeathParticles();
 screenShake=14;
@@ -1401,13 +1394,35 @@ winCloseTimer=setTimeout(()=>{
   messageText.textContent="CELEBRATION COMPLETE • CLICK ✕ TO RETURN TO LEVELS";
 },4000);
 save.best[currentLevel]=100;
+const deathsThisRun=currentLevelDeaths;
+let earnedStars=1;
+if(deathsThisRun<=5)earnedStars=2;
+if(deathsThisRun===0)earnedStars=3;
+const previousStars=save.levelStars[currentLevel]||0;
+if(earnedStars>previousStars){
+  save.levelStars[currentLevel]=earnedStars;
+  save.stars+=earnedStars-previousStars;
+}
 if(currentLevel===save.level&&save.level<levelsData.length)save.level++;
-save.stars++;
 saveGame();
+if(earnedStars===3){
+  messageText.textContent="🏆 PERFECT RUN • 3 STARS • NEXT LEVEL UNLOCKED";
+}else if(earnedStars===2){
+  messageText.textContent="⭐ 2 STARS • MASTER THIS LEVEL FOR 3 STARS";
+}else{
+  messageText.textContent="⭐ LEVEL CLEARED • REPLAY WITH FEWER CRASHES TO UPGRADE";
+}
 }
 
 function addParticle(x,y,vx,vy,life,size,color){
 particles.push({x,y,vx,vy,life,maxLife:life,size,color});
+}
+
+function createBoostParticles(x,y){
+for(let i=0;i<32;i++){
+  addParticle(x,y,(Math.random()-.5)*11,-Math.random()*9-2,28+Math.random()*24,3+Math.random()*5,i%2?"#63f5ff":"#ffd52f");
+}
+screenShake=4;
 }
 
 function createJumpParticles(){
@@ -1649,6 +1664,19 @@ for(let gx=x+18;gx<x+obstacle.w-8;gx+=28){ctx.fillStyle="#ffffff22";ctx.fillRect
 ctx.restore();
 }
 
+if(obstacle.type==="pad"){
+ctx.save();
+const py2=obstacle.y, pulse=1+Math.sin(performance.now()*.012+obstacle.pulse)*.08;
+ctx.shadowColor="#ffd52f";ctx.shadowBlur=28;
+ctx.fillStyle="#ffd52f";
+ctx.beginPath();ctx.roundRect(x,py2,obstacle.w,obstacle.h,7);ctx.fill();
+ctx.shadowBlur=0;ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.stroke();
+ctx.fillStyle="#fff";ctx.globalAlpha=.9;
+ctx.beginPath();ctx.moveTo(x+obstacle.w*.32,py2+12);ctx.lineTo(x+obstacle.w*.5,py2+3);ctx.lineTo(x+obstacle.w*.68,py2+12);ctx.closePath();ctx.fill();
+ctx.globalAlpha=1;ctx.font="900 8px Arial";ctx.textAlign="center";ctx.fillText("JUMP",x+obstacle.w/2,py2-8);
+ctx.restore();
+}
+
 if(obstacle.type==="orb"){
 ctx.save();
 const cx=x+obstacle.w/2,cy=obstacle.y+obstacle.h/2;
@@ -1676,6 +1704,22 @@ if(obstacle.direction==="down"){ctx.moveTo(left,baseY);ctx.lineTo(right,topY);ct
 else{ctx.moveTo(left,topY);ctx.lineTo(right,baseY);ctx.lineTo(left,baseY);}
 ctx.closePath();ctx.fill();
 ctx.shadowBlur=0;ctx.strokeStyle="#ffffff99";ctx.lineWidth=2;ctx.stroke();
+ctx.restore();
+}
+
+if(obstacle.type==="boostSlope"){
+ctx.save();
+const baseY=obstacle.y+obstacle.h, topY=obstacle.y, left=x, right=x+obstacle.w;
+const pulse=1+Math.sin(performance.now()*.009+obstacle.pulse)*.06;
+ctx.shadowColor="#ffd52f";ctx.shadowBlur=28;
+const ramp=ctx.createLinearGradient(left,topY,right,baseY);
+ramp.addColorStop(0,"#fff");ramp.addColorStop(.2,"#ffd52f");ramp.addColorStop(.58,"#63f5ff");ramp.addColorStop(1,"#11152f");
+ctx.fillStyle=ramp;ctx.beginPath();
+if(obstacle.direction==="down"){ctx.moveTo(left,baseY);ctx.lineTo(right,topY);ctx.lineTo(right,baseY);}else{ctx.moveTo(left,topY);ctx.lineTo(right,baseY);ctx.lineTo(left,baseY);}
+ctx.closePath();ctx.fill();
+ctx.shadowBlur=0;ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.stroke();
+ctx.globalAlpha=.8;ctx.fillStyle="#ffd52f";ctx.font="900 10px Arial";ctx.textAlign="center";ctx.fillText("HOLD",left+obstacle.w*.55,topY-12);ctx.fillText("BOOST",left+obstacle.w*.55,topY-1);
+ctx.globalAlpha=1;
 ctx.restore();
 }
 
@@ -2234,12 +2278,13 @@ else if(!activateYellowOrb())requestJump();
 canvas.addEventListener("pointerup",()=>jumpHeld=false);
 canvas.addEventListener("pointercancel",()=>jumpHeld=false);
 
-restartButton.addEventListener("click",()=>startLevel(currentLevel));
+restartButton.addEventListener("click",()=>{retryingAfterDeath=false;startLevel(currentLevel);});
 quitButton.addEventListener("click",quitGame);
 
 gameMessage.addEventListener("pointerdown",event=>{
 if(event.target===winCloseButton)return;
 if(dead){
+retryingAfterDeath=true;
 startLevel(currentLevel);
 }
 });
