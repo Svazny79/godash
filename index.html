@@ -319,7 +319,11 @@ let boostTimer=0;
 let zoneSpeedFactor=1;
 let playerMode="cube";
 let waveActive=false;
+let gravityFlipped=false;
 let waveTimer=0;
+let tubeActive=false;
+let tubeDirection=1;
+let tubePulse=0;
 let particles=[];
 let obstacles=[];
 let playerTrail=[];
@@ -873,6 +877,47 @@ const patterns={
 ["speedZone",480,1000,1.5],["spike3",620],["boostSlope",920,"down"],["orb",1170],["speedZone",1390,900,1.55],["staircase",2440,7,"up"],["slowZone",3260,550,0.48],["spike3",3890],["boostSlope",4200,"down"],["speedZone",4480,1200,1.5],["glide",4860,470,115],["orb",5460],["slowZone",5900,700,0.5],["staircase",6800,8,"down"],["boostSlope",7700,"down"],["speedZone",7980,1250,1.55],["spike3",8200],["slope",8700,"up"],["orb",8970],["slowZone",9300,650,0.48],["glide",10100,500,130],["boostSlope",10800,"down"],["speedZone",11100,1300,1.6],["staircase",12450,8,"up"],["spike3",13300],["slowZone",13600,700,0.5],["boostSlope",14500,"down"],["speedZone",14800,1000,1.6],["spike3",15800],["exitPortal",16200]],
 };
 
+/* ============================================================
+   ADVANCED GD-STYLE MODE SECTIONS — Levels 10 through 23
+   Older level layouts remain intact. These mode sections are added
+   near the end of each level so the player gets cube -> gravity ->
+   wave -> cube gameplay without removing the original obstacles.
+============================================================ */
+for(let modeLevel=10;modeLevel<=23;modeLevel++){
+  if(patterns[modeLevel]){
+    const ld=levelsData.find(l=>l.id===modeLevel);
+    const oldLength=ld?.length||16000;
+    const modeStart=oldLength+70;
+    patterns[modeLevel].push(["gravityPortal",modeStart]);
+    patterns[modeLevel].push(["gravityCourse",modeStart+95,900]);
+    patterns[modeLevel].push(["gravityPortal",modeStart+1040]);
+    patterns[modeLevel].push(["wavePortal",modeStart+1160]);
+    patterns[modeLevel].push(["waveCourse",modeStart+1260,1250]);
+    patterns[modeLevel].push(["exitPortal",modeStart+2580]);
+    if(ld)ld.length=modeStart+2850;
+  }
+}
+
+/* ============================================================
+   TUBE RUN SECTIONS — Levels 10 through 23
+   Existing level layouts stay intact. A tube is appended after the
+   original finish portal so the older content is still played first.
+   In the tube, the first click sends the player UP, the next click
+   sends DOWN, then UP/DOWN repeatedly. Slanted tube walls create
+   the changing corridor.
+============================================================ */
+for(let tubeLevel=10;tubeLevel<=23;tubeLevel++){
+  if(patterns[tubeLevel]){
+    const oldLength=levelsData.find(l=>l.id===tubeLevel)?.length||16000;
+    const tubeStart=oldLength+180;
+    patterns[tubeLevel].push(["tubePortal",tubeStart]);
+    patterns[tubeLevel].push(["tubeCourse",tubeStart+100,1500]);
+    patterns[tubeLevel].push(["tubeExit",tubeStart+1600]);
+    const ld=levelsData.find(l=>l.id===tubeLevel);
+    if(ld)ld.length=tubeStart+1850;
+  }
+}
+
 const selected=patterns[level.id]||patterns[1];
 
 for(let itemIndex=0;itemIndex<selected.length;itemIndex++){
@@ -925,6 +970,25 @@ const by=groundY-bh;
 obstacles.push({type:"boostSlope",x:x,y:by,w:150,h:bh,direction:item[2]||"down",boosted:false,pulse:Math.random()*Math.PI*2});
 }else if(type==="slope"){
 obstacles.push({type:"slope",x:x,y:groundY-30,w:78,h:30,direction:item[2]||"up",waveSafe:currentLevel===13||currentLevel===14});
+}else if(type==="tubePortal"){
+  obstacles.push({type:"tubePortal",x:x,y:groundY-190,w:64,h:190,used:false});
+}else if(type==="tubeCourse"){
+  const tw=item[2]||1500;
+  const step=180;
+  const count=Math.ceil(tw/step);
+  for(let t=0;t<count;t++){
+    const sx=x+t*step;
+    const segW=Math.min(step+8,tw-t*step);
+    /* Alternating slanted walls. The corridor moves up/down so the
+       player must tap in rhythm instead of simply holding one direction. */
+    const centerA=groundY-185 + ((t%4===0)?35:(t%4===1)?-55:(t%4===2)?-20:55);
+    const centerB=groundY-185 + (((t+1)%4===0)?35:((t+1)%4===1)?-55:((t+1)%4===2)?-20:55);
+    const half=78;
+    const ta=centerA-half,tb=centerB-half,ba=centerA+half,bb=centerB+half;
+    obstacles.push({type:"tubeWall",x:sx,y:Math.min(ta,tb),w:segW,h:Math.max(ba,bb)-Math.min(ta,tb),topA:ta,topB:tb,bottomA:ba,bottomB:bb});
+  }
+}else if(type==="tubeExit"){
+  obstacles.push({type:"tubeExit",x:x,y:groundY-190,w:64,h:190,used:false});
 }else if(type==="portal"){
 obstacles.push({type:"portal",target:"spike",x:x,y:groundY-190,w:64,h:190,used:false});
 }else if(type==="wavePortal"){
@@ -952,6 +1016,18 @@ for(let z=0;z<count;z++){
     flip:topBlock
   });
 }
+}else if(type==="gravityPortal"){
+  obstacles.push({type:"gravityPortal",target:"toggle",x:x,y:groundY-210,w:64,h:210,used:false});
+}else if(type==="gravityCourse"){
+  const gw=item[2]||900;
+  const step=180;
+  const count=Math.floor(gw/step);
+  for(let g=0;g<count;g++){
+    const gx=x+g*step;
+    const ceiling=(g%2===0);
+    obstacles.push({type:"gravitySpike",x:gx,y:ceiling?78:groundY-34,w:38,h:38,flip:ceiling});
+    if(g%2===1) obstacles.push({type:"spike",x:gx+78,y:groundY-34,w:34,h:34});
+  }
 }else if(type==="slowZone"||type==="speedZone"){
   const zw=item[2]||700;
   const factor=item[3]||(type==="slowZone"?.55:1.4);
@@ -1030,7 +1106,11 @@ player.grounded=true;
 player.rotation=0;
 playerMode="cube";
 waveActive=false;
+gravityFlipped=false;
 waveTimer=0;
+tubeActive=false;
+tubeDirection=1;
+tubePulse=0;
 boostTimer=0;
 if(currentLevel===13||currentLevel===14){
   playerMode="spike";
@@ -1171,7 +1251,14 @@ if(currentLevel===12&&bossActive){
   player.x+=levelData.speed*zoneSpeedFactor+(boostTimer>0?2.8:0);
   if(boostTimer>0)boostTimer--;
 
-  if(waveActive){
+  if(tubeActive){
+    const tubeSpeed=7.2;
+    player.y += tubeDirection*tubeSpeed;
+    player.vy=tubeDirection*tubeSpeed;
+    player.grounded=false;
+    player.rotation += tubeDirection<0 ? -0.075 : 0.075;
+    tubePulse++;
+  }else if(waveActive){
     /* Zig-zag mode: holding jumps upward, releasing dives downward. */
     const waveSpeed=(currentLevel===13?5.9:7.2);
     player.y += jumpHeld ? -waveSpeed : waveSpeed;
@@ -1181,24 +1268,35 @@ if(currentLevel===12&&bossActive){
     player.rotation += jumpHeld ? -0.085 : 0.085;
   }else{
     if(jumpBuffer>0&&(player.grounded||coyoteTime>0)){
-player.vy=-15.5;
+player.vy=gravityFlipped?15.5:-15.5;
 player.grounded=false;
 jumpBuffer=0;
 coyoteTime=0;
 createJumpParticles();
 }
 
-player.vy+=.82;
+player.vy+=(gravityFlipped?-0.82:0.82);
 player.y+=player.vy;
 
-if(player.y+player.size>=groundY){
-player.y=groundY-player.size;
-player.vy=0;
-if(!player.grounded)createLandingParticles();
-player.grounded=true;
-coyoteTime=5;
+if(!gravityFlipped){
+  if(player.y+player.size>=groundY){
+    player.y=groundY-player.size;
+    player.vy=0;
+    if(!player.grounded)createLandingParticles();
+    player.grounded=true;
+    coyoteTime=5;
+  }else{
+    player.grounded=false;
+  }
 }else{
-player.grounded=false;
+  if(player.y<=78){
+    player.y=78;
+    player.vy=0;
+    player.grounded=true;
+    coyoteTime=5;
+  }else{
+    player.grounded=false;
+  }
 }
 
 /*
@@ -1231,7 +1329,7 @@ if(currentLevel===12&&!bossActive&&player.x>=bossStartX){
   createBossEntryParticles();
 }
 
-const targetCamera=player.x-canvas.width*.25;
+const targetCamera=player.x-canvas.width*.34;
 cameraX+=(targetCamera-cameraX)*.1;
 if(cameraX<0)cameraX=0;
 
@@ -1240,7 +1338,7 @@ checkCollisions();
 if(currentLevel!==12&&player.x>=levelData.length){
 completeLevel();
 }
-if(currentLevel===12&&bossDefeated){
+if(currentLevel===12&&bossDefeated&&player.x>=levelData.length){
 completeLevel();
 }
 
@@ -1296,6 +1394,59 @@ if(obstacle.type==="orb"){
   /* Orbs are triggered by the input handler, not by body collision. */
 }
 
+if(obstacle.type==="tubePortal"){
+  if(!obstacle.used){
+    obstacle.used=true;
+    tubeActive=true;
+    tubeDirection=1; /* first click changes this to UP */
+    player.y=groundY-185-player.size/2;
+    player.vy=0;
+    waveActive=false;
+    playerMode="cube";
+    for(let i=0;i<45;i++)addParticle(player.x+player.size/2,player.y+player.size/2,(Math.random()-.5)*10,(Math.random()-.5)*10,28+Math.random()*25,2+Math.random()*4,levelData.color);
+  }
+}
+
+if(obstacle.type==="tubeExit"){
+  if(!obstacle.used){
+    obstacle.used=true;
+    tubeActive=false;
+    tubeDirection=1;
+    player.y=groundY-player.size;
+    player.vy=0;
+    player.grounded=true;
+    playerMode="cube";
+    for(let i=0;i<38;i++)addParticle(player.x+player.size/2,player.y+player.size/2,(Math.random()-.5)*9,(Math.random()-.5)*9,25+Math.random()*20,2+Math.random()*4,"#ffffff");
+  }
+}
+
+if(obstacle.type==="tubeWall"){
+  const rel=Math.max(0,Math.min(1,(px+ps/2-obstacle.x)/obstacle.w));
+  const top=obstacle.topA+(obstacle.topB-obstacle.topA)*rel;
+  const bottom=obstacle.bottomA+(obstacle.bottomB-obstacle.bottomA)*rel;
+  if(py<top || py+ps>bottom){
+    die();
+    return;
+  }
+}
+
+if(obstacle.type==="gravityPortal"){
+  if(!obstacle.used){
+    obstacle.used=true;
+    gravityFlipped=!gravityFlipped;
+    waveActive=false;
+    player.grounded=false;
+    player.vy=gravityFlipped?2.5:-2.5;
+    player.y=gravityFlipped?Math.min(player.y,groundY-player.size-18):Math.max(82,player.y);
+    for(let i=0;i<34;i++)addParticle(player.x+player.size/2,player.y+player.size/2,(Math.random()-.5)*9,(Math.random()-.5)*9,22+Math.random()*18,2+Math.random()*4,gravityFlipped?"#8b5cff":levelData.color);
+  }
+}
+
+if(obstacle.type==="gravitySpike"){
+  die();
+  return;
+}
+
 if(obstacle.type==="portal"){
   if(obstacle.decorative)continue;
   if(!obstacle.used){
@@ -1325,6 +1476,7 @@ if(obstacle.type==="forwardPortal"){
     player.grounded=true;
     playerMode="cube";
     waveActive=false;
+    gravityFlipped=false;
     cameraX=Math.max(0,target-canvas.width*.25);
     for(let i=0;i<55;i++)addParticle(player.x+player.size/2,player.y+player.size/2,(Math.random()-.5)*12,(Math.random()-.5)*12,30+Math.random()*35,3+Math.random()*5,i%2?levelData.color:"#fff");
   }
@@ -1851,6 +2003,44 @@ ctx.fillText("MADNESS",cx,obstacle.y+obstacle.h+14);
 ctx.restore();
 }
 
+if(obstacle.type==="tubePortal" || obstacle.type==="tubeExit"){
+ctx.save();
+const cx=x+obstacle.w/2, cy=obstacle.y+obstacle.h/2;
+const col=obstacle.type==="tubePortal"?"#00eaff":"#ffd52f";
+ctx.shadowColor=col;ctx.shadowBlur=34;ctx.strokeStyle=col;ctx.lineWidth=9;
+ctx.beginPath();ctx.ellipse(cx,cy,27,82,0,0,Math.PI*2);ctx.stroke();
+ctx.strokeStyle="#ffffffbb";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(cx,cy,19,70,0,0,Math.PI*2);ctx.stroke();
+ctx.fillStyle="#fff";ctx.font="900 11px Arial";ctx.textAlign="center";ctx.shadowColor="#fff";ctx.shadowBlur=12;
+ctx.fillText(obstacle.type==="tubePortal"?"TUBE MODE":"TUBE EXIT",cx,obstacle.y-14);
+ctx.font="700 8px Arial";ctx.fillText(obstacle.type==="tubePortal"?"CLICK UP / DOWN":"BACK TO CUBE",cx,obstacle.y+obstacle.h+15);
+ctx.restore();
+}
+
+if(obstacle.type==="tubeWall"){
+ctx.save();
+const relY=groundY;
+const top1=obstacle.topA,top2=obstacle.topB,bottom1=obstacle.bottomA,bottom2=obstacle.bottomB;
+const grad=ctx.createLinearGradient(x,top1,x+obstacle.w,bottom2);
+grad.addColorStop(0,"#ffffff");grad.addColorStop(.12,levelData.color);grad.addColorStop(.5,"#171b46");grad.addColorStop(1,"#060816");
+ctx.fillStyle=grad;ctx.shadowColor=levelData.color;ctx.shadowBlur=18;
+/* Draw the ceiling and floor walls, leaving the middle as a clear tube. */
+ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,top1);ctx.lineTo(x+obstacle.w,top2);ctx.lineTo(x+obstacle.w,0);ctx.closePath();ctx.fill();
+ctx.beginPath();ctx.moveTo(x,bottom1);ctx.lineTo(x+obstacle.w,bottom2);ctx.lineTo(x+obstacle.w,canvas.height);ctx.lineTo(x,canvas.height);ctx.closePath();ctx.fill();
+ctx.shadowBlur=0;ctx.strokeStyle="#ffffff88";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,top1);ctx.lineTo(x+obstacle.w,top2);ctx.moveTo(x,bottom1);ctx.lineTo(x+obstacle.w,bottom2);ctx.stroke();
+ctx.strokeStyle="#ffffff55";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+20,top1+8);ctx.lineTo(x+obstacle.w-20,top2+8);ctx.moveTo(x+20,bottom1-8);ctx.lineTo(x+obstacle.w-20,bottom2-8);ctx.stroke();
+ctx.restore();
+}
+
+if(obstacle.type==="gravityPortal"){
+ctx.save();
+const pulse=1+Math.sin(performance.now()*.008+obstacle.x)*.08;
+ctx.translate(x+obstacle.w/2,groundY-105);ctx.scale(pulse,pulse);
+ctx.strokeStyle="#8b5cff";ctx.shadowColor="#8b5cff";ctx.shadowBlur=28;ctx.lineWidth=7;
+ctx.beginPath();ctx.ellipse(0,0,25,88,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;
+ctx.fillStyle="#fff";ctx.font="900 12px Arial";ctx.textAlign="center";ctx.fillText("GRAVITY",0,-8);ctx.fillText("↕",0,20);
+ctx.restore();
+}
+
 if(obstacle.type==="portal"){
 ctx.save();
 const px=x+obstacle.w/2, py=obstacle.y+obstacle.h/2;
@@ -2271,6 +2461,12 @@ updateEmojiVictoryRain();
 
 ctx.save();
 
+/* Slightly closer camera: the player and upcoming obstacles are easier to see. */
+const zoom=1.12;
+ctx.translate(canvas.width/2,canvas.height/2);
+ctx.scale(zoom,zoom);
+ctx.translate(-canvas.width/2,-canvas.height/2);
+
 if(screenShake>0){
 ctx.translate((Math.random()-.5)*screenShake,(Math.random()-.5)*screenShake);
 screenShake*=.88;
@@ -2309,7 +2505,12 @@ if(event.code==="Space"||event.code==="ArrowUp"||event.code==="KeyW"){
 event.preventDefault();
 if(!jumpHeld){
 jumpHeld=true;
-if(currentLevel===12&&bossActive)fireBossLaser();
+if(tubeActive){
+  /* Tube controls: first click = UP, next = DOWN, then alternate. */
+  tubeDirection = tubeDirection===1 ? -1 : 1;
+  tubePulse=0;
+  for(let i=0;i<12;i++)addParticle(player.x+player.size/2,player.y+player.size/2,(Math.random()-.5)*6,tubeDirection*-(Math.random()*4+1),18+Math.random()*12,2+Math.random()*3,levelData.color);
+}else if(currentLevel===12&&bossActive)fireBossLaser();
 else if(waveActive){ jumpBuffer=0; }
 else if(!activateYellowOrb())requestJump();
 }
@@ -2332,7 +2533,12 @@ canvas.addEventListener("pointerdown",event=>{
 if(!gameScreen.classList.contains("active"))return;
 if(!jumpHeld){
 jumpHeld=true;
-if(currentLevel===12&&bossActive)fireBossLaser();
+if(tubeActive){
+  /* Tube controls: first click = UP, next = DOWN, then alternate. */
+  tubeDirection = tubeDirection===1 ? -1 : 1;
+  tubePulse=0;
+  for(let i=0;i<12;i++)addParticle(player.x+player.size/2,player.y+player.size/2,(Math.random()-.5)*6,tubeDirection*-(Math.random()*4+1),18+Math.random()*12,2+Math.random()*3,levelData.color);
+}else if(currentLevel===12&&bossActive)fireBossLaser();
 else if(waveActive){ jumpBuffer=0; }
 else if(!activateYellowOrb())requestJump();
 }
